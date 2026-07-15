@@ -1,0 +1,150 @@
+/* Retro Wave Theme */
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Exo+2:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --bg-primary: #1a0a2e;
+    --bg-secondary: #2d1b4e;
+    --text-primary: #ffffff;
+    --text-secondary: #b8b8d0;
+    --accent: #ff6b6b;
+    --accent-hover: #feca57;
+    --card-bg: rgba(45, 27, 78, 0.8);
+    --card-border: #ff6b6b;
+    --transition-speed: 0.3s;
+}
+
+body {
+    font-family: 'Exo 2', sans-serif;
+    background: linear-gradient(180deg, #1a0a2e 0%, #0d0221 100%);
+    background-image:
+        linear-gradient(rgba(255, 107, 107, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 107, 107, 0.03) 1px, transparent 1px),
+        linear-gradient(180deg, #1a0a2e 0%, #0d0221 100%);
+    background-size: 100px 100px, 100px 100px, 100% 100%;
+    position: relative;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(180deg, transparent 0%, rgba(255, 107, 107, 0.1) 100%);
+    pointer-events: none;
+}
+
+.site-title {
+    font-family: 'Audiowide', cursive;
+    font-size: clamp(2rem, 5vw, 4rem);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    background: linear-gradient(180deg, #ff6b6b 0%, #feca57 50%, #ff6b6b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    filter: drop-shadow(0 0 20px rgba(255, 107, 107, 0.5));
+}
+
+.filter-btn {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border: 2px solid #ff6b6b;
+    background: transparent;
+    color: #ff6b6b;
+    border-radius: 4px;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+    background: linear-gradient(180deg, #ff6b6b 0%, #feca57 100%);
+    color: #1a0a2e;
+    box-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+}
+
+.project-card {
+    border: 2px solid #ff6b6b;
+    background: rgba(45, 27, 78, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.project-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ff6b6b, #feca57, #ff6b6b);
+}
+
+.project-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: linear-gradient(180deg, transparent 0%, rgba(255, 107, 107, 0.1) 100%);
+    pointer-events: none;
+}
+
+.project-card:hover {
+    transform: translateY(-12px);
+    box-shadow:
+        0 20px 40px rgba(255, 107, 107, 0.3),
+        0 0 80px rgba(254, 202, 87, 0.2);
+    border-color: #feca57;
+}
+
+.project-card-placeholder {
+    background: linear-gradient(180deg, #ff6b6b 0%, #feca57 100%);
+    font-family: 'Audiowide', cursive;
+    font-size: 2.5rem;
+    color: #1a0a2e;
+}
+
+.project-card-title {
+    font-family: 'Audiowide', cursive;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #ffffff;
+}
+
+.project-card-description {
+    color: #b8b8d0;
+    line-height: 1.7;
+}
+
+.project-tag {
+    background: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+    border: 1px solid rgba(255, 107, 107, 0.4);
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.project-card-date {
+    color: #feca57;
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 600;
+}
+
+.site-footer {
+    border-top: 2px solid #ff6b6b;
+    color: #b8b8d0;
+    font-family: 'Exo 2', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}

@@ -1,0 +1,103 @@
+/* Watercolor Theme */
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Quicksand:wght@300;400;500;600&display=swap');
+
+:root {
+    --bg-primary: #faf8f5;
+    --bg-secondary: #f5f0eb;
+    --text-primary: #4a4a4a;
+    --text-secondary: #7a7a7a;
+    --accent: #e07a5f;
+    --accent-hover: #f2cc8f;
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --card-border: #e8e0d5;
+    --transition-speed: 0.5s;
+}
+
+body {
+    font-family: 'Quicksand', sans-serif;
+    background-color: var(--bg-primary);
+    background-image:
+        radial-gradient(ellipse at 15% 25%, rgba(224, 122, 95, 0.15) 0%, transparent 40%),
+        radial-gradient(ellipse at 85% 75%, rgba(242, 204, 143, 0.15) 0%, transparent 40%),
+        radial-gradient(ellipse at 50% 50%, rgba(129, 178, 154, 0.1) 0%, transparent 50%);
+}
+
+.site-title {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    color: #e07a5f;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filter-btn {
+    font-family: 'Caveat', cursive;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: 2px solid #e8e0d5;
+    background: rgba(255, 255, 255, 0.6);
+    color: #7a7a7a;
+    border-radius: 20px;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+    background: #e07a5f;
+    border-color: #e07a5f;
+    color: #ffffff;
+    transform: scale(1.05);
+}
+
+.project-card {
+    border: 1px solid #e8e0d5;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.project-card:hover {
+    transform: translateY(-12px) rotate(-1deg);
+    box-shadow: 0 20px 60px rgba(224, 122, 95, 0.2);
+}
+
+.project-card-placeholder {
+    background: linear-gradient(135deg, #e07a5f 0%, #f2cc8f 50%, #81b29a 100%);
+    font-family: 'Caveat', cursive;
+    font-size: 3rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.project-card-title {
+    font-family: 'Caveat', cursive;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #4a4a4a;
+}
+
+.project-card-description {
+    color: #7a7a7a;
+    line-height: 1.8;
+    font-weight: 300;
+}
+
+.project-tag {
+    background: rgba(224, 122, 95, 0.15);
+    color: #e07a5f;
+    border: 1px solid rgba(224, 122, 95, 0.3);
+    border-radius: 16px;
+}
+
+.project-card-date {
+    color: #81b29a;
+    font-style: italic;
+}
+
+.site-footer {
+    border-top: 1px solid #e8e0d5;
+    color: #7a7a7a;
+    font-family: 'Caveat', cursive;
+    font-size: 1.2rem;
+}

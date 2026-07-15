@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Experiments</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css">
+    <link id="theme-css" rel="stylesheet" href="">
+</head>
+<body>
+    <header class="site-header">
+        <h1 class="site-title">Web Experiments</h1>
+    </header>
+
+    <main class="site-main">
+        <div class="filters" id="filters">
+            <button class="filter-btn active" data-tag="all">All</button>
+        </div>
+
+        <div class="projects-grid" id="projects-grid">
+            <!-- Projects will be loaded dynamically -->
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>Made by <strong>Peu Borges</strong></p>
+    </footer>
+
+    <script type="module" src="scripts/themes.js"></script>
+    <script type="module" src="scripts/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+/* Retro Pixel Theme */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #1a1a2e;
+    --text-primary: #00ff41;
+    --text-secondary: #00cc33;
+    --accent: #ff00ff;
+    --accent-hover: #ff66ff;
+    --card-bg: #0d0d0d;
+    --card-border: #00ff41;
+    --transition-speed: 0.1s;
+}
+
+body {
+    font-family: 'Press Start 2P', monospace;
+    background-color: var(--bg-primary);
+    background-image:
+        linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+    image-rendering: pixelated;
+}
+
+.site-title {
+    text-shadow: 3px 3px #ff00ff, -1px -1px #00ffff;
+    animation: glitch 2s infinite;
+}
+
+@keyframes glitch {
+    0%, 100% { text-shadow: 3px 3px #ff00ff, -1px -1px #00ffff; }
+    25% { text-shadow: -3px 3px #00ffff, 3px -3px #ff00ff; }
+    50% { text-shadow: 3px -3px #ff00ff, -3px 3px #00ffff; }
+    75% { text-shadow: -3px -3px #00ffff, 3px 3px #ff00ff; }
+}
+
+.filter-btn {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.7rem;
+    border: 2px solid #00ff41;
+    background: transparent;
+    color: #00ff41;
+    text-transform: uppercase;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+    background: #00ff41;
+    color: #0a0a0a;
+    box-shadow: 0 0 20px #00ff41;
+}
+
+.project-card {
+    border: 3px solid #00ff41;
+    border-radius: 0;
+    background: #0d0d0d;
+    transition: all 0.1s;
+}
+
+.project-card:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 4px 4px #ff00ff, 8px 8px #00ffff;
+}
+
+.project-card-placeholder {
+    background: linear-gradient(135deg, #ff00ff 0%, #00ffff 100%);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 2rem;
+    color: #0a0a0a;
+}
+
+.project-card-title {
+    color: #00ff41;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.project-card-description {
+    color: #00cc33;
+    font-size: 0.7rem;
+    line-height: 1.8;
+}
+
+.project-tag {
+    background: #ff00ff;
+    color: #0a0a0a;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.5rem;
+    padding: 0.3rem 0.5rem;
+}
+
+.project-card-date {
+    color: #00ffff;
+    font-size: 0.6rem;
+}
+
+.site-footer {
+    border-top: 3px solid #00ff41;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.7rem;
+    color: #00ff41;
+}
+
+.no-projects {
+    color: #00ff41;
+}

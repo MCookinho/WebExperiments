@@ -1,0 +1,102 @@
+/* Memphis Theme */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+
+:root {
+    --bg-primary: #ffeaa7;
+    --bg-secondary: #fdcb6e;
+    --text-primary: #2d3436;
+    --text-secondary: #636e72;
+    --accent: #e17055;
+    --accent-hover: #d63031;
+    --card-bg: #ffffff;
+    --card-border: #2d3436;
+    --transition-speed: 0.3s;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    background-color: #ffeaa7;
+    background-image:
+        radial-gradient(circle at 10% 20%, #e17055 2px, transparent 2px),
+        radial-gradient(circle at 90% 80%, #0984e3 2px, transparent 2px),
+        radial-gradient(circle at 50% 50%, #6c5ce7 2px, transparent 2px),
+        radial-gradient(circle at 20% 80%, #00b894 2px, transparent 2px),
+        radial-gradient(circle at 80% 20%, #fd79a8 2px, transparent 2px);
+    background-size: 100px 100px;
+}
+
+.site-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    color: #e17055;
+    text-shadow: 4px 4px 0 #2d3436;
+}
+
+.filter-btn {
+    font-family: 'Fredoka One', cursive;
+    font-size: 0.9rem;
+    border: 3px solid #2d3436;
+    background: #ffffff;
+    color: #2d3436;
+    border-radius: 20px;
+    box-shadow: 4px 4px 0 #2d3436;
+    transition: all 0.2s;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+    background: #e17055;
+    color: #ffffff;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 #2d3436;
+}
+
+.project-card {
+    border: 3px solid #2d3436;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 6px 6px 0 #2d3436;
+    transition: all 0.2s;
+}
+
+.project-card:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 10px 10px 0 #e17055;
+}
+
+.project-card-placeholder {
+    background: linear-gradient(135deg, #e17055 0%, #fdcb6e 50%, #0984e3 100%);
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.5rem;
+    color: #ffffff;
+}
+
+.project-card-title {
+    font-family: 'Fredoka One', cursive;
+    color: #2d3436;
+}
+
+.project-card-description {
+    color: #636e72;
+    line-height: 1.7;
+    font-weight: 600;
+}
+
+.project-tag {
+    background: #fdcb6e;
+    color: #2d3436;
+    border: 2px solid #2d3436;
+    font-family: 'Fredoka One', cursive;
+    font-size: 0.7rem;
+}
+
+.project-card-date {
+    color: #e17055;
+    font-weight: 700;
+}
+
+.site-footer {
+    border-top: 3px solid #2d3436;
+    font-family: 'Fredoka One', cursive;
+    color: #2d3436;
+}

@@ -1,0 +1,119 @@
+/* Steampunk Theme */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Text:wght@400;600;700&display=swap');
+
+:root {
+    --bg-primary: #2c1810;
+    --bg-secondary: #3d2317;
+    --text-primary: #d4af37;
+    --text-secondary: #b8860b;
+    --accent: #cd7f32;
+    --accent-hover: #daa520;
+    --card-bg: rgba(61, 35, 23, 0.9);
+    --card-border: #cd7f32;
+    --transition-speed: 0.4s;
+}
+
+body {
+    font-family: 'Crimson Text', Georgia, serif;
+    background-color: #2c1810;
+    background-image:
+        radial-gradient(circle at 10% 20%, rgba(205, 127, 50, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(212, 175, 55, 0.1) 0%, transparent 40%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23cd7f32' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.site-title {
+    font-family: 'Cinzel Decorative', cursive;
+    font-weight: 900;
+    color: #d4af37;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: 0.1em;
+}
+
+.filter-btn {
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: 0.8rem;
+    border: 2px solid #cd7f32;
+    background: transparent;
+    color: #d4af37;
+    border-radius: 4px;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+    background: #cd7f32;
+    color: #2c1810;
+    box-shadow: 0 0 20px rgba(205, 127, 50, 0.5);
+}
+
+.project-card {
+    border: 2px solid #cd7f32;
+    background: rgba(61, 35, 23, 0.9);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.project-card::before {
+    content: '⚙';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    opacity: 0.3;
+    animation: gearSpin 10s linear infinite;
+}
+
+@keyframes gearSpin {
+    100% { transform: rotate(360deg); }
+}
+
+.project-card:hover {
+    transform: translateY(-8px);
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.4),
+        0 0 40px rgba(205, 127, 50, 0.3);
+    border-color: #d4af37;
+}
+
+.project-card-placeholder {
+    background: linear-gradient(135deg, #cd7f32 0%, #8b4513 100%);
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: 2rem;
+    color: #2c1810;
+}
+
+.project-card-title {
+    font-family: 'Cinzel Decorative', cursive;
+    font-weight: 700;
+    color: #d4af37;
+}
+
+.project-card-description {
+    color: #b8860b;
+    line-height: 1.8;
+    font-style: italic;
+}
+
+.project-tag {
+    background: rgba(205, 127, 50, 0.2);
+    color: #d4af37;
+    border: 1px solid #cd7f32;
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.project-card-date {
+    color: #cd7f32;
+    font-style: italic;
+}
+
+.site-footer {
+    border-top: 2px solid #cd7f32;
+    color: #d4af37;
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+}

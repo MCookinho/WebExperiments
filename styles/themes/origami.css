@@ -1,0 +1,122 @@
+/* Origami Theme */
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&family=Arvo:wght@400;700&display=swap');
+
+:root {
+    --bg-primary: #f5f5f0;
+    --bg-secondary: #ebe8e0;
+    --text-primary: #4a4a4a;
+    --text-secondary: #7a7a7a;
+    --accent: #e74c3c;
+    --accent-hover: #c0392b;
+    --card-bg: #ffffff;
+    --card-border: #dcd8d0;
+    --transition-speed: 0.4s;
+}
+
+body {
+    font-family: 'Josefin Sans', sans-serif;
+    background-color: #f5f5f0;
+    background-image:
+        linear-gradient(45deg, #ebe8e0 25%, transparent 25%),
+        linear-gradient(-45deg, #ebe8e0 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #ebe8e0 75%),
+        linear-gradient(-45deg, transparent 75%, #ebe8e0 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+.site-title {
+    font-family: 'Arvo', serif;
+    font-weight: 700;
+    color: #4a4a4a;
+    letter-spacing: 0.05em;
+}
+
+.filter-btn {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 500;
+    border: 1px solid #dcd8d0;
+    background: #ffffff;
+    color: #7a7a7a;
+    border-radius: 4px;
+    box-shadow: 2px 2px 0 #dcd8d0;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+    background: #e74c3c;
+    border-color: #e74c3c;
+    color: #ffffff;
+    box-shadow: 4px 4px 0 #c0392b;
+    transform: translate(-2px, -2px);
+}
+
+.project-card {
+    border: 1px solid #dcd8d0;
+    background: #ffffff;
+    border-radius: 4px;
+    box-shadow: 4px 4px 0 #dcd8d0;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.project-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 40px 40px 0 0;
+    border-color: #e74c3c transparent transparent transparent;
+    transition: all 0.3s;
+}
+
+.project-card:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 8px 8px 0 #e74c3c;
+}
+
+.project-card:hover::before {
+    border-width: 50px 50px 0 0;
+}
+
+.project-card-placeholder {
+    background: linear-gradient(135deg, #e74c3c 0%, #f39c12 100%);
+    font-family: 'Arvo', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.project-card-title {
+    font-family: 'Arvo', serif;
+    font-weight: 700;
+    color: #4a4a4a;
+}
+
+.project-card-description {
+    color: #7a7a7a;
+    line-height: 1.8;
+}
+
+.project-tag {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+    font-weight: 500;
+}
+
+.project-card-date {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+.site-footer {
+    border-top: 1px solid #dcd8d0;
+    color: #7a7a7a;
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 300;
+}

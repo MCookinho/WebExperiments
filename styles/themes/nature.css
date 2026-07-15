@@ -1,0 +1,92 @@
+/* Nature Theme */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Lora:wght@400;500;600&display=swap');
+
+:root {
+    --bg-primary: #f5f0e8;
+    --bg-secondary: #ebe5d9;
+    --text-primary: #2d3436;
+    --text-secondary: #636e72;
+    --accent: #4a7c59;
+    --accent-hover: #6b9b7a;
+    --card-bg: #ffffff;
+    --card-border: #d4c9b8;
+    --transition-speed: 0.4s;
+}
+
+body {
+    font-family: 'Lora', Georgia, serif;
+    background-color: var(--bg-primary);
+    background-image:
+        radial-gradient(ellipse at 20% 50%, rgba(74, 124, 89, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 50%, rgba(139, 115, 85, 0.1) 0%, transparent 50%);
+}
+
+.site-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: #2d3436;
+    letter-spacing: -0.02em;
+}
+
+.filter-btn {
+    font-family: 'Lora', serif;
+    border: 1px solid #d4c9b8;
+    background: transparent;
+    color: #636e72;
+    border-radius: 4px;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+    background: #4a7c59;
+    border-color: #4a7c59;
+    color: #ffffff;
+}
+
+.project-card {
+    border: 1px solid #d4c9b8;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.project-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(74, 124, 89, 0.15);
+}
+
+.project-card-placeholder {
+    background: linear-gradient(135deg, #4a7c59 0%, #8b7355 100%);
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.project-card-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    color: #2d3436;
+}
+
+.project-card-description {
+    color: #636e72;
+    line-height: 1.8;
+}
+
+.project-tag {
+    background: rgba(74, 124, 89, 0.1);
+    color: #4a7c59;
+    border: 1px solid rgba(74, 124, 89, 0.2);
+}
+
+.project-card-date {
+    color: #8b7355;
+    font-style: italic;
+}
+
+.site-footer {
+    border-top: 1px solid #d4c9b8;
+    color: #636e72;
+    font-style: italic;
+}

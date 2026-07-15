@@ -1,0 +1,101 @@
+/* Brutalism Theme */
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;700;900&display=swap');
+
+:root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f0f0f0;
+    --text-primary: #000000;
+    --text-secondary: #333333;
+    --accent: #ff0000;
+    --accent-hover: #cc0000;
+    --card-bg: #ffffff;
+    --card-border: #000000;
+    --transition-speed: 0.1s;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.site-title {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: 4px solid #000000;
+    padding-bottom: 1rem;
+}
+
+.filter-btn {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    border: 3px solid #000000;
+    background: transparent;
+    color: #000000;
+    border-radius: 0;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+    background: #000000;
+    color: #ffffff;
+}
+
+.project-card {
+    border: 4px solid #000000;
+    background: #ffffff;
+    border-radius: 0;
+    box-shadow: 8px 8px 0 #000000;
+}
+
+.project-card:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 12px 12px 0 #ff0000;
+}
+
+.project-card-placeholder {
+    background: #ff0000;
+    font-family: 'Space Mono', monospace;
+    font-size: 3rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.project-card-title {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.project-card-description {
+    font-weight: 700;
+    line-height: 1.6;
+}
+
+.project-tag {
+    background: #000000;
+    color: #ffffff;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-radius: 0;
+}
+
+.project-card-date {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    color: #ff0000;
+}
+
+.site-footer {
+    border-top: 4px solid #000000;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    text-transform: uppercase;
+}
