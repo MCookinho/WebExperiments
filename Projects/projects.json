@@ -1,13 +1,184 @@
 {
     "projects": [
         {
-            "name": "Projeto Exemplo",
-            "description": "Este é um projeto de exemplo para demonstrar como os cards aparecem no site. Edite o arquivo projects.json para adicionar seus próprios projetos.",
-            "tags": ["exemplo", "demo", "template"],
+            "name": "Pixel Art Generator",
+            "description": "Gerador de pixel art com paletas personalizadas e exportação em PNG.",
+            "tags": ["arte", "canvas", "javascript"],
             "image": "",
-            "url": "Projects/exemplo/",
-            "color": "#6366f1",
+            "url": "Projects/projeto-01/",
+            "color": "#e74c3c",
+            "date": "2024-01-10"
+        },
+        {
+            "name": "Weather Dashboard",
+            "description": "Dashboard de clima com previsão de 7 dias e gráficos interativos.",
+            "tags": ["api", "dashboard", "css"],
+            "image": "",
+            "url": "Projects/projeto-02/",
+            "color": "#3498db",
             "date": "2024-01-15"
+        },
+        {
+            "name": "Todo List App",
+            "description": "Aplicativo de lista de tarefas com drag and drop e persistência local.",
+            "tags": ["produtividade", "localStorage", "javascript"],
+            "image": "",
+            "url": "Projects/projeto-03/",
+            "color": "#2ecc71",
+            "date": "2024-02-01"
+        },
+        {
+            "name": "Music Player",
+            "description": "Player de música com visualizador de áudio e playlist.",
+            "tags": ["audio", "web audio api", "javascript"],
+            "image": "",
+            "url": "Projects/projeto-04/",
+            "color": "#9b59b6",
+            "date": "2024-02-10"
+        },
+        {
+            "name": "Markdown Editor",
+            "description": "Editor de markdown em tempo real com preview lado a lado.",
+            "tags": ["editor", "markdown", "javascript"],
+            "image": "",
+            "url": "Projects/projeto-05/",
+            "color": "#1abc9c",
+            "date": "2024-02-15"
+        },
+        {
+            "name": "Snake Game",
+            "description": "Jogo da cobrinha clássico com pontuação e níveis de dificuldade.",
+            "tags": ["jogo", "canvas", "javascript"],
+            "image": "",
+            "url": "Projects/projeto-06/",
+            "color": "#f39c12",
+            "date": "2024-03-01"
+        },
+        {
+            "name": "Password Generator",
+            "description": "Gerador de senhas seguras com opções de complexidade.",
+            "tags": ["segurança", "utilidade", "javascript"],
+            "image": "",
+            "url": "Projects/projeto-07/",
+            "color": "#e67e22",
+            "date": "2024-03-10"
+        },
+        {
+            "name": "Portfolio Template",
+            "description": "Template de portfólio pessoal responsivo e minimalista.",
+            "tags": ["template", "css", "responsivo"],
+            "image": "",
+            "url": "Projects/projeto-08/",
+            "color": "#34495e",
+            "date": "2024-03-15"
+        },
+        {
+            "name": "Quiz App",
+            "description": "Aplicativo de quiz com múltiplas categorias e placar.",
+            "tags": ["jogo", "quiz", "javascript"],
+            "image": "",
+            "url": "Projects/projeto-09/",
+            "color": "#16a085",
+            "date": "2024-04-01"
+        },
+        {
+            "name": "Expense Tracker",
+            "description": "Rastreador de despesas com gráficos e categorias.",
+            "tags": ["finanças", "dashboard", "javascript"],
+            "image": "",
+            "url": "Projects/projeto-10/",
+            "color": "#27ae60",
+            "date": "2024-04-10"
+        },
+        {
+            "name": "Color Palette",
+            "description": "Gerador de paletas de cores com harmonia e exportação.",
+            "tags": ["design", "cores", "css"],
+            "image": "",
+            "url": "Projects/projeto-11/",
+            "color": "#8e44ad",
+            "date": "2024-04-15"
+        },
+        {
+            "name": "Clock App",
+            "description": "Relógio digital com cronômetro, timer e alarmes.",
+            "tags": ["utilidade", "tempo", "javascript"],
+            "image": "",
+            "url": "Projects/projeto-12/",
+            "color": "#2c3e50",
+            "date": "2024-05-01"
+        },
+        {
+            "name": "Calculator",
+            "description": "Calculadora científica com histórico e temas personalizáveis.",
+            "tags": ["utilidade", "matemática", "javascript"],
+            "image": "",
+            "url": "Projects/projeto-13/",
+            "color": "#d35400",
+            "date": "2024-05-10"
+        },
+        {
+            "name": "Blog Layout",
+            "description": "Layout de blog com sistema de comentários e categorias.",
+            "tags": ["blog", "layout", "css"],
+            "image": "",
+            "url": "Projects/projeto-14/",
+            "color": "#c0392b",
+            "date": "2024-05-15"
+        },
+        {
+            "name": "Chat Interface",
+            "description": "Interface de chat com bolhas de mensagem e status online.",
+            "tags": ["chat", "ui", "javascript"],
+            "image": "",
+            "url": "Projects/projeto-15/",
+            "color": "#7f8c8d",
+            "date": "2024-06-01"
+        },
+        {
+            "name": "Image Gallery",
+            "description": "Galeria de imagens com lightbox e filtros de efeitos.",
+            "tags": ["galeria", "css", "javascript"],
+            "image": "",
+            "url": "Projects/projeto-16/",
+            "color": "#2980b9",
+            "date": "2024-06-10"
+        },
+        {
+            "name": "Landing Page",
+            "description": "Landing page moderna com animações de scroll e CTA.",
+            "tags": ["landing", "marketing", "css"],
+            "image": "",
+            "url": "Projects/projeto-17/",
+            "color": "#1abc9c",
+            "date": "2024-06-15"
+        },
+        {
+            "name": "Form Builder",
+            "description": "Construtor de formulários arrastando e soltando campos.",
+            "tags": ["formulário", "drag drop", "javascript"],
+            "image": "",
+            "url": "Projects/projeto-18/",
+            "color": "#f1c40f",
+            "date": "2024-07-01"
+        },
+        {
+            "name": "API Tester",
+            "description": "Testador de APIs REST com histórico de requisições.",
+            "tags": ["api", "ferramenta", "javascript"],
+            "image": "",
+            "url": "Projects/projeto-19/",
+            "color": "#e74c3c",
+            "date": "2024-07-10"
+        },
+        {
+            "name": "Carbon Calculator",
+            "description": "Calculadora de pegada de carbono com dicas sustentáveis.",
+            "tags": ["sustentabilidade", "utilidade", "javascript"],
+            "image": "",
+            "url": "Projects/projeto-20/",
+            "color": "#27ae60",
+            "date": "2024-07-15"
         }
     ]
 }

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Palette - Web Experiments</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #8e44ad22 0%, #8e44ad11 100%);
+            color: #fff;
+            padding: 2rem;
+            text-align: center;
+        }
+        .container { max-width: 600px; }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #8e44ad;
+        }
+        p {
+            font-size: 1.1rem;
+            color: #a0a0a0;
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: #8e44ad;
+            color: #fff;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+        .back-link {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: #8e44ad;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px #8e44ad66;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="badge">Projeto #11</div>
+        <h1>Color Palette</h1>
+        <p>Gerador de paletas de cores</p>
+        <a href="../../index.html" class="back-link">← Voltar ao WebExperiments</a>
+    </div>
+</body>
+</html>
