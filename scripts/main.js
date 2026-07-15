@@ -5,7 +5,7 @@ let currentFilter = 'all';
 
 async function loadProjects() {
     try {
-        const response = await fetch('Projects/projects.json');
+        const response = await fetch('Projects/projects.json?' + Date.now());
         if (!response.ok) throw new Error('Failed to load projects');
         const data = await response.json();
         allProjects = data.projects || [];
