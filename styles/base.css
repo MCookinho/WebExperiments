@@ -42,6 +42,17 @@ body {
     letter-spacing: -0.02em;
 }
 
+.site-subtitle {
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    color: var(--text-secondary);
+    margin-top: 1rem;
+    font-style: italic;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+}
+
 .site-main {
     flex: 1;
     padding: 2rem;

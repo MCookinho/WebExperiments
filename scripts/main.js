@@ -1,7 +1,48 @@
 import { getRandomTheme, getAllTags } from './themes.js';
 
+const randomPhrases = [
+    "The only way to do great work is to love what you do. — Steve Jobs",
+    "Stay hungry, stay foolish. — Steve Jobs",
+    "In the middle of difficulty lies opportunity. — Albert Einstein",
+    "Life is what happens when you're busy making other plans. — John Lennon",
+    "The future belongs to those who believe in the beauty of their dreams. — Eleanor Roosevelt",
+    "It does not matter how slowly you go as long as you do not stop. — Confucius",
+    "Every moment is a fresh beginning. — T.S. Eliot",
+    "Not all those who wander are lost. — J.R.R. Tolkien",
+    "All that is gold does not glitter. — J.R.R. Tolkien",
+    "To live is the rarest thing in the world. Most people just exist. — Oscar Wilde",
+    "Be yourself; everyone else is already taken. — Oscar Wilde",
+    "So we beat on, boats against the current, borne back ceaselessly into the past. — F. Scott Fitzgerald",
+    "I think, therefore I am. — René Descartes",
+    "The only limit is your imagination.",
+    "Code is poetry. — WordPress",
+    "First, solve the problem. Then, write the code. — John Johnson",
+    "Talk is cheap. Show me the code. — Linus Torvalds",
+    "Any fool can write code that a computer can understand. Good programmers write code that humans can understand. — Martin Fowler",
+    "Programs must be written for people to read, and only incidentally for machines to execute. — Abelson & Sussman",
+    "Simplicity is the soul of efficiency. — Austin Freeman",
+    "Make it work, make it right, make it fast. — Kent Beck",
+    "The best error message is the one that never shows up. — Thomas Fuchs",
+    "Code never lies, comments sometimes do. — Ron Jeffries",
+    "Walking on water and developing software from a specification are easy if both are frozen. — Edward V. Berard",
+    "It works on my machine. — Every developer ever",
+    "There are only two hard things in Computer Science: cache invalidation and naming things. — Phil Karlton",
+    "Perfection is achieved not when there is nothing more to add, but when there is nothing left to take away. — Antoine de Saint-Exupéry",
+    "The only way to learn a new programming language is by writing programs in it. — Dennis Ritchie",
+    "Sometimes it pays to stay in bed on Monday, rather than spending the rest of the week debugging code. — Daniel Quinn",
+    "Deleted code is debugged code. — Jeff Sickel",
+    "Weeks of coding can save you hours of planning."
+];
+
 let allProjects = [];
 let currentFilter = 'all';
+
+function showRandomPhrase() {
+    const subtitle = document.getElementById('site-subtitle');
+    if (!subtitle) return;
+    const randomIndex = Math.floor(Math.random() * randomPhrases.length);
+    subtitle.textContent = randomPhrases[randomIndex];
+}
 
 async function loadProjects() {
     try {
@@ -130,5 +171,6 @@ function initTheme() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
+    showRandomPhrase();
     loadProjects();
 });
