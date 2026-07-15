@@ -74,14 +74,8 @@ export const themes = [
 ];
 
 export function getRandomTheme() {
-    const savedTheme = sessionStorage.getItem('currentTheme');
-    if (savedTheme) {
-        return themes.find(t => t.id === savedTheme) || themes[Math.floor(Math.random() * themes.length)];
-    }
     const randomIndex = Math.floor(Math.random() * themes.length);
-    const selectedTheme = themes[randomIndex];
-    sessionStorage.setItem('currentTheme', selectedTheme.id);
-    return selectedTheme;
+    return themes[randomIndex];
 }
 
 export function getAllTags(projects) {
