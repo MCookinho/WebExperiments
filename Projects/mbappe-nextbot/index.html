@@ -138,35 +138,70 @@ scene.add(camera);
 
 /* ─── COLLISION ─── */
 const colliders = [];
+let mapMeshes = [];
+let floorYData = null;
+let useMeshCollision = false;
+const meshRaycaster = new THREE.Raycaster();
+const _rayOrigin = new THREE.Vector3();
+const _rayDir = new THREE.Vector3(0, -1, 0);
+const _v = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
 
 function addColliderFromMesh(mesh) {
+  if (useMeshCollision) return;
   const bbox = new THREE.Box3().setFromObject(mesh);
   const size = new THREE.Vector3();
   bbox.getSize(size);
   if (size.x < 0.01 || size.y < 0.01 || size.z < 0.01) return;
-  if (size.x > 50 || size.y > 50 || size.z > 50) return;
   colliders.push(bbox);
 }
 
-function testCollisionX(px, pz, r) {
-  for (const b of colliders) {
-    const closestZ = Math.max(b.min.z, Math.min(pz, b.max.z));
-    if (Math.abs(pz - closestZ) >= r) continue;
-    if (px + r > b.min.x && px - r < b.max.x) return true;
+function testCollisionAt(px, pz, r) {
+  if (!useMeshCollision) {
+    for (const b of colliders) {
+      const closestZ = Math.max(b.min.z, Math.min(pz, b.max.z));
+      if (Math.abs(pz - closestZ) < r) {
+        if (px + r > b.min.x && px - r < b.max.x) return true;
+      }
+      const closestX = Math.max(b.min.x, Math.min(px, b.max.x));
+      if (Math.abs(px - closestX) < r) {
+        if (pz + r > b.min.z && pz - r < b.max.z) return true;
+      }
+    }
+    return false;
+  }
+  const minGx = Math.max(0, Math.floor((px - r - gridOffsetX) / GRID_SIZE));
+  const maxGx = Math.min(gridW - 1, Math.floor((px + r - gridOffsetX) / GRID_SIZE));
+  const minGz = Math.max(0, Math.floor((pz - r - gridOffsetZ) / GRID_SIZE));
+  const maxGz = Math.min(gridH - 1, Math.floor((pz + r - gridOffsetZ) / GRID_SIZE));
+  for (let gz = minGz; gz <= maxGz; gz++) {
+    for (let gx = minGx; gx <= maxGx; gx++) {
+      if (wallGrid[gz * gridW + gx] === 1) return true;
+    }
   }
   return false;
 }
 
-function testCollisionZ(px, pz, r) {
-  for (const b of colliders) {
-    const closestX = Math.max(b.min.x, Math.min(px, b.max.x));
-    if (Math.abs(px - closestX) >= r) continue;
-    if (pz + r > b.min.z && pz - r < b.max.z) return true;
-  }
-  return false;
-}
+function testCollisionX(px, pz, r) { return testCollisionAt(px, pz, r); }
+function testCollisionZ(px, pz, r) { return testCollisionAt(px, pz, r); }
 
-function getFloorY(px, pz) {
+function getFloorY(px, pz, currentFeetY) {
+  if (useMeshCollision && floorYData) {
+    const gx = Math.floor((px - gridOffsetX) / GRID_SIZE);
+    const gz = Math.floor((pz - gridOffsetZ) / GRID_SIZE);
+    if (gx >= 0 && gx < gridW && gz >= 0 && gz < gridH) {
+      const floors = floorYData[gz * gridW + gx];
+      if (floors && floors.length > 0) {
+        const tol = 0.6;
+        let best = -999;
+        for (let i = 0; i < floors.length; i++) {
+          if (floors[i] <= currentFeetY + tol && floors[i] > best) best = floors[i];
+        }
+        if (best > -999) return best;
+        return floors[0];
+      }
+    }
+    return -19.6;
+  }
   let maxY = -999;
   for (const b of colliders) {
     if (px >= b.min.x - 0.1 && px <= b.max.x + 0.1 &&
@@ -252,7 +287,7 @@ function updatePlayer(dt) {
   playerPos.y += playerVel.y * dt;
 
   const feetY = playerPos.y - EYE;
-  const ground = getFloorY(playerPos.x, playerPos.z);
+  const ground = getFloorY(playerPos.x, playerPos.z, feetY);
   if (feetY <= ground + 0.05) {
     playerPos.y = ground + EYE;
     playerVel.y = 0;
@@ -283,14 +318,89 @@ function updatePlayer(dt) {
 }
 
 /* ─── GRID FOR PATHFINDING ─── */
-const GRID_SIZE = 2;
-const gridW = 200;
-const gridH = 200;
-const gridOffsetX = -gridW * GRID_SIZE / 2;
-const gridOffsetZ = -gridH * GRID_SIZE / 2;
-const wallGrid = new Uint8Array(gridW * gridH);
+let GRID_SIZE = 0.5;
+let gridW = 10, gridH = 10;
+let gridOffsetX = -5, gridOffsetZ = -5;
+let wallGrid = new Uint8Array(100);
 
-function buildWallGrid() {
+function initGrid(minX, minZ, maxX, maxZ) {
+  const margin = 2;
+  GRID_SIZE = 0.5;
+  gridOffsetX = Math.floor((minX - margin) / GRID_SIZE) * GRID_SIZE;
+  gridOffsetZ = Math.floor((minZ - margin) / GRID_SIZE) * GRID_SIZE;
+  gridW = Math.ceil(((maxX + margin) - gridOffsetX) / GRID_SIZE);
+  gridH = Math.ceil(((maxZ + margin) - gridOffsetZ) / GRID_SIZE);
+  wallGrid = new Uint8Array(gridW * gridH);
+  console.log(`Grid: ${gridW}x${gridH} (${gridW*gridH} cells) covering X[${gridOffsetX.toFixed(1)}..${(gridOffsetX+gridW*GRID_SIZE).toFixed(1)}] Z[${gridOffsetZ.toFixed(1)}..${(gridOffsetZ+gridH*GRID_SIZE).toFixed(1)}]`);
+}
+
+function buildWallGridFromMeshes(meshes) {
+  wallGrid.fill(0);
+  floorYData = new Array(gridW * gridH);
+  for (let i = 0; i < floorYData.length; i++) floorYData[i] = [];
+  const pr = PR;
+  for (const mesh of meshes) {
+    const geo = mesh.geometry;
+    const pos = geo.attributes.position;
+    const idx = geo.index;
+    const worldMat = mesh.matrixWorld;
+    const triCount = idx ? idx.count / 3 : pos.count / 3;
+    for (let t = 0; t < triCount; t++) {
+      const ia = idx ? idx.getX(t * 3) : t * 3;
+      const ib = idx ? idx.getX(t * 3 + 1) : t * 3 + 1;
+      const ic = idx ? idx.getX(t * 3 + 2) : t * 3 + 2;
+      _v[0].fromBufferAttribute(pos, ia).applyMatrix4(worldMat);
+      _v[1].fromBufferAttribute(pos, ib).applyMatrix4(worldMat);
+      _v[2].fromBufferAttribute(pos, ic).applyMatrix4(worldMat);
+      const e1x = _v[1].x - _v[0].x, e1y = _v[1].y - _v[0].y, e1z = _v[1].z - _v[0].z;
+      const e2x = _v[2].x - _v[0].x, e2y = _v[2].y - _v[0].y, e2z = _v[2].z - _v[0].z;
+      const nx = e1y * e2z - e1z * e2y;
+      const ny = e1z * e2x - e1x * e2z;
+      const nz = e1x * e2y - e1y * e2x;
+      const nl = Math.sqrt(nx * nx + ny * ny + nz * nz) || 1;
+      const absNY = Math.abs(ny / nl);
+      const triMinX = Math.min(_v[0].x, _v[1].x, _v[2].x);
+      const triMaxX = Math.max(_v[0].x, _v[1].x, _v[2].x);
+      const triMinZ = Math.min(_v[0].z, _v[1].z, _v[2].z);
+      const triMaxZ = Math.max(_v[0].z, _v[1].z, _v[2].z);
+      const triMaxY = Math.max(_v[0].y, _v[1].y, _v[2].y);
+      if (absNY < 0.7) {
+        const mgx = Math.max(0, Math.floor((triMinX - gridOffsetX - pr) / GRID_SIZE));
+        const xgx = Math.min(gridW - 1, Math.floor((triMaxX - gridOffsetX + pr) / GRID_SIZE));
+        const mgz = Math.max(0, Math.floor((triMinZ - gridOffsetZ - pr) / GRID_SIZE));
+        const xgz = Math.min(gridH - 1, Math.floor((triMaxZ - gridOffsetZ + pr) / GRID_SIZE));
+        for (let gz = mgz; gz <= xgz; gz++) {
+          for (let gx = mgx; gx <= xgx; gx++) {
+            wallGrid[gz * gridW + gx] = 1;
+          }
+        }
+      }
+      if (absNY >= 0.7) {
+        const avgY = (_v[0].y + _v[1].y + _v[2].y) / 3;
+        const mgx = Math.max(0, Math.floor((triMinX - gridOffsetX) / GRID_SIZE));
+        const xgx = Math.min(gridW - 1, Math.floor((triMaxX - gridOffsetX) / GRID_SIZE));
+        const mgz = Math.max(0, Math.floor((triMinZ - gridOffsetZ) / GRID_SIZE));
+        const xgz = Math.min(gridH - 1, Math.floor((triMaxZ - gridOffsetZ) / GRID_SIZE));
+        for (let gz = mgz; gz <= xgz; gz++) {
+          for (let gx = mgx; gx <= xgx; gx++) {
+            const arr = floorYData[gz * gridW + gx];
+            if (arr.length === 0 || Math.abs(arr[arr.length - 1] - avgY) > 0.15) {
+              arr.push(avgY);
+            }
+          }
+        }
+      }
+    }
+  }
+  for (let i = 0; i < floorYData.length; i++) {
+    floorYData[i].sort((a, b) => a - b);
+  }
+  let wallCount = 0;
+  for (let i = 0; i < wallGrid.length; i++) if (wallGrid[i]) wallCount++;
+  console.log(`Wall cells: ${wallCount}/${wallGrid.length}`);
+}
+
+function buildWallGridFromAABBs() {
   wallGrid.fill(0);
   for (let gz = 0; gz < gridH; gz++) {
     for (let gx = 0; gx < gridW; gx++) {
@@ -300,8 +410,7 @@ function buildWallGrid() {
         const hw = (b.max.x - b.min.x) / 2;
         const hd = (b.max.z - b.min.z) / 2;
         const hh = b.max.y - b.min.y;
-        if (hh < 0.3 || hh > 30) continue;
-        if (hw > 30 || hd > 30) continue;
+        if (hh < 0.3 || hw > 30 || hd > 30) continue;
         const cx = (b.min.x + b.max.x) / 2;
         const cz = (b.min.z + b.max.z) / 2;
         const dx = Math.abs(wx - cx);
@@ -451,7 +560,7 @@ function updateBot(dt) {
     }
   }
 
-  const botGround = getFloorY(nextbotSprite.position.x, nextbotSprite.position.z);
+  const botGround = getFloorY(nextbotSprite.position.x, nextbotSprite.position.z, nextbotSprite.position.y - 2.5);
   nextbotSprite.position.y = botGround + 2.5 + Math.sin(Date.now() * 0.005) * 0.15;
 
   botLight.position.set(nextbotSprite.position.x, 4, nextbotSprite.position.z);
@@ -512,20 +621,23 @@ const mmCtx = mmCanvas.getContext('2d');
 function updateMinimap() {
   mmCtx.fillStyle = '#0a0808';
   mmCtx.fillRect(0, 0, 160, 160);
-  const sc = 0.6;
+  const mapExtentX = gridW * GRID_SIZE;
+  const mapExtentZ = gridH * GRID_SIZE;
+  const sc = Math.min(140 / mapExtentX, 140 / mapExtentZ);
   const px = (playerPos.x - gridOffsetX) * sc;
   const pz = (playerPos.z - gridOffsetZ) * sc;
   const ox = 80 - px;
   const oz = 80 - pz;
 
   mmCtx.fillStyle = '#2a2520';
-  for (let gz = 0; gz < gridH; gz += 2) {
-    for (let gx = 0; gx < gridW; gx += 2) {
+  const step = Math.max(1, Math.floor(2 / GRID_SIZE));
+  for (let gz = 0; gz < gridH; gz += step) {
+    for (let gx = 0; gx < gridW; gx += step) {
       if (!isGridWall(gx, gz)) continue;
       const sx = gx * GRID_SIZE * sc + ox;
       const sz = gz * GRID_SIZE * sc + oz;
-      if (sx < -20 || sx > 180 || sz < -20 || sz > 180) continue;
-      mmCtx.fillRect(sx, sz, GRID_SIZE * sc * 2, GRID_SIZE * sc * 2);
+      if (sx < -5 || sx > 165 || sz < -5 || sz > 165) continue;
+      mmCtx.fillRect(sx, sz, Math.max(1, GRID_SIZE * sc * step), Math.max(1, GRID_SIZE * sc * step));
     }
   }
 
@@ -602,63 +714,12 @@ $('start-btn').addEventListener('click', async () => {
 
   try {
     $('loading').style.display = 'flex';
-    $('loading-text').textContent = 'Carregando mapa...';
+    $('loading-text').textContent = 'Gerando mapa...';
 
-    const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/');
-    const gltfLoader = new GLTFLoader();
-    gltfLoader.setDRACOLoader(dracoLoader);
-    let gltf;
-    try {
-      gltf = await gltfLoader.loadAsync('brezhnevka.glb');
-    } catch (e) {
-      console.warn('GLB load failed, using fallback map:', e);
-      $('loading-text').textContent = 'Mapa GLB falhou, gerando mapa...';
-      buildFallbackMap();
-      gltf = null;
-    }
+    buildFallbackMap();
 
-    if (gltf) {
-      const mapRoot = gltf.scene;
-      mapRoot.traverse((child) => {
-        if (child.isMesh) {
-          child.castShadow = true;
-          child.receiveShadow = true;
-          if (child.material) {
-            const mats = Array.isArray(child.material) ? child.material : [child.material];
-            mats.forEach(m => {
-              m.side = THREE.DoubleSide;
-              if (m.map) m.map.colorSpace = THREE.SRGBColorSpace;
-            });
-          }
-          addColliderFromMesh(child);
-        }
-      });
-      scene.add(mapRoot);
-
-      const mapBBox = new THREE.Box3().setFromObject(mapRoot);
-      const mapCenter = new THREE.Vector3();
-      mapBBox.getCenter(mapCenter);
-      const mapSize = new THREE.Vector3();
-      mapBBox.getSize(mapSize);
-      console.log('Map loaded. Size:', mapSize.toArray(), 'Colliders:', colliders.length);
-
-      const existingLights = [];
-      mapRoot.traverse(c => { if (c.isLight) existingLights.push(c); });
-      if (existingLights.length < 5) {
-        for (let x = mapBBox.min.x + 4; x < mapBBox.max.x; x += 8) {
-          for (let z = mapBBox.min.z + 4; z < mapBBox.max.z; z += 8) {
-            if (!testCollisionX(x, z, 0.1) && !testCollisionZ(x, z, 0.1)) {
-              const pl = new THREE.PointLight(0xffddaa, 0.5, 12, 1.5);
-              pl.position.set(x, 3.5, z);
-              scene.add(pl);
-            }
-          }
-        }
-      }
-    }
-
-    buildWallGrid();
+    initGrid(-70, -70, 70, 70);
+    buildWallGridFromAABBs();
 
     let openCount = 0;
     for (let i = 0; i < wallGrid.length; i++) if (wallGrid[i] === 0) openCount++;
@@ -698,10 +759,22 @@ $('start-btn').addEventListener('click', async () => {
 });
 
 function findSpawnPos() {
+  if (useMeshCollision && floorYData) {
+    for (let r = 0; r < 30; r += 2) {
+      for (let dx = -r; dx <= r; dx += 2) {
+        for (let dz = -r; dz <= r; dz += 2) {
+          if (!testCollisionAt(dx, dz, PR)) {
+            const feet = getFloorY(dx, dz, -999);
+            if (feet > -900) return new THREE.Vector3(dx, feet + EYE, dz);
+          }
+        }
+      }
+    }
+  }
   for (let r = 0; r < 50; r += 3) {
     for (let dx = -r; dx <= r; dx += 3) {
       for (let dz = -r; dz <= r; dz += 3) {
-        if (!testCollisionX(dx, dz, PR) && !testCollisionZ(dx, dz, PR)) {
+        if (!testCollisionAt(dx, dz, PR)) {
           return new THREE.Vector3(dx, EYE, dz);
         }
       }
@@ -712,130 +785,151 @@ function findSpawnPos() {
 
 function findBotSpawnPos(playerP) {
   let best = null, bestDist = 0;
-  for (let x = -80; x < 80; x += 4) {
-    for (let z = -80; z < 80; z += 4) {
-      if (!testCollisionX(x, z, 0.5) && !testCollisionZ(x, z, 0.5)) {
+  const minX = gridOffsetX + 2, maxX = gridOffsetX + gridW * GRID_SIZE - 2;
+  const minZ = gridOffsetZ + 2, maxZ = gridOffsetZ + gridH * GRID_SIZE - 2;
+  for (let x = minX; x < maxX; x += 3) {
+    for (let z = minZ; z < maxZ; z += 3) {
+      if (!testCollisionAt(x, z, 0.5)) {
         const dx = x - playerP.x, dz = z - playerP.z;
         const d = dx * dx + dz * dz;
-        if (d > bestDist) { bestDist = d; best = new THREE.Vector3(x, 0, z); }
+        if (d > bestDist && d > 16) { bestDist = d; best = new THREE.Vector3(x, 0, z); }
       }
     }
+  }
+  if (best) {
+    const botFeet = getFloorY(best.x, best.z, -999);
+    if (botFeet > -900) best.y = botFeet;
   }
   return best || new THREE.Vector3(10, 0, 10);
 }
 
-/* ─── FALLBACK MAP (if GLB fails) ─── */
+/* ─── PROCEDURAL MAP ─── */
 function buildFallbackMap() {
-  const MAP = [
-    "################################",
-    "#..............................#",
-    "#..............................#",
-    "#..............................#",
-    "#.....######.......####........#",
-    "#.....#....#.......#..#........#",
-    "#.....#....#.......#..#........#",
-    "#.....#....#..#....#..#........#",
-    "#.....#....#..#....#..###......#",
-    "#.....######..#......#.........#",
-    "#.............#......#.........#",
-    "#.............#......#.........#",
-    "#.....###..#..#......#####.....#",
-    "#.....#....#..#..........#.....#",
-    "#.....#....#..#..........#.....#",
-    "#.....#....#..#####......#.....#",
-    "#.....#....#.....#......#......#",
-    "#.....######.....#......#......#",
-    "#................#......#......#",
-    "#................#......#......#",
-    "#.....####.......########......#",
-    "#.....#..............#.........#",
-    "#.....#..............#.........#",
-    "#.....#....########..#..####...#",
-    "#.....#....#.........#..#..#...#",
-    "#..........#.........#..#..#...#",
-    "#..........#.........#..#..#...#",
-    "#.....######.........#..####...#",
-    "#....................#.........#",
-    "#....................#.........#",
-    "#.....###...########...........#",
-    "#.....#.....#..................#",
-    "#.....#.....#..................#",
-    "#.....#.....#....####...####...#",
-    "#.....#.....#....#..#...#..#...#",
-    "#...........#....#..#...#..#...#",
-    "#...........#....#..#...#..#...#",
-    "#.....#######....####...####...#",
-    "#..............................#",
-    "#..............................#",
-    "################################",
-  ];
+  const C = 2.5;
+  const WH = 3.2;
+  const FLOORS = 3;
+  const MW = 24;
+  const MH = 24;
 
-  const C = 4, WH = 5;
   const wallMat = new THREE.MeshStandardMaterial({ color: 0x3d3530, roughness: 0.92 });
   const floorMat = new THREE.MeshStandardMaterial({ color: 0x181512, roughness: 0.88 });
   const ceilMat = new THREE.MeshStandardMaterial({ color: 0x221e1a, roughness: 0.95 });
+  const stairMat = new THREE.MeshStandardMaterial({ color: 0x2a2520, roughness: 0.9 });
 
   const floorGeo = new THREE.PlaneGeometry(C, C);
   floorGeo.rotateX(-Math.PI / 2);
   const ceilGeo = new THREE.PlaneGeometry(C, C);
   ceilGeo.rotateX(Math.PI / 2);
-  const wallGeoH = new THREE.BoxGeometry(C, WH, 0.25);
-  const wallGeoV = new THREE.BoxGeometry(0.25, WH, C);
+  const wallGeoH = new THREE.BoxGeometry(C, WH, 0.2);
+  const wallGeoV = new THREE.BoxGeometry(0.2, WH, C);
 
-  function isWall(x, z) {
-    if (z < 0 || z >= MAP.length || x < 0 || x >= MAP[0].length) return true;
-    return MAP[z][x] === '#';
-  }
+  function genPlan(floorIdx) {
+    const p = [];
+    for (let z = 0; z < MH; z++) {
+      p[z] = [];
+      for (let x = 0; x < MW; x++) {
+        if (x === 0 || x === MW - 1 || z === 0 || z === MH - 1) { p[z][x] = 1; continue; }
+        p[z][x] = 0;
+      }
+    }
+    const mid = Math.floor(MW / 2);
+    const cw = 2;
+    for (let x = 1; x < MW - 1; x++) { for (let d = 0; d < cw; d++) { p[mid - 1 - d][x] = 1; p[mid + 1 + d][x] = 1; } }
+    for (let z = 1; z < MH - 1; z++) { for (let d = 0; d < cw; d++) { p[z][mid - 1 - d] = 1; p[z][mid + 1 + d] = 1; } }
+    for (let x = 1; x < MW - 1; x += 3) { for (let d = 0; d < cw; d++) { p[mid - 1 - d][x] = 0; p[mid + 1 + d][x] = 0; } }
+    for (let z = 1; z < MH - 1; z += 3) { for (let d = 0; d < cw; d++) { p[z][mid - 1 - d] = 0; p[z][mid + 1 + d] = 0; } }
 
-  for (let z = 0; z < MAP.length; z++) {
-    for (let x = 0; x < MAP[0].length; x++) {
-      const wx = x * C, wz = z * C;
-      if (!isWall(x, z)) {
-        const fl = new THREE.Mesh(floorGeo, floorMat);
-        fl.position.set(wx + C / 2, 0, wz + C / 2);
-        fl.receiveShadow = true;
-        scene.add(fl);
-        const cl = new THREE.Mesh(ceilGeo, ceilMat);
-        cl.position.set(wx + C / 2, WH, wz + C / 2);
-        scene.add(cl);
-        if (Math.random() < 0.1) {
-          const pl = new THREE.PointLight(0xffaa55, 0.6, 10, 2);
-          pl.position.set(wx + C / 2, WH - 0.4, wz + C / 2);
-          scene.add(pl);
+    const quarters = [
+      [2, 2, mid - 2, mid - 2],
+      [mid + 2, 2, MW - 3, mid - 2],
+      [2, mid + 2, mid - 2, MH - 3],
+      [mid + 2, mid + 2, MW - 3, MH - 3],
+    ];
+    for (const [x0, z0, x1, z1] of quarters) {
+      const qw = x1 - x0 + 1;
+      const qh = z1 - z0 + 1;
+      const rs = 3;
+      for (let wz = z0; wz <= z1; wz += rs) {
+        for (let wx = x0; wx <= x1; wx += rs) {
+          if (wz < MH - 1 && wx < MW - 1) p[wz][wx] = 1;
+          if (wz + 1 <= z1 && wx < MW - 1) p[wz + 1][wx] = 1;
+          if (wz < MH - 1 && wx + 1 <= x1) p[wz][wx + 1] = 1;
+          if (wz + 1 <= z1 && wx + 1 <= x1) p[wz + 1][wx + 1] = 1;
         }
       }
-      if (isWall(x, z)) {
-        if (!isWall(x + 1, z)) {
-          const w = new THREE.Mesh(wallGeoV, wallMat);
-          w.position.set((x + 1) * C, WH / 2, wz + C / 2);
-          w.castShadow = true; w.receiveShadow = true;
-          scene.add(w);
-          addColliderFromMesh(w);
+      for (let wz = z0 + 1; wz < z1; wz += rs) {
+        for (let wx = x0 + 1; wx < x1; wx++) { if (Math.abs(wx - x0 - rs) < 1) p[wz][wx] = 0; }
+      }
+      for (let wx = x0 + 1; wx < x1; wx += rs) {
+        for (let wz = z0 + 1; wz < z1; wz++) { if (Math.abs(wz - z0 - rs) < 1) p[wz][wx] = 0; }
+      }
+    }
+
+    const sx = MW - 4, sz = MH - 4;
+    p[sz][sx] = 0; p[sz][sx + 1] = 0; p[sz + 1][sx] = 0; p[sz + 1][sx + 1] = 0;
+    if (floorIdx < FLOORS - 1) {
+      p[2][2] = 0; p[2][3] = 0; p[3][2] = 0; p[3][3] = 0;
+    }
+    return p;
+  }
+
+  function buildLevel(baseY, plan) {
+    for (let z = 0; z < MH; z++) {
+      for (let x = 0; x < MW; x++) {
+        if (plan[z][x] === 0) {
+          const wx = (x - MW / 2) * C;
+          const wz = (z - MH / 2) * C;
+          const fl = new THREE.Mesh(floorGeo, floorMat);
+          fl.position.set(wx, baseY, wz); fl.receiveShadow = true; scene.add(fl);
+          const cl = new THREE.Mesh(ceilGeo, ceilMat);
+          cl.position.set(wx, baseY + WH, wz); scene.add(cl);
+          const above = z > 0 && plan[z - 1][x] === 1;
+          const below = z < MH - 1 && plan[z + 1][x] === 1;
+          const left = x > 0 && plan[z][x - 1] === 1;
+          const right = x < MW - 1 && plan[z][x + 1] === 1;
+          if (above) { const w = new THREE.Mesh(wallGeoH, wallMat); w.position.set(wx, baseY + WH / 2, wz - C / 2); w.castShadow = true; w.receiveShadow = true; scene.add(w); addColliderFromMesh(w); }
+          if (below) { const w = new THREE.Mesh(wallGeoH, wallMat); w.position.set(wx, baseY + WH / 2, wz + C / 2); w.castShadow = true; w.receiveShadow = true; scene.add(w); addColliderFromMesh(w); }
+          if (left) { const w = new THREE.Mesh(wallGeoV, wallMat); w.position.set(wx - C / 2, baseY + WH / 2, wz); w.castShadow = true; w.receiveShadow = true; scene.add(w); addColliderFromMesh(w); }
+          if (right) { const w = new THREE.Mesh(wallGeoV, wallMat); w.position.set(wx + C / 2, baseY + WH / 2, wz); w.castShadow = true; w.receiveShadow = true; scene.add(w); addColliderFromMesh(w); }
         }
-        if (!isWall(x - 1, z)) {
-          const w = new THREE.Mesh(wallGeoV, wallMat);
-          w.position.set(x * C, WH / 2, wz + C / 2);
-          w.castShadow = true; w.receiveShadow = true;
-          scene.add(w);
-          addColliderFromMesh(w);
-        }
-        if (!isWall(x, z + 1)) {
-          const w = new THREE.Mesh(wallGeoH, wallMat);
-          w.position.set(wx + C / 2, WH / 2, (z + 1) * C);
-          w.castShadow = true; w.receiveShadow = true;
-          scene.add(w);
-          addColliderFromMesh(w);
-        }
-        if (!isWall(x, z - 1)) {
-          const w = new THREE.Mesh(wallGeoH, wallMat);
-          w.position.set(wx + C / 2, WH / 2, z * C);
-          w.castShadow = true; w.receiveShadow = true;
-          scene.add(w);
-          addColliderFromMesh(w);
+      }
+    }
+    for (let z = 1; z < MH - 1; z += 3) {
+      for (let x = 1; x < MW - 1; x += 3) {
+        if (plan[z][x] === 0) {
+          const pl = new THREE.PointLight(0xffaa55, 0.5, 8, 2);
+          pl.position.set((x - MW / 2) * C, baseY + WH - 0.4, (z - MH / 2) * C);
+          scene.add(pl);
         }
       }
     }
   }
+
+  function buildStairs(baseY, x0, z0) {
+    const steps = 10;
+    const stepH = WH / steps;
+    const stepD = C * 1.5 / steps;
+    for (let i = 0; i < steps; i++) {
+      const geo = new THREE.BoxGeometry(C * 1.2, stepH * 0.9, stepD);
+      const m = new THREE.Mesh(geo, stairMat);
+      m.position.set((x0 - MW / 2) * C, baseY + stepH * (i + 0.5), (z0 - MH / 2) * C + i * stepD - steps * stepD / 2);
+      m.castShadow = true; m.receiveShadow = true;
+      scene.add(m); addColliderFromMesh(m);
+    }
+  }
+
+  for (let f = 0; f < FLOORS; f++) {
+    const baseY = f * WH;
+    const plan = genPlan(f);
+    buildLevel(baseY, plan);
+  }
+
+  const sx = MW - 3, sz = MH - 3;
+  buildStairs(0, sx, sz);
+  buildStairs(WH, 3, 3);
+
+  scene.background = new THREE.Color(0x0a0808);
+  scene.fog = new THREE.Fog(0x0a0808, 15, 55);
 }
 
 window.addEventListener('resize', () => {
