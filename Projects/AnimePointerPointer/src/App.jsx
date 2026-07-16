@@ -155,20 +155,16 @@ export default function App() {
 
       const imageRatio = iw / ih
       const viewportRatio = vw / vh
-      const scale = imageRatio > viewportRatio ? vw / iw : vh / ih
-      const displayW = iw * scale
-      const displayH = ih * scale
+      const displayW = imageRatio > viewportRatio ? vw : vh * imageRatio
+      const displayH = imageRatio > viewportRatio ? vw / imageRatio : vh
 
-      const fingerOffsetX = (fingerPos.x - mouseNorm.x) * -1 * displayW * 1.2
-      const fingerOffsetY = (fingerPos.y - mouseNorm.y) * -1 * displayH * 1.2
-
-      const imageX = fingerOffsetX + (mouseNorm.x - fingerPos.x) * displayW
-      const imageY = fingerOffsetY + (mouseNorm.y - fingerPos.y) * displayH
+      const tx = delayedPointer.x - fingerPos.x * displayW
+      const ty = delayedPointer.y - fingerPos.y * displayH
 
       setImageStyle({
         width: `${displayW}px`,
         height: `${displayH}px`,
-        transform: `translate(${fingerOffsetX}px, ${fingerOffsetY}px) scale(1.2)`,
+        transform: `translate(${tx}px, ${ty}px) scale(1.2)`,
         transformOrigin: `${fingerPos.x * 100}% ${fingerPos.y * 100}%`,
       })
     }
