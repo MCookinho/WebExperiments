@@ -46,6 +46,29 @@ canvas#game-canvas{display:block}
 @keyframes spin{to{transform:rotate(360deg)}}
 #loading p{color:#666;font-size:.9rem}
 #loading .error{color:#ff4444;font-size:.8rem;margin-top:.5rem;max-width:400px;text-align:center}
+
+/* ─── MOBILE CONTROLS ─── */
+#mobile-controls{display:none;position:fixed;inset:0;z-index:150;pointer-events:none}
+#joystick-zone{position:absolute;left:10px;bottom:10px;width:140px;height:140px;pointer-events:auto;touch-action:none}
+#joystick-base{width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.15);position:absolute;bottom:10px;left:10px;display:none}
+#joystick-knob{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.3);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+#btn-sprint{position:absolute;right:15px;bottom:30px;width:70px;height:70px;border-radius:50%;background:rgba(255,0,64,.15);border:2px solid rgba(255,0,64,.4);color:#ff0040;font-size:.6rem;font-family:'Courier New',monospace;font-weight:700;display:none;pointer-events:auto;touch-action:none;-webkit-user-select:none;user-select:none;letter-spacing:1px}
+#btn-sprint:active{background:rgba(255,0,64,.4)}
+#btn-jump{position:absolute;right:100px;bottom:30px;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);font-size:.55rem;font-family:'Courier New',monospace;font-weight:700;display:none;pointer-events:auto;touch-action:none;-webkit-user-select:none;user-select:none}
+#btn-jump:active{background:rgba(255,255,255,.2)}
+#mobile-warning{position:fixed;top:12px;left:50%;transform:translateX(-50%);font-size:.75rem;color:rgba(255,255,255,.3);z-index:101;display:none;text-align:center}
+
+@media(hover:none)and(pointer:coarse){
+  #mobile-controls{display:block}
+  #joystick-base{display:none}
+  #btn-sprint,#btn-jump{display:none}
+  #stamina-bar{bottom:90px}
+  #stamina-hint{display:none!important}
+  #minimap-wrap{width:100px;height:100px;top:10px;right:10px}
+  #minimap-canvas{width:100px;height:100px}
+  #warning{font-size:1rem;top:55px}
+  #crosshair{display:none!important}
+}
 </style>
 </head>
 <body>
@@ -75,6 +98,15 @@ canvas#game-canvas{display:block}
 <div id="capture-overlay"></div>
 <video id="jumpscare-video" playsinline></video>
 <div id="death-text">CAPTURED</div>
+
+<div id="mobile-controls">
+  <div id="joystick-zone">
+    <div id="joystick-base"><div id="joystick-knob"></div></div>
+  </div>
+  <button id="btn-sprint">SPRINT</button>
+  <button id="btn-jump">JUMP</button>
+</div>
+<div id="mobile-warning">Touch and drag to look &bull; Use joystick to move</div>
 
 <script type="importmap">
 {
@@ -112,11 +144,13 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0a0808);
 scene.fog = new THREE.Fog(0xaaaaaa, 80, 200);
 
-const renderer = new THREE.WebGLRenderer({ antialias: false });
+const _isMobile = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+
+const renderer = new THREE.WebGLRenderer({ antialias: !_isMobile });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFShadowMap;
+renderer.setPixelRatio(_isMobile ? 1 : Math.min(window.devicePixelRatio, 1.5));
+renderer.shadowMap.enabled = !_isMobile;
+if (!_isMobile) renderer.shadowMap.type = THREE.PCFShadowMap;
 renderer.toneMapping = THREE.NoToneMapping;
 document.body.appendChild(renderer.domElement);
 renderer.domElement.id = 'game-canvas';
@@ -128,16 +162,18 @@ scene.add(new THREE.HemisphereLight(0x87CEEB, 0x556633, 0.4));
 
 const dirLight = new THREE.DirectionalLight(0xfff5e0, 1.4);
 dirLight.position.set(40, 60, 30);
-dirLight.castShadow = true;
-dirLight.shadow.mapSize.width = 1024;
-dirLight.shadow.mapSize.height = 1024;
-dirLight.shadow.camera.near = 0.5;
-dirLight.shadow.camera.far = 120;
-dirLight.shadow.camera.left = -60;
-dirLight.shadow.camera.right = 60;
-dirLight.shadow.camera.top = 60;
-dirLight.shadow.camera.bottom = -60;
-dirLight.shadow.bias = -0.002;
+if (!_isMobile) {
+  dirLight.castShadow = true;
+  dirLight.shadow.mapSize.width = 1024;
+  dirLight.shadow.mapSize.height = 1024;
+  dirLight.shadow.camera.near = 0.5;
+  dirLight.shadow.camera.far = 120;
+  dirLight.shadow.camera.left = -60;
+  dirLight.shadow.camera.right = 60;
+  dirLight.shadow.camera.top = 60;
+  dirLight.shadow.camera.bottom = -60;
+  dirLight.shadow.bias = -0.002;
+}
 scene.add(dirLight);
 scene.add(dirLight.target);
 
@@ -222,6 +258,95 @@ function getFloorY(px, pz, currentFeetY) {
   return maxY > -999 ? maxY : 0;
 }
 
+/* ─── MOBILE DETECTION ─── */
+const isMobile = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+let mobileInput = { x: 0, z: 0, sprint: false, jump: false, jumpPressed: false };
+let lookTouch = null;
+let lookStartX = 0, lookStartY = 0;
+
+if (isMobile) {
+  const joyZone = $('joystick-zone');
+  const joyBase = $('joystick-base');
+  const joyKnob = $('joystick-knob');
+  const btnSprint = $('btn-sprint');
+  const btnJump = $('btn-jump');
+  const joyRadius = 50;
+
+  joyZone.addEventListener('touchstart', e => {
+    e.preventDefault();
+    joyBase.style.display = 'block';
+    btnSprint.style.display = 'block';
+    btnJump.style.display = 'block';
+    const t = e.changedTouches[0];
+    const rect = joyBase.getBoundingClientRect();
+    joyBase._cx = rect.left + rect.width / 2;
+    joyBase._cy = rect.top + rect.height / 2;
+  }, { passive: false });
+
+  joyZone.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const t = e.changedTouches[0];
+    let dx = t.clientX - joyBase._cx;
+    let dy = t.clientY - joyBase._cy;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > joyRadius) { dx = dx / dist * joyRadius; dy = dy / dist * joyRadius; }
+    joyKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+    mobileInput.x = dx / joyRadius;
+    mobileInput.z = dy / joyRadius;
+  }, { passive: false });
+
+  const resetJoy = e => {
+    joyBase.style.display = 'none';
+    joyKnob.style.transform = 'translate(-50%,-50%)';
+    mobileInput.x = 0;
+    mobileInput.z = 0;
+  };
+  joyZone.addEventListener('touchend', resetJoy);
+  joyZone.addEventListener('touchcancel', resetJoy);
+
+  btnSprint.addEventListener('touchstart', e => { e.preventDefault(); mobileInput.sprint = true; }, { passive: false });
+  btnSprint.addEventListener('touchend', e => { mobileInput.sprint = false; });
+  btnSprint.addEventListener('touchcancel', e => { mobileInput.sprint = false; });
+
+  btnJump.addEventListener('touchstart', e => { e.preventDefault(); mobileInput.jumpPressed = true; }, { passive: false });
+  btnJump.addEventListener('touchend', e => { mobileInput.jumpPressed = false; });
+
+  document.addEventListener('touchstart', e => {
+    if (gameStarted && !gameOver) {
+      const t = e.changedTouches[0];
+      const sx = t.clientX;
+      if (sx > window.innerWidth * 0.35 && !e.target.closest('#mobile-controls')) {
+        lookTouch = t.identifier;
+        lookStartX = t.clientX;
+        lookStartY = t.clientY;
+        $('mobile-warning').style.display = 'none';
+      }
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchmove', e => {
+    if (lookTouch === null) return;
+    for (const t of e.changedTouches) {
+      if (t.identifier === lookTouch) {
+        const dx = t.clientX - lookStartX;
+        const dy = t.clientY - lookStartY;
+        euler.y -= dx * 0.004;
+        euler.x -= dy * 0.004;
+        euler.x = Math.max(-Math.PI / 2 + 0.01, Math.min(Math.PI / 2 - 0.01, euler.x));
+        camera.quaternion.setFromEuler(euler);
+        lookStartX = t.clientX;
+        lookStartY = t.clientY;
+      }
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', e => {
+    for (const t of e.changedTouches) {
+      if (t.identifier === lookTouch) lookTouch = null;
+    }
+  });
+}
+
 /* ─── PLAYER STATE ─── */
 const playerPos = new THREE.Vector3(0, EYE, 0);
 const playerVel = new THREE.Vector3(0, 0, 0);
@@ -246,7 +371,7 @@ document.addEventListener('keyup', e => {
 });
 
 renderer.domElement.addEventListener('click', () => {
-  if (!locked && gameStarted && !gameOver) renderer.domElement.requestPointerLock();
+  if (!isMobile && !locked && gameStarted && !gameOver) renderer.domElement.requestPointerLock();
 });
 document.addEventListener('pointerlockchange', () => {
   locked = document.pointerLockElement === renderer.domElement;
@@ -270,10 +395,21 @@ function updatePlayer(dt) {
   const right = new THREE.Vector3().crossVectors(fwd, new THREE.Vector3(0, 1, 0)).normalize();
 
   const move = new THREE.Vector3();
-  if (keys['KeyW']) move.add(fwd);
-  if (keys['KeyS']) move.sub(fwd);
-  if (keys['KeyD']) move.add(right);
-  if (keys['KeyA']) move.sub(right);
+  if (isMobile) {
+    move.addScaledVector(fwd, -mobileInput.z);
+    move.addScaledVector(right, mobileInput.x);
+    sprinting = mobileInput.sprint;
+    if (mobileInput.jumpPressed && onGround) {
+      playerVel.y = JUMP;
+      onGround = false;
+      mobileInput.jumpPressed = false;
+    }
+  } else {
+    if (keys['KeyW']) move.add(fwd);
+    if (keys['KeyS']) move.sub(fwd);
+    if (keys['KeyD']) move.add(right);
+    if (keys['KeyA']) move.sub(right);
+  }
   if (move.lengthSq() > 0) move.normalize();
 
   const canSprint = sprinting && stamina > 0 && move.lengthSq() > 0;
@@ -753,7 +889,7 @@ function animate() {
   if (gameOver) { renderer.render(scene, camera); return; }
   requestAnimationFrame(animate);
   const dt = Math.min(clock.getDelta(), 0.05);
-  if (locked) updatePlayer(dt);
+  if (locked || isMobile) updatePlayer(dt);
   updateBot(dt);
   updateAudio();
   updateMinimap();
@@ -794,7 +930,14 @@ $('overlay').style.display = 'none';
     $('minimap-wrap').style.display = 'block';
     gameStarted = true;
 
-    renderer.domElement.requestPointerLock();
+    if (isMobile) {
+      $('mobile-warning').style.display = 'block';
+      $('joystick-base').style.display = 'none';
+      $('btn-sprint').style.display = 'none';
+      $('btn-jump').style.display = 'none';
+    } else {
+      renderer.domElement.requestPointerLock();
+    }
     if (listener.context.state === 'suspended') await listener.context.resume();
     startMusic();
     clock.start();

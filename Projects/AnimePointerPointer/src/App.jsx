@@ -3,6 +3,7 @@ import './App.css'
 
 const RECENT_LIMIT = 6
 const recentIndices = []
+const INITIAL_STATE = { src: undefined, style: undefined }
 
 function getViewport() {
   return { x: document.documentElement.clientWidth, y: document.documentElement.clientHeight }
@@ -31,9 +32,9 @@ function distance(a, b) {
   return (a.x - b.x) ** 2 + (a.y - b.y) ** 2
 }
 
-function findClosestImage(mouse, positions) {
-  let bestIdx = undefined
-  let bestDist = Number.MAX_VALUE
+function findBestImage(mouse, positions) {
+  let bestIdx
+  let bestDist = Infinity
   for (let i = 0; i < positions.length; i++) {
     const d = distance(mouse, positions[i])
     if (d < bestDist && !recentIndices.includes(i)) {
@@ -54,6 +55,29 @@ function usePositions() {
       .then(data => setPositions(data.map(([x, y]) => ({ x, y }))))
   }, [])
   return positions
+}
+
+function computeStyle(img, delayedPointer, fingerPos, viewport) {
+  const vw = viewport.x
+  const vh = viewport.y
+  const iw = img.width
+  const ih = img.height
+
+  const imageRatio = iw / ih
+  const viewportRatio = vw / vh
+
+  const displayW = imageRatio > viewportRatio ? vw : vh * imageRatio
+  const displayH = imageRatio > viewportRatio ? vw / imageRatio : vh
+
+  const tx = delayedPointer.x - fingerPos.x * displayW
+  const ty = delayedPointer.y - fingerPos.y * displayH
+
+  return {
+    width: `${displayW}px`,
+    height: `${displayH}px`,
+    transform: `translate(${tx}px, ${ty}px) scale(1.2)`,
+    transformOrigin: `${fingerPos.x * 100}% ${fingerPos.y * 100}%`,
+  }
 }
 
 function LoadingScreen({ position }) {
@@ -89,24 +113,23 @@ function CursorDot({ position }) {
 export default function App() {
   const viewport = useViewport()
   const positions = usePositions()
+  const imgRef = useRef()
 
   const [isOutside, setIsOutside] = useState(false)
   const [rawPointer, setRawPointer] = useState()
+
+  const [imageSrc, setImageSrc] = useState()
   const [imageStyle, setImageStyle] = useState()
-  const [loadedImg, setLoadedImg] = useState()
+  const [imageLoaded, setImageLoaded] = useState(false)
 
   const delayedPointer = useDelayedValue(rawPointer, 2000)
   const pointer = isOutside ? undefined : rawPointer
 
-  const imgRef = useRef(null)
-  const imgIndexRef = useRef()
-
   useEffect(() => {
     const onMouseMove = (e) => setRawPointer({ x: e.clientX, y: e.clientY })
     const onTouchMove = (e) => {
-      if (e.touches.length > 0) {
+      if (e.touches.length > 0)
         setRawPointer({ x: e.touches[0].clientX, y: e.touches[0].clientY })
-      }
     }
     const onMouseLeave = () => setIsOutside(true)
     const onMouseEnter = () => setIsOutside(false)
@@ -125,74 +148,54 @@ export default function App() {
 
   useEffect(() => {
     if (!delayedPointer || positions.length === 0) {
-      imgIndexRef.current = undefined
-      setLoadedImg(undefined)
+      setImageSrc(undefined)
       setImageStyle(undefined)
+      setImageLoaded(false)
       return
     }
 
     const mouseNorm = { x: delayedPointer.x / viewport.x, y: delayedPointer.y / viewport.y }
-    const idx = findClosestImage(mouseNorm, positions)
+    const idx = findBestImage(mouseNorm, positions)
 
     if (idx === undefined) {
-      imgIndexRef.current = undefined
-      setLoadedImg(undefined)
+      setImageSrc(undefined)
       setImageStyle(undefined)
+      setImageLoaded(false)
       return
     }
 
-    imgIndexRef.current = idx
+    const fingerPos = positions[idx]
+    const src = `/images/${idx}.jpg`
+    setImageSrc(src)
+
     const img = new Image()
     img.onload = () => {
-      if (imgIndexRef.current !== idx) return
-      setLoadedImg(img)
-
-      const fingerPos = positions[idx]
-      const iw = img.width
-      const ih = img.height
-      const vw = viewport.x
-      const vh = viewport.y
-
-      const imageRatio = iw / ih
-      const viewportRatio = vw / vh
-      const displayW = imageRatio > viewportRatio ? vw : vh * imageRatio
-      const displayH = imageRatio > viewportRatio ? vw / imageRatio : vh
-
-      const tx = delayedPointer.x - fingerPos.x * displayW
-      const ty = delayedPointer.y - fingerPos.y * displayH
-
-      setImageStyle({
-        width: `${displayW}px`,
-        height: `${displayH}px`,
-        transform: `translate(${tx}px, ${ty}px) scale(1.2)`,
-        transformOrigin: `${fingerPos.x * 100}% ${fingerPos.y * 100}%`,
-      })
+      const s = computeStyle(img, delayedPointer, fingerPos, viewport)
+      setImageStyle(s)
+      setImageLoaded(true)
     }
-    img.src = `/images/${idx}.svg`
+    img.src = src
   }, [delayedPointer, positions, viewport])
-
-  const imageSrc = imgIndexRef.current !== undefined ? `/images/${imgIndexRef.current}.svg` : undefined
 
   return (
     <>
       <div className="Interactions" style={{ width: viewport.x, height: viewport.y }} />
       <div className="App" style={{ width: viewport.x, height: viewport.y }}>
         {!isOutside && pointer && <CursorDot position={pointer} />}
-        {loadedImg && imageStyle ? (
+        {imageSrc && imageStyle && imageLoaded ? (
           <>
             <div style={{ position: 'absolute', transform: 'scale(1.1)' }}>
               <img
+                ref={imgRef}
                 style={{ ...imageStyle, filter: 'blur(8px)' }}
-                alt="someone pointing at your pointer"
-                key={imageSrc}
+                alt=""
                 src={imageSrc}
               />
             </div>
             <div style={{ position: 'absolute' }}>
               <img
                 style={imageStyle}
-                alt="someone pointing at your pointer"
-                key={imageSrc}
+                alt=""
                 src={imageSrc}
               />
             </div>

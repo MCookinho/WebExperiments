@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Flags - TechVault Corp CTF</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏴</text></svg>">
+    <style>
+        .ctf-container {
+            max-width: 700px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .ctf-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .ctf-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .ctf-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .flag-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .flag-input-group {
+            background: var(--surface);
+            border: 1px solid var(--surface-light);
+            border-radius: 10px;
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .flag-input-group.correct {
+            border-color: var(--success);
+            background: rgba(34, 197, 94, 0.05);
+        }
+
+        .flag-input-group.wrong {
+            border-color: var(--danger);
+            background: rgba(239, 68, 68, 0.05);
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        .flag-number {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--accent);
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .flag-input-group input {
+            flex: 1;
+            background: var(--primary);
+            border: 1px solid var(--surface-light);
+            border-radius: 6px;
+            padding: 0.65rem 1rem;
+            color: var(--text);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .flag-input-group input:focus {
+            border-color: var(--accent);
+        }
+
+        .flag-input-group input::placeholder {
+            color: #475569;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-style: italic;
+        }
+
+        .flag-status {
+            font-size: 1.3rem;
+            min-width: 28px;
+            text-align: center;
+        }
+
+        .submit-btn {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            letter-spacing: 0.5px;
+        }
+
+        .submit-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .result-box {
+            margin-top: 2rem;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            display: none;
+        }
+
+        .result-box.success {
+            display: block;
+            background: linear-gradient(135deg, #052e16 0%, #14532d 100%);
+            border: 2px solid var(--success);
+        }
+
+        .result-box.partial {
+            display: block;
+            background: linear-gradient(135deg, #422006 0%, #713f12 100%);
+            border: 2px solid var(--warning);
+        }
+
+        .result-box h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .result-box p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .result-box .score {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 1rem 0;
+        }
+
+        .result-box.success .score {
+            color: var(--success);
+        }
+
+        .result-box.partial .score {
+            color: var(--warning);
+        }
+
+        .reset-btn {
+            margin-top: 1rem;
+            padding: 0.6rem 1.5rem;
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--surface-light);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .reset-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .hints-section {
+            margin-top: 2.5rem;
+            border-top: 1px solid var(--surface-light);
+            padding-top: 1.5rem;
+        }
+
+        .hints-section h3 {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .hint-toggle {
+            background: var(--surface);
+            border: 1px solid var(--surface-light);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+
+        .hint-toggle summary {
+            padding: 0.8rem 1.2rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            user-select: none;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hint-toggle summary::before {
+            content: '+';
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .hint-toggle[open] summary::before {
+            content: '-';
+        }
+
+        .hint-toggle summary:hover {
+            color: var(--text);
+        }
+
+        .hint-toggle .hint-content {
+            padding: 0 1.2rem 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">TechVault<span>Corp</span></div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="login.html">Login</a>
+            <a href="flags.html" style="color: var(--accent);">Submit Flags</a>
+        </div>
+    </nav>
+
+    <div class="ctf-container">
+        <div class="ctf-header">
+            <h1>Submit Your Flags</h1>
+            <p>Found all 6 flags? Enter them below to complete the CTF challenge.</p>
+        </div>
+
+        <form class="flag-form" id="flagForm">
+            <div class="flag-input-group" id="group1">
+                <span class="flag-number">#1</span>
+                <input type="text" id="flag1" placeholder="flag{...}" autocomplete="off" spellcheck="false">
+                <span class="flag-status" id="status1"></span>
+            </div>
+            <div class="flag-input-group" id="group2">
+                <span class="flag-number">#2</span>
+                <input type="text" id="flag2" placeholder="flag{...}" autocomplete="off" spellcheck="false">
+                <span class="flag-status" id="status2"></span>
+            </div>
+            <div class="flag-input-group" id="group3">
+                <span class="flag-number">#3</span>
+                <input type="text" id="flag3" placeholder="flag{...}" autocomplete="off" spellcheck="false">
+                <span class="flag-status" id="status3"></span>
+            </div>
+            <div class="flag-input-group" id="group4">
+                <span class="flag-number">#4</span>
+                <input type="text" id="flag4" placeholder="flag{...}" autocomplete="off" spellcheck="false">
+                <span class="flag-status" id="status4"></span>
+            </div>
+            <div class="flag-input-group" id="group5">
+                <span class="flag-number">#5</span>
+                <input type="text" id="flag5" placeholder="flag{...}" autocomplete="off" spellcheck="false">
+                <span class="flag-status" id="status5"></span>
+            </div>
+            <div class="flag-input-group" id="group6">
+                <span class="flag-number">#6</span>
+                <input type="text" id="flag6" placeholder="flag{...}" autocomplete="off" spellcheck="false">
+                <span class="flag-status" id="status6"></span>
+            </div>
+
+            <button type="submit" class="submit-btn">Verify Flags</button>
+        </form>
+
+        <div class="result-box" id="resultBox">
+            <h2 id="resultTitle"></h2>
+            <div class="score" id="resultScore"></div>
+            <p id="resultMsg"></p>
+            <button class="reset-btn" id="resetBtn">Try Again</button>
+        </div>
+
+        <div class="hints-section">
+            <h3>Need help? Check the hints</h3>
+
+            <details class="hint-toggle">
+                <summary>Flag 1 — Reconnaissance</summary>
+                <div class="hint-content">Check files that web crawlers read. It reveals hidden paths on the site.</div>
+            </details>
+
+            <details class="hint-toggle">
+                <summary>Flag 2 — Source Code</summary>
+                <div class="hint-content">View the page source. Developers sometimes leave notes in HTML comments.</div>
+            </details>
+
+            <details class="hint-toggle">
+                <summary>Flag 3 — Environment Variables</summary>
+                <div class="hint-content">From the first flag, you know a secret config file exists. It should never be public.</div>
+            </details>
+
+            <details class="hint-toggle">
+                <summary>Flag 4 — Backup File</summary>
+                <div class="hint-content">There is a backup directory with a config file. It contains an encoded string — decode it.</div>
+            </details>
+
+            <details class="hint-toggle">
+                <summary>Flag 5 — JavaScript Analysis</summary>
+                <div class="hint-content">Read the auth JavaScript source. The password hash can be reversed using rainbow tables.</div>
+            </details>
+
+            <details class="hint-toggle">
+                <summary>Flag 6 — Final Flag</summary>
+                <div class="hint-content">Use the credentials you found to log in. The dashboard holds the final flag.</div>
+            </details>
+        </div>
+    </div>
+
+    <script>
+        const FLAGS = {
+            1: 'flag{r3c0nn4ss4nc3_1s_k3y}',
+            2: 'flag{h1dd3n_1n_pl41n_s1ght}',
+            3: 'flag{3nv_v4r14bl3s_sh0uld_n3v3r_b3_3xp0s3d}',
+            4: 'flag{client_side_auth_is_no_auth}',
+            5: 'flag{cr4ck3d_th3_h4sh_w1th_r41nb0w_t4bl3s}',
+            6: 'flag{y0u_4r3_th3_t3chv4ult_m4st3r}'
+        };
+
+        const form = document.getElementById('flagForm');
+        const resultBox = document.getElementById('resultBox');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let correct = 0;
+            const total = Object.keys(FLAGS).length;
+
+            for (let i = 1; i <= total; i++) {
+                const input = document.getElementById('flag' + i);
+                const group = document.getElementById('group' + i);
+                const status = document.getElementById('status' + i);
+                const value = input.value.trim();
+
+                group.classList.remove('correct', 'wrong');
+
+                if (value === FLAGS[i]) {
+                    correct++;
+                    group.classList.add('correct');
+                    status.textContent = '✅';
+                } else {
+                    group.classList.add('wrong');
+                    status.textContent = '❌';
+                }
+            }
+
+            const resultTitle = document.getElementById('resultTitle');
+            const resultScore = document.getElementById('resultScore');
+            const resultMsg = document.getElementById('resultMsg');
+
+            resultBox.classList.remove('success', 'partial');
+
+            if (correct === total) {
+                resultBox.classList.add('success');
+                resultTitle.textContent = 'CTF COMPLETED!';
+                resultScore.textContent = `${correct}/${total}`;
+                resultMsg.textContent = 'You successfully exploited all vulnerabilities. You are a true TechVault hacker!';
+            } else {
+                resultBox.classList.add('partial');
+                resultTitle.textContent = 'Not quite there yet';
+                resultScore.textContent = `${correct}/${total}`;
+                resultMsg.textContent = `You got ${correct} out of ${total} flags correct. Keep digging!`;
+            }
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            for (let i = 1; i <= 6; i++) {
+                document.getElementById('flag' + i).value = '';
+                document.getElementById('group' + i).classList.remove('correct', 'wrong');
+                document.getElementById('status' + i).textContent = '';
+            }
+            resultBox.classList.remove('success', 'partial');
+            resultBox.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
