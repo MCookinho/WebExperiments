@@ -12,7 +12,7 @@
         {
             "name": "AI Thing",
             "description": "I asked an AI to build a website and let it do everything on its own, and then it created that monstrosity...",
-            "tags": ["exemplo", "teste"],
+            "tags": ["Experiment", "AI", "Random"],
             "image": "Projects/AI-Thing/thumb.gif",
             "url": "Projects/AI-Thing",
             "color": "#00d4ff",
@@ -21,7 +21,7 @@
         {
             "name": "Test",
             "description": "Just Testing the website.",
-            "tags": ["exemplo", "demo"],
+            "tags": ["Template", "Test"],
             "image": "",
             "url": "Projects/exemplo-3/",
             "color": "#ff00ff",
