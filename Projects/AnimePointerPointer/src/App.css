@@ -41,7 +41,7 @@ body, html {
 }
 
 .Loading.mod-loader {
-  background: #0a0a1a url('/spinner.svg') no-repeat fixed center;
+  background: var(--spinner-url) no-repeat fixed center;
   background-size: 3em 3em;
 }
 

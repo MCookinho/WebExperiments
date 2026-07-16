@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import './App.css'
 
+const BASE = import.meta.env.BASE_URL || '/'
 const RECENT_LIMIT = 6
 const recentIndices = []
 const INITIAL_STATE = { src: undefined, style: undefined }
@@ -50,7 +51,7 @@ function findBestImage(mouse, positions) {
 function usePositions() {
   const [positions, setPositions] = useState([])
   useEffect(() => {
-    fetch('/positions.json')
+    fetch(`${BASE}positions.json`)
       .then(r => r.json())
       .then(data => setPositions(data.map(([x, y]) => ({ x, y }))))
   }, [])
@@ -105,7 +106,7 @@ function CursorDot({ position }) {
       position: 'absolute',
       transform: `translate(${position.x - 3}px, ${position.y - 4}px)`,
     }}>
-      <img src="/cursor.svg" width="15" alt="pointer" />
+      <img src={`${BASE}cursor.svg`} width="15" alt="pointer" />
     </div>
   )
 }
@@ -133,6 +134,8 @@ export default function App() {
     }
     const onMouseLeave = () => setIsOutside(true)
     const onMouseEnter = () => setIsOutside(false)
+
+    document.documentElement.style.setProperty('--spinner-url', `url(${BASE}spinner.svg)`)
 
     window.addEventListener('mousemove', onMouseMove)
     window.addEventListener('touchmove', onTouchMove)
@@ -165,7 +168,7 @@ export default function App() {
     }
 
     const fingerPos = positions[idx]
-    const src = `/images/${idx}.jpg`
+    const src = `${BASE}images/${idx}.jpg`
     setImageSrc(src)
 
     const img = new Image()
