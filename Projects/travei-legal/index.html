@@ -229,6 +229,68 @@
       justify-content: center;
     }
 
+    .live-transcript {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px dashed var(--card-border);
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.2s;
+    }
+
+    .live-transcript .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-dim);
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+
+    .live-transcript.active .dot {
+      background: var(--danger);
+      animation: dotPulse 0.8s ease-in-out infinite;
+    }
+
+    @keyframes dotPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    .live-transcript .transcript-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-dim);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .live-transcript.active .transcript-label {
+      color: var(--danger);
+    }
+
+    .live-transcript .transcript-text {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--primary-glow);
+      font-style: italic;
+      min-height: 1.3em;
+      opacity: 0.4;
+      transition: opacity 0.2s;
+    }
+
+    .live-transcript.active .transcript-text {
+      opacity: 1;
+    }
+
+    .live-transcript .transcript-text.has-text {
+      opacity: 1;
+    }
+
     /* Microphone Button */
     .mic-section {
       margin: 12px 0;
@@ -603,6 +665,11 @@
     <div class="twister-card">
       <div class="twister-number" id="twisterNumber">TRAVA-LÍNGUA #1</div>
       <div class="twister-text" id="twisterText">Traz os trecos dos trancos e dos troncos</div>
+      <div class="live-transcript" id="liveTranscript">
+        <div class="dot"></div>
+        <span class="transcript-label">Você:</span>
+        <span class="transcript-text" id="transcriptText">...</span>
+      </div>
     </div>
 
     <div class="mic-section">
@@ -772,6 +839,7 @@
       currentTwister = TRAVA_LINGUAS[currentIndex];
       document.getElementById('twisterNumber').textContent = `TRAVA-LÍNGUA #${points + 1}`;
       document.getElementById('twisterText').textContent = currentTwister;
+      clearLiveTranscript();
       currentIndex++;
     }
 
@@ -791,9 +859,17 @@
 
       recognition.onresult = (e) => {
         const transcript = e.results[0][0].transcript;
-        const conf = e.results[0][0].confidence;
+        const interimTranscript = e.results[0][e.results[0].length - 1].transcript;
+        const isFinal = e.results[0].isFinal;
 
-        if (e.results[0].isFinal) {
+        // Show live transcript
+        const liveEl = document.getElementById('liveTranscript');
+        const textEl = document.getElementById('transcriptText');
+        liveEl.classList.add('active');
+        textEl.textContent = interimTranscript;
+        textEl.classList.add('has-text');
+
+        if (isFinal) {
           stopListening();
           checkAnswer(transcript);
         }
@@ -847,6 +923,14 @@
       document.getElementById('micBtn').classList.remove('listening');
       document.getElementById('micLabel').textContent = 'Toque para falar';
       try { recognition?.stop(); } catch(e) {}
+    }
+
+    function clearLiveTranscript() {
+      const liveEl = document.getElementById('liveTranscript');
+      const textEl = document.getElementById('transcriptText');
+      liveEl.classList.remove('active');
+      textEl.textContent = '...';
+      textEl.classList.remove('has-text');
     }
 
     function checkAnswer(transcript) {
