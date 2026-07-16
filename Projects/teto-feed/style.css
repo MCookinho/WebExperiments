@@ -507,13 +507,54 @@ body {
     border: 1px solid var(--card-border);
     border-radius: 16px;
     padding: 25px;
+    max-height: 500px;
+    overflow-y: auto;
 }
 
-.track-list h4 {
-    font-size: 1rem;
+.track-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.track-list-header h4 {
+    font-size: 1rem;
     color: var(--pink);
     font-family: 'JetBrains Mono', monospace;
+    margin: 0;
+}
+
+.search-input {
+    background: var(--darker);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.85rem;
+    width: 180px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.search-input:focus {
+    border-color: var(--pink);
+}
+
+.search-input::placeholder {
+    color: var(--text-dim);
+}
+
+.player-time {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-bottom: 15px;
 }
 
 .track-item {

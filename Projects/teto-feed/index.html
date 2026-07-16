@@ -66,6 +66,8 @@
             <h2 class="section-title glitch" data-text="♪ MUSIC PLAYER">♪ MUSIC PLAYER</h2>
             <p class="section-subtitle">Listen to Kasane Teto's most iconic tracks</p>
 
+            <div id="ytPlayer" style="position:absolute;width:0;height:0;opacity:0;pointer-events:none;"></div>
+
             <div class="player-container">
                 <div class="player-main">
                     <div class="player-artwork">
@@ -78,6 +80,10 @@
                         <div class="player-progress">
                             <div class="progress-bar" id="progressBar"></div>
                         </div>
+                        <div class="player-time">
+                            <span id="playerCurrentTime">0:00</span>
+                            <span id="playerTotalTime">0:00</span>
+                        </div>
                         <div class="player-controls">
                             <button class="ctrl-btn" onclick="prevTrack()">⏮</button>
                             <button class="ctrl-btn play-btn" id="playBtn" onclick="togglePlay()">▶</button>
@@ -87,7 +93,12 @@
                 </div>
 
                 <div class="track-list">
-                    <h4>Playlist</h4>
+                    <div class="track-list-header">
+                        <h4>Playlist • <span id="trackCount">0</span> tracks</h4>
+                        <div class="track-search">
+                            <input type="text" placeholder="Search songs..." oninput="searchTracks(this.value)" class="search-input">
+                        </div>
+                    </div>
                     <div id="trackList"></div>
                 </div>
             </div>
