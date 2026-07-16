@@ -532,7 +532,7 @@ function createNextbot(spawnPos) {
   nextbotSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: nextbotTex }));
   nextbotSprite.scale.set(3.5, 5, 1);
   nextbotSprite.position.copy(spawnPos);
-  nextbotSprite.position.y = 2.5;
+  nextbotSprite.position.y = spawnPos.y + 2.5;
   scene.add(nextbotSprite);
 
   botLight = new THREE.PointLight(0xff0022, 2, 20);
@@ -825,23 +825,28 @@ function findSpawnPos() {
 }
 
 function findBotSpawnPos(playerP) {
-  let best = null, bestDist = 0;
-  const minX = gridOffsetX + 2, maxX = gridOffsetX + gridW * GRID_SIZE - 2;
-  const minZ = gridOffsetZ + 2, maxZ = gridOffsetZ + gridH * GRID_SIZE - 2;
-  for (let x = minX; x < maxX; x += 3) {
-    for (let z = minZ; z < maxZ; z += 3) {
-      if (!testCollisionAt(x, z, 0.5)) {
-        const dx = x - playerP.x, dz = z - playerP.z;
-        const d = dx * dx + dz * dz;
-        if (d > bestDist && d > 16) { bestDist = d; best = new THREE.Vector3(x, 0, z); }
-      }
+  const minDist = 30;
+  const maxDist = 50;
+  const angle = Math.random() * Math.PI * 2;
+  for (let d = minDist; d <= maxDist; d += 3) {
+    const tx = playerP.x + Math.cos(angle) * d;
+    const tz = playerP.z + Math.sin(angle) * d;
+    if (!testCollisionAt(tx, tz, 0.5)) {
+      const feet = getFloorY(tx, tz, -999);
+      if (feet > -10) return new THREE.Vector3(tx, feet, tz);
     }
   }
-  if (best) {
-    const botFeet = getFloorY(best.x, best.z, -999);
-    if (botFeet > -900) best.y = botFeet;
+  for (let attempt = 0; attempt < 60; attempt++) {
+    const a = Math.random() * Math.PI * 2;
+    const r = minDist + Math.random() * (maxDist - minDist);
+    const tx = playerP.x + Math.cos(a) * r;
+    const tz = playerP.z + Math.sin(a) * r;
+    if (!testCollisionAt(tx, tz, 0.5)) {
+      const feet = getFloorY(tx, tz, -999);
+      if (feet > -10) return new THREE.Vector3(tx, feet, tz);
+    }
   }
-  return best || new THREE.Vector3(10, 0, 10);
+  return new THREE.Vector3(playerP.x + 40, 0, playerP.z);
 }
 
 /* ─── PROCEDURAL CITY MAP ─── */
@@ -1215,6 +1220,12 @@ function buildFallbackMap() {
     geoByMaterial.get(mat).push(g);
   }
 
+  function markPropWall(wx, wz) {
+    const gx = Math.round(wx / C + halfW);
+    const gz = Math.round(wz / C + halfH);
+    if (gx >= 0 && gx < GW && gz >= 0 && gz < GH) wallMap[gz][gx] = 1;
+  }
+
   function collectCylinder(mat, x, y, z, rTop, rBot, h, segs) {
     if (!geoByMaterial.has(mat)) geoByMaterial.set(mat, []);
     const g = new THREE.CylinderGeometry(rTop, rBot, h, segs || 8);
@@ -1360,6 +1371,7 @@ function buildFallbackMap() {
         collectCylinder(materials.pole, wx, 0, wz, 0.06, 0.08, 5.5, 8);
         collectBox(materials.pole, wx, 5.0, wz, 0.08, 0.08, 2.0);
         collectBox(materials.lampBulb, wx, 4.8, wz + 0.8, 0.3, 0.15, 0.3);
+        markPropWall(wx, wz);
 
         streetLights.push({ x: wx, z: wz + 0.8 });
       }
@@ -1415,6 +1427,7 @@ function buildFallbackMap() {
         const wz = (z - halfH) * C + (rng() - 0.5) * 0.5;
         if (treePositions.some(t => Math.abs(t.x - wx) < C * 2 && Math.abs(t.z - wz) < C * 2)) continue;
         treePositions.push({ x: wx, z: wz });
+        markPropWall(wx, wz);
 
         const trunkH = 2.5 + rng() * 1.5;
         collectCylinder(materials.treeTrunk, wx, 0.15, wz, 0.12, 0.18, trunkH, 6);
@@ -1435,6 +1448,7 @@ function buildFallbackMap() {
       const wz = (z - halfH) * C;
 
       if (rng() > 0.5) {
+        markPropWall(wx, wz);
         const trunkH = 2.0 + rng() * 1.0;
         collectCylinder(materials.treeTrunk, wx, 0.1, wz, 0.1, 0.15, trunkH, 6);
         const leafMat = rng() > 0.5 ? materials.treeLeaves : materials.treeLeavesDark;
@@ -1460,19 +1474,25 @@ function buildFallbackMap() {
         const wx = (x - halfW) * C;
         const wz = (z - halfH) * C;
         if (facingStreet === 0 || facingStreet === 1) {
-          collectBox(materials.bench, wx, 0.15, wz, 1.2, 0.08, 0.4);
-          collectBox(materials.benchMetal, wx - 0.5, 0, wz, 0.08, 0.5, 0.35);
-          collectBox(materials.benchMetal, wx + 0.5, 0, wz, 0.08, 0.5, 0.35);
+          const seatW = 1.2, seatD = 0.4, legH = 0.38, seatThick = 0.06, legW = 0.06;
+          collectBox(materials.bench, wx, legH, wz, seatW, seatThick, seatD);
+          collectBox(materials.benchMetal, wx - seatW/2 + legW, 0, wz, legW, legH, seatD * 0.8);
+          collectBox(materials.benchMetal, wx + seatW/2 - legW, 0, wz, legW, legH, seatD * 0.8);
+          collectBox(materials.benchMetal, wx, legH + 0.02, wz - seatD/2 + 0.02, seatW * 0.9, 0.32, 0.04);
         } else {
-          collectBox(materials.bench, wx, 0.15, wz, 0.4, 0.08, 1.2);
-          collectBox(materials.benchMetal, wx, 0, wz - 0.5, 0.35, 0.5, 0.08);
-          collectBox(materials.benchMetal, wx, 0, wz + 0.5, 0.35, 0.5, 0.08);
+          const seatW = 0.4, seatD = 1.2, legH = 0.38, seatThick = 0.06, legW = 0.06;
+          collectBox(materials.bench, wx, legH, wz, seatW, seatThick, seatD);
+          collectBox(materials.benchMetal, wx, 0, wz - seatD/2 + legW, seatW * 0.8, legH, legW);
+          collectBox(materials.benchMetal, wx, 0, wz + seatD/2 - legW, seatW * 0.8, legH, legW);
+          collectBox(materials.benchMetal, wx, legH + 0.02, wz + seatD/2 - 0.02, 0.04, 0.32, seatD * 0.9);
         }
+        markPropWall(wx, wz);
       }
       if (rng() > 0.95) {
         const wx = (x - halfW) * C + (rng() - 0.5) * 0.6;
         const wz = (z - halfH) * C + (rng() - 0.5) * 0.6;
         collectCylinder(materials.trashcan, wx, 0.15, wz, 0.2, 0.22, 0.7, 8);
+        markPropWall(wx, wz);
       }
     }
   }
@@ -1483,6 +1503,11 @@ function buildFallbackMap() {
   collectCylinder(materials.fountain, pcx, 0.8, pcz, 1.8, 2.0, 0.5, 16);
   collectCylinder(materials.water, pcx, 0.9, pcz, 1.7, 1.7, 0.3, 16);
   collectCylinder(materials.fountain, pcx, 1.2, pcz, 0.3, 0.4, 1.0, 8);
+  for (let dz = -1; dz <= 1; dz++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      markPropWall(pcx + dx * C, pcz + dz * C);
+    }
+  }
 
   for (const [mat, geos] of geoByMaterial) {
     if (geos.length === 0) continue;
