@@ -41,10 +41,11 @@ canvas#game-canvas{display:block}
 
 #death-text{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3rem;color:#ff0040;z-index:2001;display:none;text-shadow:0 0 20px #ff0040;font-weight:700;letter-spacing:5px}
 
-#loading{position:fixed;inset:0;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:999;color:#fff}
+#loading{position:fixed;inset:0;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:1001;color:#fff}
 #loading .spinner{width:40px;height:40px;border:3px solid #222;border-top-color:#ff0040;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:1rem}
 @keyframes spin{to{transform:rotate(360deg)}}
 #loading p{color:#666;font-size:.9rem}
+#loading .error{color:#ff4444;font-size:.8rem;margin-top:.5rem;max-width:400px;text-align:center}
 </style>
 </head>
 <body>
@@ -62,7 +63,7 @@ canvas#game-canvas{display:block}
   <button id="start-btn">JOGAR</button>
 </div>
 
-<div id="loading"><div class="spinner"></div><p>Carregando mapa...</p></div>
+<div id="loading"><div class="spinner"></div><p id="loading-text">Carregando...</p><div class="error" id="loading-error"></div></div>
 
 <div id="crosshair"></div>
 <div id="stamina-bar"><div id="stamina-fill"></div></div>
@@ -87,6 +88,8 @@ canvas#game-canvas{display:block}
 <script type="module">
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const $ = id => document.getElementById(id);
 
 /* ─── CONSTANTS ─── */
 const PR = 0.35;
@@ -119,7 +122,6 @@ renderer.domElement.id = 'game-canvas';
 
 const camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 200);
 
-/* ─── LIGHTING ─── */
 scene.add(new THREE.AmbientLight(0xffe8cc, 0.15));
 scene.add(new THREE.HemisphereLight(0xffeedd, 0x221100, 0.2));
 
@@ -137,29 +139,18 @@ scene.add(camera);
 const colliders = [];
 
 function addColliderFromMesh(mesh) {
-  const geo = mesh.geometry;
-  const posAttr = geo.getAttribute('position');
-  if (!posAttr) return;
-
   const bbox = new THREE.Box3().setFromObject(mesh);
   const size = new THREE.Vector3();
   bbox.getSize(size);
-
   if (size.x < 0.01 || size.y < 0.01 || size.z < 0.01) return;
   if (size.x > 50 || size.y > 50 || size.z > 50) return;
-
   colliders.push(bbox);
-}
-
-function addColliderFromBox3(box) {
-  colliders.push(box.clone());
 }
 
 function testCollisionX(px, pz, r) {
   for (const b of colliders) {
     const closestZ = Math.max(b.min.z, Math.min(pz, b.max.z));
-    const dz = Math.abs(pz - closestZ);
-    if (dz >= r) continue;
+    if (Math.abs(pz - closestZ) >= r) continue;
     if (px + r > b.min.x && px - r < b.max.x) return true;
   }
   return false;
@@ -168,24 +159,23 @@ function testCollisionX(px, pz, r) {
 function testCollisionZ(px, pz, r) {
   for (const b of colliders) {
     const closestX = Math.max(b.min.x, Math.min(px, b.max.x));
-    const dx = Math.abs(px - closestX);
-    if (dx >= r) continue;
+    if (Math.abs(px - closestX) >= r) continue;
     if (pz + r > b.min.z && pz - r < b.max.z) return true;
   }
   return false;
 }
 
 function getFloorY(px, pz) {
-  let maxY = 0;
+  let maxY = -999;
   for (const b of colliders) {
     if (px >= b.min.x - 0.1 && px <= b.max.x + 0.1 &&
         pz >= b.min.z - 0.1 && pz <= b.max.z + 0.1) {
-      if (b.min.y <= maxY + 0.1 && b.max.y > maxY) {
+      if (b.max.y > maxY && b.min.y < maxY + 1) {
         maxY = b.max.y;
       }
     }
   }
-  return maxY;
+  return maxY > -999 ? maxY : 0;
 }
 
 /* ─── PLAYER STATE ─── */
@@ -201,11 +191,10 @@ let headBob = 0;
 let shakeAmount = 0;
 let floorY = 0;
 
-/* ─── INPUT ─── */
 document.addEventListener('keydown', e => {
   keys[e.code] = true;
   if (e.code === 'ShiftLeft') sprinting = true;
-  e.preventDefault();
+  if (['Space','KeyW','KeyS','KeyA','KeyD'].includes(e.code)) e.preventDefault();
 });
 document.addEventListener('keyup', e => {
   keys[e.code] = false;
@@ -263,7 +252,7 @@ function updatePlayer(dt) {
 
   const feetY = playerPos.y - EYE;
   const ground = getFloorY(playerPos.x, playerPos.z);
-  if (feetY <= ground) {
+  if (feetY <= ground + 0.05) {
     playerPos.y = ground + EYE;
     playerVel.y = 0;
     onGround = true;
@@ -288,8 +277,8 @@ function updatePlayer(dt) {
     if (shakeAmount < 0.001) shakeAmount = 0;
   }
 
-  document.getElementById('stamina-fill').style.width = (stamina / MAX_STAM * 100) + '%';
-  document.getElementById('stamina-fill').style.background = stamina < 25 ? '#ff3030' : '#40ff40';
+  $('stamina-fill').style.width = (stamina / MAX_STAM * 100) + '%';
+  $('stamina-fill').style.background = stamina < 25 ? '#ff3030' : '#40ff40';
 }
 
 /* ─── GRID FOR PATHFINDING ─── */
@@ -306,21 +295,16 @@ function buildWallGrid() {
     for (let gx = 0; gx < gridW; gx++) {
       const wx = gx * GRID_SIZE + gridOffsetX + GRID_SIZE / 2;
       const wz = gz * GRID_SIZE + gridOffsetZ + GRID_SIZE / 2;
-
       for (const b of colliders) {
         const hw = (b.max.x - b.min.x) / 2;
         const hd = (b.max.z - b.min.z) / 2;
         const hh = b.max.y - b.min.y;
-
         if (hh < 0.5 || hh > 20) continue;
         if (hw > 15 || hd > 15) continue;
-
         const cx = (b.min.x + b.max.x) / 2;
         const cz = (b.min.z + b.max.z) / 2;
-
         const dx = Math.abs(wx - cx);
         const dz = Math.abs(wz - cz);
-
         if (dx < hw + PR && dz < hd + PR && b.max.y > 0.5) {
           wallGrid[gz * gridW + gx] = 1;
           break;
@@ -343,193 +327,79 @@ function worldToGrid(pos) {
 }
 
 function gridToWorld(gx, gz) {
-  return new THREE.Vector3(
-    gx * GRID_SIZE + gridOffsetX + GRID_SIZE / 2,
-    0,
-    gz * GRID_SIZE + gridOffsetZ + GRID_SIZE / 2
-  );
+  return new THREE.Vector3(gx * GRID_SIZE + gridOffsetX + GRID_SIZE / 2, 0, gz * GRID_SIZE + gridOffsetZ + GRID_SIZE / 2);
 }
 
-/* ─── BFS PATHFINDING ─── */
 function bfsPath(sx, sz, gx, gz) {
   if (sx === gx && sz === gz) return [{ x: gx, z: gz }];
   if (isGridWall(gx, gz)) return null;
   if (sx < 0 || sx >= gridW || sz < 0 || sz >= gridH) return null;
-
   const visited = new Uint8Array(gridW * gridH);
   const parent = new Int32Array(gridW * gridH).fill(-1);
   const queue = [sz * gridW + sx];
   visited[sz * gridW + sx] = 1;
-
-  const dirs = [1, -1, gridW, -gridW];
-
   while (queue.length > 0) {
     const cur = queue.shift();
     const cx = cur % gridW;
-    const cz = Math.floor(cur / gridW);
-
-    for (let i = 0; i < 4; i++) {
-      const nx = cx + (i < 2 ? (i === 0 ? 1 : -1) : 0);
-      const nz = cz + (i >= 2 ? (i === 2 ? 1 : -1) : 0);
-      const ni = nz * gridW + nx;
-
+    const cz = (cur / gridW) | 0;
+    const nbrs = [
+      [cx + 1, cz], [cx - 1, cz],
+      [cx, cz + 1], [cx, cz - 1]
+    ];
+    for (const [nx, nz] of nbrs) {
       if (nx === gx && nz === gz) {
         const path = [{ x: nx, z: nz }];
         let p = cur;
         while (p !== sz * gridW + sx) {
-          path.unshift({ x: p % gridW, z: Math.floor(p / gridW) });
+          path.unshift({ x: p % gridW, z: (p / gridW) | 0 });
           p = parent[p];
         }
         return path;
       }
-
-      if (nx >= 0 && nx < gridW && nz >= 0 && nz < gridH &&
-          !visited[ni] && !isGridWall(nx, nz)) {
-        visited[ni] = 1;
-        parent[ni] = cur;
-        queue.push(ni);
+      if (nx >= 0 && nx < gridW && nz >= 0 && nz < gridH) {
+        const ni = nz * gridW + nx;
+        if (!visited[ni] && !isGridWall(nx, nz)) {
+          visited[ni] = 1;
+          parent[ni] = cur;
+          queue.push(ni);
+        }
       }
     }
   }
   return null;
 }
 
-/* ─── LOAD MAP ─── */
-document.getElementById('loading').style.display = 'flex';
-
-const gltfLoader = new GLTFLoader();
-const gltf = await gltfLoader.loadAsync('backroom.glb');
-const mapRoot = gltf.scene;
-
-mapRoot.traverse((child) => {
-  if (child.isMesh) {
-    child.castShadow = true;
-    child.receiveShadow = true;
-
-    if (child.material) {
-      if (Array.isArray(child.material)) {
-        child.material.forEach(m => {
-          m.side = THREE.DoubleSide;
-          if (m.map) m.map.colorSpace = THREE.SRGBColorSpace;
-        });
-      } else {
-        child.material.side = THREE.DoubleSide;
-        if (child.material.map) child.material.map.colorSpace = THREE.SRGBColorSpace;
-      }
-    }
-    addColliderFromMesh(child);
-  }
-});
-
-scene.add(mapRoot);
-
-const mapBBox = new THREE.Box3().setFromObject(mapRoot);
-const mapCenter = new THREE.Vector3();
-mapBBox.getCenter(mapCenter);
-const mapSize = new THREE.Vector3();
-mapBBox.getSize(mapSize);
-
-console.log('Map bounds:', mapBBox.min.toArray(), mapBBox.max.toArray());
-console.log('Map size:', mapSize.toArray());
-console.log('Colliders:', colliders.length);
-
-/* ─── PLACE LIGHTS IN MAP ─── */
-const existingLights = [];
-mapRoot.traverse((child) => {
-  if (child.isLight) existingLights.push(child);
-});
-
-if (existingLights.length < 5) {
-  const step = 8;
-  for (let x = mapBBox.min.x + 4; x < mapBBox.max.x; x += step) {
-    for (let z = mapBBox.min.z + 4; z < mapBBox.max.z; z += step) {
-      if (!testCollisionX(x, z, 0.1) && !testCollisionZ(x, z, 0.1)) {
-        const pl = new THREE.PointLight(0xffddaa, 0.5, 12, 1.5);
-        pl.position.set(x, 3.5, z);
-        scene.add(pl);
-      }
-    }
-  }
-}
-
-/* ─── GRID-BASED PATHFINDING WALL DETECTION ─── */
-buildWallGrid();
-
-let openCount = 0;
-for (let i = 0; i < wallGrid.length; i++) if (wallGrid[i] === 0) openCount++;
-console.log('Open grid cells:', openCount, '/', gridW * gridH);
-
-/* ─── FIND SPAWN ─── */
-function findSpawnPos() {
-  const cx = mapCenter.x;
-  const cz = mapCenter.z;
-  for (let r = 0; r < 30; r += 2) {
-    for (let dx = -r; dx <= r; dx += 2) {
-      for (let dz = -r; dz <= r; dz += 2) {
-        const x = cx + dx;
-        const z = cz + dz;
-        if (!testCollisionX(x, z, PR) && !testCollisionZ(x, z, PR)) {
-          return new THREE.Vector3(x, EYE, z);
-        }
-      }
-    }
-  }
-  return new THREE.Vector3(cx, EYE, cz);
-}
-
-function findBotSpawnPos() {
-  let best = null;
-  let bestDist = 0;
-  for (let x = mapBBox.min.x + 2; x < mapBBox.max.x - 2; x += 3) {
-    for (let z = mapBBox.min.z + 2; z < mapBBox.max.z - 2; z += 3) {
-      if (!testCollisionX(x, z, 0.5) && !testCollisionZ(x, z, 0.5)) {
-        const dx = x - playerPos.x;
-        const dz = z - playerPos.z;
-        const d = dx * dx + dz * dz;
-        if (d > bestDist) { bestDist = d; best = new THREE.Vector3(x, 0, z); }
-      }
-    }
-  }
-  return best || new THREE.Vector3(cx + 10, 0, cz + 10);
-}
-
-playerPos.copy(findSpawnPos());
-const botSpawnPos = findBotSpawnPos();
-
-console.log('Player spawn:', playerPos.toArray());
-console.log('Bot spawn:', botSpawnPos.toArray());
-
 /* ─── NEXTBOT ─── */
-const nextbotTex = new THREE.TextureLoader().load('mbappe.png');
-nextbotTex.colorSpace = THREE.SRGBColorSpace;
-const nextbotSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: nextbotTex }));
-nextbotSprite.scale.set(3.5, 5, 1);
-nextbotSprite.position.copy(botSpawnPos);
-nextbotSprite.position.y = 2.5;
-scene.add(nextbotSprite);
-
-const botLight = new THREE.PointLight(0xff0022, 2, 20);
-botLight.position.copy(nextbotSprite.position);
-botLight.position.y = 4;
-scene.add(botLight);
-
-const botLight2 = new THREE.PointLight(0xff4400, 0.6, 10);
-botLight2.position.copy(nextbotSprite.position);
-botLight2.position.y = 1;
-scene.add(botLight2);
-
-let botPath = null;
-let botPathIdx = 0;
-let botRecalcTimer = 0;
-let botStuckTimer = 0;
-const botLastPos = new THREE.Vector3().copy(nextbotSprite.position);
+let nextbotSprite, botLight, botLight2;
+let botPath = null, botPathIdx = 0, botRecalcTimer = 0, botStuckTimer = 0;
+const botLastPos = new THREE.Vector3();
 let botActivated = false;
-const BOT_ACTIVATION_DIST = 45;
+
+function createNextbot(spawnPos) {
+  const nextbotTex = new THREE.TextureLoader().load('mbappe.png');
+  nextbotTex.colorSpace = THREE.SRGBColorSpace;
+  nextbotSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: nextbotTex }));
+  nextbotSprite.scale.set(3.5, 5, 1);
+  nextbotSprite.position.copy(spawnPos);
+  nextbotSprite.position.y = 2.5;
+  scene.add(nextbotSprite);
+
+  botLight = new THREE.PointLight(0xff0022, 2, 20);
+  botLight.position.copy(nextbotSprite.position);
+  botLight.position.y = 4;
+  scene.add(botLight);
+
+  botLight2 = new THREE.PointLight(0xff4400, 0.6, 10);
+  botLight2.position.copy(nextbotSprite.position);
+  botLight2.position.y = 1;
+  scene.add(botLight2);
+
+  botLastPos.copy(nextbotSprite.position);
+}
 
 function updateBot(dt) {
   const dist = nextbotSprite.position.distanceTo(playerPos);
-
-  if (dist < BOT_ACTIVATION_DIST && !botActivated) botActivated = true;
+  if (dist < 45 && !botActivated) botActivated = true;
   if (!botActivated) return;
 
   const bg = worldToGrid(nextbotSprite.position);
@@ -580,19 +450,12 @@ function updateBot(dt) {
     }
   }
 
-  const feetBot = nextbotSprite.position.y - 2.5;
   const botGround = getFloorY(nextbotSprite.position.x, nextbotSprite.position.z);
-  if (feetBot <= botGround) nextbotSprite.position.y = botGround + 2.5;
-
-  const bobSpeed = dist < 12 ? 10 : 6;
-  const bobAmp = dist < 12 ? 0.25 : 0.12;
-  nextbotSprite.position.y += Math.sin(Date.now() * 0.001 * bobSpeed) * bobAmp * dt * 5;
+  nextbotSprite.position.y = botGround + 2.5 + Math.sin(Date.now() * 0.005) * 0.15;
 
   botLight.position.set(nextbotSprite.position.x, 4, nextbotSprite.position.z);
   botLight2.position.set(nextbotSprite.position.x, 1, nextbotSprite.position.z);
-
-  const intensity = dist < 8 ? 4 : (dist < 20 ? 1.8 : 0.6);
-  botLight.intensity = intensity + Math.sin(Date.now() * 0.01) * 0.8;
+  botLight.intensity = (dist < 8 ? 4 : dist < 20 ? 1.8 : 0.6) + Math.sin(Date.now() * 0.01) * 0.8;
 
   if (dist < CAP_R) triggerCapture();
 }
@@ -600,7 +463,6 @@ function updateBot(dt) {
 /* ─── AUDIO ─── */
 const listener = new THREE.AudioListener();
 camera.add(listener);
-
 let musicBuffer = null, musicSource = null, musicGain = null, musicPlaying = false;
 
 async function loadMusic() {
@@ -627,33 +489,28 @@ function startMusic() {
 function updateAudio() {
   if (!musicPlaying || !musicGain) return;
   const dist = nextbotSprite.position.distanceTo(playerPos);
-  const maxDist = 35;
-  const raw = Math.max(0, 1 - dist / maxDist);
-  const vol = raw * raw * raw;
-  musicGain.gain.setTargetAtTime(Math.min(vol, 0.95), listener.context.currentTime, 0.08);
+  const raw = Math.max(0, 1 - dist / 35);
+  musicGain.gain.setTargetAtTime(Math.min(raw * raw * raw, 0.95), listener.context.currentTime, 0.08);
 
-  const warn = document.getElementById('warning');
-  const vhs = document.getElementById('vhs-overlay');
   if (dist < 14) {
-    warn.style.display = 'block';
-    vhs.style.display = 'block';
-    warn.style.opacity = String(0.5 + (1 - dist / 14) * 0.5);
+    $('warning').style.display = 'block';
+    $('vhs-overlay').style.display = 'block';
+    $('warning').style.opacity = String(0.5 + (1 - dist / 14) * 0.5);
   } else {
-    warn.style.display = 'none';
-    vhs.style.display = 'none';
+    $('warning').style.display = 'none';
+    $('vhs-overlay').style.display = 'none';
   }
 
   if (dist < 10) shakeAmount = Math.max(shakeAmount, (1 - dist / 10) * 0.02);
 }
 
 /* ─── MINIMAP ─── */
-const mmCanvas = document.getElementById('minimap-canvas');
+const mmCanvas = $('minimap-canvas');
 const mmCtx = mmCanvas.getContext('2d');
 
 function updateMinimap() {
   mmCtx.fillStyle = '#0a0808';
   mmCtx.fillRect(0, 0, 160, 160);
-
   const sc = 0.6;
   const px = (playerPos.x - gridOffsetX) * sc;
   const pz = (playerPos.z - gridOffsetZ) * sc;
@@ -696,62 +553,35 @@ function updateMinimap() {
 /* ─── GAME STATE ─── */
 let gameStarted = false;
 let gameOver = false;
+const clock = new THREE.Clock();
 
 function triggerCapture() {
   if (gameOver) return;
   gameOver = true;
   document.exitPointerLock();
+  if (musicPlaying && musicGain) musicGain.gain.setTargetAtTime(1.0, listener.context.currentTime, 0.01);
 
-  if (musicPlaying && musicGain) {
-    musicGain.gain.setTargetAtTime(1.0, listener.context.currentTime, 0.01);
-  }
-
-  document.getElementById('death-text').style.display = 'block';
-  document.getElementById('crosshair').style.display = 'none';
-  document.getElementById('stamina-bar').style.display = 'none';
-  document.getElementById('stamina-hint').style.display = 'none';
-  document.getElementById('warning').style.display = 'none';
-  document.getElementById('vhs-overlay').style.display = 'none';
-  document.getElementById('minimap-wrap').style.display = 'none';
+  $('death-text').style.display = 'block';
+  $('crosshair').style.display = 'none';
+  $('stamina-bar').style.display = 'none';
+  $('stamina-hint').style.display = 'none';
+  $('warning').style.display = 'none';
+  $('vhs-overlay').style.display = 'none';
+  $('minimap-wrap').style.display = 'none';
 
   setTimeout(() => {
-    document.getElementById('death-text').style.display = 'none';
-    const vid = document.getElementById('jumpscare-video');
-    const cap = document.getElementById('capture-overlay');
-    cap.style.display = 'block';
-    vid.style.display = 'block';
-    vid.src = 'ankara_messi.mp4';
-    vid.play();
-    vid.onended = () => {
+    $('death-text').style.display = 'none';
+    $('capture-overlay').style.display = 'block';
+    $('jumpscare-video').style.display = 'block';
+    $('jumpscare-video').src = 'ankara_messi.mp4';
+    $('jumpscare-video').play();
+    $('jumpscare-video').onended = () => {
       window.close();
       window.location.href = 'about:blank';
       document.documentElement.innerHTML = '<head></head><body style="margin:0;display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;font-family:monospace;font-size:2rem;letter-spacing:5px">FIM DE JOGO</body>';
     };
   }, 1200);
 }
-
-/* ─── AUDIO LOAD ─── */
-await loadMusic();
-
-/* ─── LOADING DONE → SHOW MENU ─── */
-document.getElementById('loading').style.display = 'none';
-document.getElementById('overlay').style.display = 'flex';
-
-document.getElementById('start-btn').addEventListener('click', async () => {
-  document.getElementById('overlay').style.display = 'none';
-  document.getElementById('crosshair').style.display = 'block';
-  document.getElementById('stamina-bar').style.display = 'block';
-  document.getElementById('stamina-hint').style.display = 'block';
-  document.getElementById('minimap-wrap').style.display = 'block';
-  gameStarted = true;
-  renderer.domElement.requestPointerLock();
-  if (listener.context.state === 'suspended') await listener.context.resume();
-  startMusic();
-  clock.start();
-  animate();
-});
-
-const clock = new THREE.Clock();
 
 function animate() {
   if (gameOver) { renderer.render(scene, camera); return; }
@@ -762,6 +592,246 @@ function animate() {
   updateAudio();
   updateMinimap();
   renderer.render(scene, camera);
+}
+
+/* ─── START BUTTON (register FIRST, load async on click) ─── */
+$('start-btn').addEventListener('click', async () => {
+  $('start-btn').disabled = true;
+  $('start-btn').textContent = 'CARREGANDO...';
+
+  try {
+    $('loading').style.display = 'flex';
+    $('loading-text').textContent = 'Carregando mapa...';
+
+    const gltfLoader = new GLTFLoader();
+    let gltf;
+    try {
+      gltf = await gltfLoader.loadAsync('backroom.glb');
+    } catch (e) {
+      console.warn('GLB load failed, using fallback map:', e);
+      $('loading-text').textContent = 'Mapa GLB falhou, gerando mapa...';
+      buildFallbackMap();
+      gltf = null;
+    }
+
+    if (gltf) {
+      const mapRoot = gltf.scene;
+      mapRoot.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+          if (child.material) {
+            const mats = Array.isArray(child.material) ? child.material : [child.material];
+            mats.forEach(m => {
+              m.side = THREE.DoubleSide;
+              if (m.map) m.map.colorSpace = THREE.SRGBColorSpace;
+            });
+          }
+          addColliderFromMesh(child);
+        }
+      });
+      scene.add(mapRoot);
+
+      const mapBBox = new THREE.Box3().setFromObject(mapRoot);
+      const mapCenter = new THREE.Vector3();
+      mapBBox.getCenter(mapCenter);
+      const mapSize = new THREE.Vector3();
+      mapBBox.getSize(mapSize);
+      console.log('Map loaded. Size:', mapSize.toArray(), 'Colliders:', colliders.length);
+
+      const existingLights = [];
+      mapRoot.traverse(c => { if (c.isLight) existingLights.push(c); });
+      if (existingLights.length < 5) {
+        for (let x = mapBBox.min.x + 4; x < mapBBox.max.x; x += 8) {
+          for (let z = mapBBox.min.z + 4; z < mapBBox.max.z; z += 8) {
+            if (!testCollisionX(x, z, 0.1) && !testCollisionZ(x, z, 0.1)) {
+              const pl = new THREE.PointLight(0xffddaa, 0.5, 12, 1.5);
+              pl.position.set(x, 3.5, z);
+              scene.add(pl);
+            }
+          }
+        }
+      }
+    }
+
+    buildWallGrid();
+
+    let openCount = 0;
+    for (let i = 0; i < wallGrid.length; i++) if (wallGrid[i] === 0) openCount++;
+    console.log('Open grid cells:', openCount, '/', gridW * gridH);
+
+    let spawnPos = findSpawnPos();
+    playerPos.copy(spawnPos);
+
+    let botSpawn = findBotSpawnPos(playerPos);
+    createNextbot(botSpawn);
+
+    console.log('Player:', playerPos.toArray(), 'Bot:', nextbotSprite.position.toArray());
+
+    await loadMusic();
+
+    $('loading').style.display = 'none';
+    $('overlay').style.display = 'none';
+    $('crosshair').style.display = 'block';
+    $('stamina-bar').style.display = 'block';
+    $('stamina-hint').style.display = 'block';
+    $('minimap-wrap').style.display = 'block';
+    gameStarted = true;
+
+    renderer.domElement.requestPointerLock();
+    if (listener.context.state === 'suspended') await listener.context.resume();
+    startMusic();
+    clock.start();
+    animate();
+
+  } catch (err) {
+    console.error('Game init failed:', err);
+    $('loading-text').textContent = 'Erro ao carregar jogo';
+    $('loading-error').textContent = err.message || String(err);
+    $('start-btn').disabled = false;
+    $('start-btn').textContent = 'TENTAR NOVAMENTE';
+  }
+});
+
+function findSpawnPos() {
+  for (let r = 0; r < 50; r += 3) {
+    for (let dx = -r; dx <= r; dx += 3) {
+      for (let dz = -r; dz <= r; dz += 3) {
+        if (!testCollisionX(dx, dz, PR) && !testCollisionZ(dx, dz, PR)) {
+          return new THREE.Vector3(dx, EYE, dz);
+        }
+      }
+    }
+  }
+  return new THREE.Vector3(0, EYE, 0);
+}
+
+function findBotSpawnPos(playerP) {
+  let best = null, bestDist = 0;
+  for (let x = -80; x < 80; x += 4) {
+    for (let z = -80; z < 80; z += 4) {
+      if (!testCollisionX(x, z, 0.5) && !testCollisionZ(x, z, 0.5)) {
+        const dx = x - playerP.x, dz = z - playerP.z;
+        const d = dx * dx + dz * dz;
+        if (d > bestDist) { bestDist = d; best = new THREE.Vector3(x, 0, z); }
+      }
+    }
+  }
+  return best || new THREE.Vector3(10, 0, 10);
+}
+
+/* ─── FALLBACK MAP (if GLB fails) ─── */
+function buildFallbackMap() {
+  const MAP = [
+    "################################",
+    "#..............................#",
+    "#..............................#",
+    "#..............................#",
+    "#.....######.......####........#",
+    "#.....#....#.......#..#........#",
+    "#.....#....#.......#..#........#",
+    "#.....#....#..#....#..#........#",
+    "#.....#....#..#....#..###......#",
+    "#.....######..#......#.........#",
+    "#.............#......#.........#",
+    "#.............#......#.........#",
+    "#.....###..#..#......#####.....#",
+    "#.....#....#..#..........#.....#",
+    "#.....#....#..#..........#.....#",
+    "#.....#....#..#####......#.....#",
+    "#.....#....#.....#......#......#",
+    "#.....######.....#......#......#",
+    "#................#......#......#",
+    "#................#......#......#",
+    "#.....####.......########......#",
+    "#.....#..............#.........#",
+    "#.....#..............#.........#",
+    "#.....#....########..#..####...#",
+    "#.....#....#.........#..#..#...#",
+    "#..........#.........#..#..#...#",
+    "#..........#.........#..#..#...#",
+    "#.....######.........#..####...#",
+    "#....................#.........#",
+    "#....................#.........#",
+    "#.....###...########...........#",
+    "#.....#.....#..................#",
+    "#.....#.....#..................#",
+    "#.....#.....#....####...####...#",
+    "#.....#.....#....#..#...#..#...#",
+    "#...........#....#..#...#..#...#",
+    "#...........#....#..#...#..#...#",
+    "#.....#######....####...####...#",
+    "#..............................#",
+    "#..............................#",
+    "################################",
+  ];
+
+  const C = 4, WH = 5;
+  const wallMat = new THREE.MeshStandardMaterial({ color: 0x3d3530, roughness: 0.92 });
+  const floorMat = new THREE.MeshStandardMaterial({ color: 0x181512, roughness: 0.88 });
+  const ceilMat = new THREE.MeshStandardMaterial({ color: 0x221e1a, roughness: 0.95 });
+
+  const floorGeo = new THREE.PlaneGeometry(C, C);
+  floorGeo.rotateX(-Math.PI / 2);
+  const ceilGeo = new THREE.PlaneGeometry(C, C);
+  ceilGeo.rotateX(Math.PI / 2);
+  const wallGeoH = new THREE.BoxGeometry(C, WH, 0.25);
+  const wallGeoV = new THREE.BoxGeometry(0.25, WH, C);
+
+  function isWall(x, z) {
+    if (z < 0 || z >= MAP.length || x < 0 || x >= MAP[0].length) return true;
+    return MAP[z][x] === '#';
+  }
+
+  for (let z = 0; z < MAP.length; z++) {
+    for (let x = 0; x < MAP[0].length; x++) {
+      const wx = x * C, wz = z * C;
+      if (!isWall(x, z)) {
+        const fl = new THREE.Mesh(floorGeo, floorMat);
+        fl.position.set(wx + C / 2, 0, wz + C / 2);
+        fl.receiveShadow = true;
+        scene.add(fl);
+        const cl = new THREE.Mesh(ceilGeo, ceilMat);
+        cl.position.set(wx + C / 2, WH, wz + C / 2);
+        scene.add(cl);
+        if (Math.random() < 0.1) {
+          const pl = new THREE.PointLight(0xffaa55, 0.6, 10, 2);
+          pl.position.set(wx + C / 2, WH - 0.4, wz + C / 2);
+          scene.add(pl);
+        }
+      }
+      if (isWall(x, z)) {
+        if (!isWall(x + 1, z)) {
+          const w = new THREE.Mesh(wallGeoV, wallMat);
+          w.position.set((x + 1) * C, WH / 2, wz + C / 2);
+          w.castShadow = true; w.receiveShadow = true;
+          scene.add(w);
+          addColliderFromMesh(w);
+        }
+        if (!isWall(x - 1, z)) {
+          const w = new THREE.Mesh(wallGeoV, wallMat);
+          w.position.set(x * C, WH / 2, wz + C / 2);
+          w.castShadow = true; w.receiveShadow = true;
+          scene.add(w);
+          addColliderFromMesh(w);
+        }
+        if (!isWall(x, z + 1)) {
+          const w = new THREE.Mesh(wallGeoH, wallMat);
+          w.position.set(wx + C / 2, WH / 2, (z + 1) * C);
+          w.castShadow = true; w.receiveShadow = true;
+          scene.add(w);
+          addColliderFromMesh(w);
+        }
+        if (!isWall(x, z - 1)) {
+          const w = new THREE.Mesh(wallGeoH, wallMat);
+          w.position.set(wx + C / 2, WH / 2, z * C);
+          w.castShadow = true; w.receiveShadow = true;
+          scene.add(w);
+          addColliderFromMesh(w);
+        }
+      }
+    }
+  }
 }
 
 window.addEventListener('resize', () => {
