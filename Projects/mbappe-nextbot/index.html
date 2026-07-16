@@ -109,7 +109,7 @@ const STAM_REGEN = 10;
 /* ─── RENDERER ─── */
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0a0808);
-scene.fog = new THREE.Fog(0x0a0808, 15, 65);
+scene.fog = new THREE.Fog(0x0a0808, 20, 80);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -126,7 +126,7 @@ const camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerH
 scene.add(new THREE.AmbientLight(0xffe8cc, 0.15));
 scene.add(new THREE.HemisphereLight(0xffeedd, 0x221100, 0.2));
 
-const flashlight = new THREE.SpotLight(0xffeedd, 3, 20, Math.PI / 5, 0.4, 1.5);
+const flashlight = new THREE.SpotLight(0xffeedd, 3, 25, Math.PI / 5, 0.4, 1.5);
 flashlight.castShadow = true;
 flashlight.shadow.mapSize.set(1024, 1024);
 flashlight.shadow.bias = -0.002;
@@ -300,8 +300,8 @@ function buildWallGrid() {
         const hw = (b.max.x - b.min.x) / 2;
         const hd = (b.max.z - b.min.z) / 2;
         const hh = b.max.y - b.min.y;
-        if (hh < 0.5 || hh > 20) continue;
-        if (hw > 15 || hd > 15) continue;
+        if (hh < 0.3 || hh > 30) continue;
+        if (hw > 30 || hd > 30) continue;
         const cx = (b.min.x + b.max.x) / 2;
         const cz = (b.min.z + b.max.z) / 2;
         const dx = Math.abs(wx - cx);
@@ -610,7 +610,7 @@ $('start-btn').addEventListener('click', async () => {
     gltfLoader.setDRACOLoader(dracoLoader);
     let gltf;
     try {
-      gltf = await gltfLoader.loadAsync('backroom.glb');
+      gltf = await gltfLoader.loadAsync('brezhnevka.glb');
     } catch (e) {
       console.warn('GLB load failed, using fallback map:', e);
       $('loading-text').textContent = 'Mapa GLB falhou, gerando mapa...';
