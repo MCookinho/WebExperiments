@@ -582,10 +582,19 @@ function updateBot(dt) {
       dir.normalize();
       const spd = dist < 12 ? BOT_FAST : BOT_BASE;
       const mv = dir.multiplyScalar(spd * dt);
+      const br = 0.3;
       const nx = nextbotSprite.position.x + mv.x;
       const nz = nextbotSprite.position.z + mv.z;
-      if (!testCollisionX(nx, nextbotSprite.position.z, 0.5)) nextbotSprite.position.x = nx;
-      if (!testCollisionZ(nextbotSprite.position.x, nz, 0.5)) nextbotSprite.position.z = nz;
+      const canX = !testCollisionX(nx, nextbotSprite.position.z, br);
+      const canZ = !testCollisionZ(nextbotSprite.position.x, nz, br);
+      if (canX) nextbotSprite.position.x = nx;
+      if (canZ) nextbotSprite.position.z = nz;
+      if (!canX && !canZ) {
+        const slideX = !testCollisionX(nx, nextbotSprite.position.z + mv.z * 0.5, br);
+        const slideZ = !testCollisionZ(nextbotSprite.position.x + mv.x * 0.5, nz, br);
+        if (slideX) nextbotSprite.position.x = nx;
+        else if (slideZ) nextbotSprite.position.z = nz;
+      }
     }
   } else {
     const dir = new THREE.Vector3().subVectors(playerPos, nextbotSprite.position);
@@ -594,10 +603,11 @@ function updateBot(dt) {
       dir.normalize();
       const spd = dist < 12 ? BOT_FAST : BOT_BASE;
       const mv = dir.multiplyScalar(spd * dt * 0.5);
+      const br = 0.3;
       const nx = nextbotSprite.position.x + mv.x;
       const nz = nextbotSprite.position.z + mv.z;
-      if (!testCollisionX(nx, nextbotSprite.position.z, 0.5)) nextbotSprite.position.x = nx;
-      if (!testCollisionZ(nextbotSprite.position.x, nz, 0.5)) nextbotSprite.position.z = nz;
+      if (!testCollisionX(nx, nextbotSprite.position.z, br)) nextbotSprite.position.x = nx;
+      if (!testCollisionZ(nextbotSprite.position.x, nz, br)) nextbotSprite.position.z = nz;
     }
   }
 
@@ -991,25 +1001,6 @@ function buildFallbackMap() {
     }
   });
 
-  const windowTex = makeTex(64, 64, (ctx, w, h) => {
-    ctx.fillStyle = '#1a2535';
-    ctx.fillRect(0, 0, w, h);
-    for (let i = 0; i < 60; i++) {
-      const bright = Math.random() > 0.6;
-      if (bright) {
-        const r = 200 + Math.random() * 55;
-        const g = 180 + Math.random() * 50;
-        const b = 80 + Math.random() * 40;
-        ctx.fillStyle = `rgba(${r},${g},${b},${0.4+Math.random()*0.4})`;
-      } else {
-        ctx.fillStyle = `rgba(20,30,50,${0.3+Math.random()*0.3})`;
-      }
-      const wx = 4 + Math.floor(Math.random() * 6) * 10;
-      const wy = 4 + Math.floor(Math.random() * 6) * 10;
-      ctx.fillRect(wx, wy, 7, 7);
-    }
-  });
-
   const curbTex = makeTex(64, 32, (ctx, w, h) => {
     ctx.fillStyle = '#aaa598';
     ctx.fillRect(0, 0, w, h);
@@ -1037,8 +1028,6 @@ function buildFallbackMap() {
     grass: new THREE.MeshStandardMaterial({ map: grassTex, roughness: 0.95, metalness: 0 }),
     concrete: new THREE.MeshStandardMaterial({ map: concreteTex, roughness: 0.78, metalness: 0.05 }),
     roof: new THREE.MeshStandardMaterial({ map: roofTex, roughness: 0.85, metalness: 0.05 }),
-    window: new THREE.MeshStandardMaterial({ map: windowTex, roughness: 0.3, metalness: 0.2 }),
-    curb: new THREE.MeshStandardMaterial({ map: curbTex, roughness: 0.65, metalness: 0.05 }),
     pole: new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.4, metalness: 0.5 }),
     lampBulb: new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xfff0c0, emissiveIntensity: 1.2 }),
     treeTrunk: new THREE.MeshStandardMaterial({ color: 0x5a3a1a, roughness: 0.9, metalness: 0 }),
@@ -1281,30 +1270,6 @@ function buildFallbackMap() {
       if (s) collectBox(mat, wx, 0, wz + C/2, C + 0.1, wallH, 0.2);
       if (w) collectBox(mat, wx - C/2, 0, wz, 0.2, wallH, C + 0.1);
       if (e) collectBox(mat, wx + C/2, 0, wz, 0.2, wallH, C + 0.1);
-
-      if (h >= 3) {
-        const windowRows = Math.floor(h * 1.2 / 2.2);
-        for (let wr = 0; wr < windowRows; wr++) {
-          const wy = 1.0 + wr * 2.2;
-          if (wy + 1.0 >= wallH) continue;
-          if (n || s) {
-            const nw = Math.max(1, Math.floor(C / 1.2));
-            for (let wi = 0; wi < nw; wi++) {
-              const wox = -C/2 + 0.6 + wi * 1.2;
-              if (n) collectBox(materials.window, wx + wox, wy, wz - C/2 - 0.05, 0.8, 1.0, 0.05);
-              if (s) collectBox(materials.window, wx + wox, wy, wz + C/2 + 0.05, 0.8, 1.0, 0.05);
-            }
-          }
-          if (w || e) {
-            const nw = Math.max(1, Math.floor(C / 1.2));
-            for (let wi = 0; wi < nw; wi++) {
-              const woz = -C/2 + 0.6 + wi * 1.2;
-              if (w) collectBox(materials.window, wx - C/2 - 0.05, wy, wz + woz, 0.05, 1.0, 0.8);
-              if (e) collectBox(materials.window, wx + C/2 + 0.05, wy, wz + woz, 0.05, 1.0, 0.8);
-            }
-          }
-        }
-      }
     }
   }
 
@@ -1371,7 +1336,6 @@ function buildFallbackMap() {
         collectCylinder(materials.pole, wx, 0, wz, 0.06, 0.08, 5.5, 8);
         collectBox(materials.pole, wx, 5.0, wz, 0.08, 0.08, 2.0);
         collectBox(materials.lampBulb, wx, 4.8, wz + 0.8, 0.3, 0.15, 0.3);
-        markPropWall(wx, wz);
 
         streetLights.push({ x: wx, z: wz + 0.8 });
       }
@@ -1390,28 +1354,6 @@ function buildFallbackMap() {
 
   for (let z = 0; z < GH; z++) {
     for (let x = 0; x < GW; x++) {
-      if (groundType[z][x] !== 'street') continue;
-      let adjSidewalk = false;
-      for (const [dx, dz] of [[1,0],[-1,0],[0,1],[0,-1]]) {
-        const nx = x + dx, nz = z + dz;
-        if (nx >= 0 && nx < GW && nz >= 0 && nz < GH && groundType[nz][nx] === 'sidewalk') {
-          adjSidewalk = true; break;
-        }
-      }
-      if (!adjSidewalk) continue;
-      if (isIntersection(x, z)) continue;
-
-      const wx = (x - halfW) * C;
-      const wz = (z - halfH) * C;
-      if (rng() > 0.5) {
-        collectBox(materials.curb, wx, 0.15, wz, C, 0.12, C);
-      }
-    }
-  }
-
-  const treePositions = [];
-  for (let z = 0; z < GH; z++) {
-    for (let x = 0; x < GW; x++) {
       if (groundType[z][x] !== 'sidewalk') continue;
       if (rng() > 0.96) {
         let nearStreet = false;
@@ -1427,7 +1369,6 @@ function buildFallbackMap() {
         const wz = (z - halfH) * C + (rng() - 0.5) * 0.5;
         if (treePositions.some(t => Math.abs(t.x - wx) < C * 2 && Math.abs(t.z - wz) < C * 2)) continue;
         treePositions.push({ x: wx, z: wz });
-        markPropWall(wx, wz);
 
         const trunkH = 2.5 + rng() * 1.5;
         collectCylinder(materials.treeTrunk, wx, 0.15, wz, 0.12, 0.18, trunkH, 6);
@@ -1435,8 +1376,8 @@ function buildFallbackMap() {
         const leafMat = rng() > 0.5 ? materials.treeLeaves : materials.treeLeavesDark;
         const crownR = 1.2 + rng() * 0.8;
         const crownH = 1.8 + rng() * 1.0;
-        collectCone(leafMat, wx, trunkH * 0.6, wz, crownR, crownH, 7);
-        collectCone(leafMat, wx, trunkH * 0.6 + crownH * 0.4, wz, crownR * 0.7, crownH * 0.7, 7);
+        collectCone(leafMat, wx, trunkH * 0.6, wz, crownR, crownH, 6);
+        collectCone(leafMat, wx, trunkH * 0.6 + crownH * 0.4, wz, crownR * 0.7, crownH * 0.7, 6);
       }
     }
   }
@@ -1448,13 +1389,12 @@ function buildFallbackMap() {
       const wz = (z - halfH) * C;
 
       if (rng() > 0.5) {
-        markPropWall(wx, wz);
         const trunkH = 2.0 + rng() * 1.0;
         collectCylinder(materials.treeTrunk, wx, 0.1, wz, 0.1, 0.15, trunkH, 6);
         const leafMat = rng() > 0.5 ? materials.treeLeaves : materials.treeLeavesDark;
         const crownR = 1.0 + rng() * 0.6;
-        collectCone(leafMat, wx, trunkH * 0.5, wz, crownR, 1.6, 7);
-        collectCone(leafMat, wx, trunkH * 0.5 + 1.0, wz, crownR * 0.65, 1.2, 7);
+        collectCone(leafMat, wx, trunkH * 0.5, wz, crownR, 1.6, 6);
+        collectCone(leafMat, wx, trunkH * 0.5 + 1.0, wz, crownR * 0.65, 1.2, 6);
       }
     }
   }
@@ -1486,13 +1426,11 @@ function buildFallbackMap() {
           collectBox(materials.benchMetal, wx, 0, wz + seatD/2 - legW, seatW * 0.8, legH, legW);
           collectBox(materials.benchMetal, wx, legH + 0.02, wz + seatD/2 - 0.02, 0.04, 0.32, seatD * 0.9);
         }
-        markPropWall(wx, wz);
       }
       if (rng() > 0.95) {
         const wx = (x - halfW) * C + (rng() - 0.5) * 0.6;
         const wz = (z - halfH) * C + (rng() - 0.5) * 0.6;
         collectCylinder(materials.trashcan, wx, 0.15, wz, 0.2, 0.22, 0.7, 8);
-        markPropWall(wx, wz);
       }
     }
   }
@@ -1503,11 +1441,7 @@ function buildFallbackMap() {
   collectCylinder(materials.fountain, pcx, 0.8, pcz, 1.8, 2.0, 0.5, 16);
   collectCylinder(materials.water, pcx, 0.9, pcz, 1.7, 1.7, 0.3, 16);
   collectCylinder(materials.fountain, pcx, 1.2, pcz, 0.3, 0.4, 1.0, 8);
-  for (let dz = -1; dz <= 1; dz++) {
-    for (let dx = -1; dx <= 1; dx++) {
-      markPropWall(pcx + dx * C, pcz + dz * C);
-    }
-  }
+  markPropWall(pcx, pcz);
 
   for (const [mat, geos] of geoByMaterial) {
     if (geos.length === 0) continue;
