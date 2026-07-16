@@ -19,11 +19,11 @@
             "date": "2024-02-10"
         },
         {
-            "name": "Test",
-            "description": "Just Testing the website.",
-            "tags": ["Template", "Test"],
-            "image": "",
-            "url": "Projects/exemplo-3/",
+            "name": "Travei Legal",
+            "description": "Vai aparecer um trava lingua na tela pra você tentar falar!",
+            "tags": ["Game", "Voice", "PT-BR"],
+            "image": "Projects/travei-legal/thumb.gif",
+            "url": "Projects/travei-legal/",
             "color": "#ff00ff",
             "date": "2024-03-05"
         }

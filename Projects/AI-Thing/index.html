@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FLUXO — Arte Generativa Interativa</title>
-  <meta name="description" content="Uma experiência imersiva de arte generativa com 5 modos visuais interativos. Pinte o vazio com luz.">
+  <meta name="description" content="Uma experiência imersiva de arte generativa com 8 modos visuais interativos. Pinte o vazio com luz.">
   <meta name="theme-color" content="#07070e">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -23,35 +23,58 @@
     </div>
 
     <nav id="mode-selector">
-      <button class="mode-btn active" data-mode="aurora" data-name="Aurora" data-desc="Luzes do norte — ribbons de cor flutuam pelo céu">
-        <span class="mode-icon">◆</span>
-        <span class="mode-label">Aurora</span>
-      </button>
-      <button class="mode-btn" data-mode="stars" data-name="Névoa Estelar" data-desc="Nebulosas e estrelas — o universo em suas mãos">
-        <span class="mode-icon">✦</span>
-        <span class="mode-label">Estrelas</span>
-      </button>
-      <button class="mode-btn" data-mode="fire" data-desc="Chamas eternas — fogo que dança ao vento" data-name="Chamas">
-        <span class="mode-icon">●</span>
-        <span class="mode-label">Fogo</span>
-      </button>
-      <button class="mode-btn" data-mode="ocean" data-name="Oceano" data-desc="Bioluminescência — vida brilhante nas profundezas">
-        <span class="mode-icon">◎</span>
-        <span class="mode-label">Oceano</span>
-      </button>
-      <button class="mode-btn" data-mode="galaxy" data-name="Galáxia" data-desc="Espiral cósmica — gravidade que forma mundos">
-        <span class="mode-icon">✧</span>
-        <span class="mode-label">Galáxia</span>
-      </button>
+      <div class="mode-group">
+        <button class="mode-btn active" data-mode="aurora" data-name="Aurora" data-desc="Luzes do norte — ribbons de cor flutuam pelo céu">
+          <span class="mode-icon">◆</span>
+          <span class="mode-label">Aurora</span>
+        </button>
+        <button class="mode-btn" data-mode="stars" data-name="Névoa Estelar" data-desc="Nebulosas e estrelas — o universo em suas mãos">
+          <span class="mode-icon">✦</span>
+          <span class="mode-label">Estrelas</span>
+        </button>
+        <button class="mode-btn" data-mode="fire" data-name="Chamas" data-desc="Chamas eternas — fogo que dança ao vento">
+          <span class="mode-icon">●</span>
+          <span class="mode-label">Fogo</span>
+        </button>
+        <button class="mode-btn" data-mode="ocean" data-name="Oceano" data-desc="Bioluminescência — vida brilhante nas profundezas">
+          <span class="mode-icon">◎</span>
+          <span class="mode-label">Oceano</span>
+        </button>
+        <button class="mode-btn" data-mode="galaxy" data-name="Galáxia" data-desc="Espiral cósmica — gravidade que forma mundos">
+          <span class="mode-icon">✧</span>
+          <span class="mode-label">Galáxia</span>
+        </button>
+      </div>
+      <div class="mode-divider"></div>
+      <div class="mode-group">
+        <button class="mode-btn" data-mode="matrix" data-name="Matrix" data-desc="Código digital — chuva de dados cibernética">
+          <span class="mode-icon">▦</span>
+          <span class="mode-label">Matrix</span>
+        </button>
+        <button class="mode-btn" data-mode="lightning" data-name="Raio" data-desc="Relâmpagos — eletricidade que parte os céus">
+          <span class="mode-icon">⚡</span>
+          <span class="mode-label">Raio</span>
+        </button>
+        <button class="mode-btn" data-mode="neon" data-name="Neon" data-desc="Luzes de néon — trilhas de cor que dançam">
+          <span class="mode-icon">◇</span>
+          <span class="mode-label">Neon</span>
+        </button>
+      </div>
     </nav>
 
     <div id="controls">
-      <button id="btn-fullscreen" class="ctrl-btn" title="Tela cheia">
+      <button id="btn-screenshot" class="ctrl-btn" title="Salvar imagem (S)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+      </button>
+      <button id="btn-fullscreen" class="ctrl-btn" title="Tela cheia (F)">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
         </svg>
       </button>
-      <button id="btn-clear" class="ctrl-btn" title="Limpar tela">
+      <button id="btn-clear" class="ctrl-btn" title="Limpar tela (Espaço)">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14"/>
         </svg>
@@ -59,7 +82,15 @@
     </div>
   </div>
 
-  <div id="fps-counter">60 FPS</div>
+  <div id="status-bar">
+    <span id="fps-counter">60 FPS</span>
+    <span id="particle-count">0 particulas</span>
+  </div>
+
+  <div id="hint" class="visible">
+    <span>clique e arraste para interagir</span>
+    <span class="hint-keys">teclas 1-8 para trocar modo · F fullscreen · S screenshot · espaço limpar</span>
+  </div>
 
   <script src="app.js"></script>
 </body>
