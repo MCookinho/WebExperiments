@@ -1352,6 +1352,7 @@ function buildFallbackMap() {
     }
   }
 
+  const treePositions = [];
   for (let z = 0; z < GH; z++) {
     for (let x = 0; x < GW; x++) {
       if (groundType[z][x] !== 'sidewalk') continue;
