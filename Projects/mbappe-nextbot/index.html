@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,29 +52,29 @@ canvas#game-canvas{display:block}
 
 <div id="overlay">
   <h1>MBAPPÉ NEXTBOT</h1>
-  <div class="sub">ELE VAI TE PEGAR</div>
+  <div class="sub">HE IS COMING FOR YOU</div>
   <div class="controls-info">
-    <p><span>W A S D</span> &mdash; Mover</p>
-    <p><span>SHIFT</span> &mdash; Correr</p>
-    <p><span>ESPAÇO</span> &mdash; Pular</p>
-    <p><span>MOUSE</span> &mdash; Olhar</p>
-    <p><span>CLICK</span> &mdash; Soltar cursor</p>
+    <p><span>W A S D</span> &mdash; Move</p>
+    <p><span>SHIFT</span> &mdash; Sprint</p>
+    <p><span>SPACE</span> &mdash; Jump</p>
+    <p><span>MOUSE</span> &mdash; Look</p>
+    <p><span>CLICK</span> &mdash; Release cursor</p>
   </div>
-  <button id="start-btn">JOGAR</button>
+  <button id="start-btn">PLAY</button>
 </div>
 
-<div id="loading"><div class="spinner"></div><p id="loading-text">Carregando...</p><div class="error" id="loading-error"></div></div>
+<div id="loading"><div class="spinner"></div><p id="loading-text">Loading...</p><div class="error" id="loading-error"></div></div>
 
 <div id="crosshair"></div>
 <div id="stamina-bar"><div id="stamina-fill"></div></div>
-<div id="stamina-hint">Segure SHIFT para correr</div>
-<div id="warning">⚡ ELE ESTÁ PERTO ⚡</div>
+<div id="stamina-hint">Hold SHIFT to sprint</div>
+<div id="warning">⚡ HE IS CLOSE ⚡</div>
 <div id="vhs-overlay"></div>
 <div id="minimap-wrap"><canvas id="minimap-canvas" width="160" height="160"></canvas></div>
 
 <div id="capture-overlay"></div>
 <video id="jumpscare-video" playsinline></video>
-<div id="death-text">CAPTURADO</div>
+<div id="death-text">CAPTURED</div>
 
 <script type="importmap">
 {
@@ -723,7 +723,8 @@ function triggerCapture() {
   if (gameOver) return;
   gameOver = true;
   document.exitPointerLock();
-  if (musicPlaying && musicGain) musicGain.gain.setTargetAtTime(1.0, listener.context.currentTime, 0.01);
+  if (musicSource) { try { musicSource.stop(); } catch(e) {} musicPlaying = false; }
+  try { listener.context.close(); } catch(e) {}
 
   $('death-text').style.display = 'block';
   $('crosshair').style.display = 'none';
@@ -742,7 +743,7 @@ function triggerCapture() {
     $('jumpscare-video').onended = () => {
       window.close();
       window.location.href = 'about:blank';
-      document.documentElement.innerHTML = '<head></head><body style="margin:0;display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;font-family:monospace;font-size:2rem;letter-spacing:5px">FIM DE JOGO</body>';
+      document.documentElement.innerHTML = '<head></head><body style="margin:0;display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;font-family:monospace;font-size:2rem;letter-spacing:5px">GAME OVER</body>';
     };
   }, 1200);
 }
@@ -758,14 +759,12 @@ function animate() {
   renderer.render(scene, camera);
 }
 
-/* ─── START BUTTON (register FIRST, load async on click) ─── */
-$('start-btn').addEventListener('click', async () => {
-  $('start-btn').disabled = true;
-  $('start-btn').textContent = 'CARREGANDO...';
-
+/* ─── AUTO-START on load ─── */
+$('overlay').style.display = 'none';
+(async () => {
   try {
     $('loading').style.display = 'flex';
-    $('loading-text').textContent = 'Gerando mapa...';
+    $('loading-text').textContent = 'Generating map...';
     await new Promise(r => setTimeout(r, 10));
     proceduralLayouts = [];
     buildFallbackMap();
@@ -802,12 +801,10 @@ $('start-btn').addEventListener('click', async () => {
 
   } catch (err) {
     console.error('Game init failed:', err);
-    $('loading-text').textContent = 'Erro ao carregar jogo';
+    $('loading-text').textContent = 'Error loading game';
     $('loading-error').textContent = err.message || String(err);
-    $('start-btn').disabled = false;
-    $('start-btn').textContent = 'TENTAR NOVAMENTE';
   }
-});
+})();
 
 function findSpawnPos() {
   if (useMeshCollision && floorYData) {
