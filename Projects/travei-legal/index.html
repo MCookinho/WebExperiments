@@ -634,7 +634,7 @@
   <div class="game-container">
     <div class="header">
       <h1>Travei Legal</h1>
-      <p>Fale o trava-língua antes de 5 segundos!</p>
+      <p>Fale o trava-língua antes de 10 segundos!</p>
     </div>
 
     <div class="score-bar">
@@ -658,7 +658,7 @@
           <circle class="timer-ring-bg" cx="40" cy="40" r="36"/>
           <circle class="timer-ring-progress" id="timerProgress" cx="40" cy="40" r="36"/>
         </svg>
-        <div class="timer-text" id="timerText">5.0</div>
+        <div class="timer-text" id="timerText">10.0</div>
       </div>
     </div>
 
@@ -732,7 +732,7 @@
     let streak = 0;
     let bestScore = parseInt(localStorage.getItem('traveiBest') || '0');
     let timerInterval = null;
-    let timeLeft = 5.0;
+    let timeLeft = 10.0;
     let isListening = false;
     let recognition = null;
     let gameActive = false;
@@ -770,7 +770,7 @@
       }
       const rec = new SpeechRecognition();
       rec.lang = 'pt-BR';
-      rec.continuous = false;
+      rec.continuous = true;
       rec.interimResults = true;
       rec.maxAlternatives = 3;
       return rec;
@@ -795,8 +795,8 @@
     }
 
     function startTimer() {
-      timeLeft = 5.0;
-      document.getElementById('timerText').textContent = '5.0';
+      timeLeft = 10.0;
+      document.getElementById('timerText').textContent = '10.0';
       document.getElementById('timerProgress').style.strokeDashoffset = '0';
       document.getElementById('timerProgress').classList.remove('warning', 'danger');
 
@@ -808,13 +808,13 @@
           timerUp();
         }
         document.getElementById('timerText').textContent = Math.max(0, timeLeft).toFixed(1);
-        const pct = 1 - (timeLeft / 5);
+        const pct = 1 - (timeLeft / 10);
         document.getElementById('timerProgress').style.strokeDashoffset = (pct * circumference).toString();
 
-        if (timeLeft <= 1.5) {
+        if (timeLeft <= 2) {
           document.getElementById('timerProgress').classList.add('danger');
           document.getElementById('timerProgress').classList.remove('warning');
-        } else if (timeLeft <= 2.5) {
+        } else if (timeLeft <= 4) {
           document.getElementById('timerProgress').classList.add('warning');
         }
       }, 100);
@@ -883,7 +883,7 @@
 
       recognition.onend = () => {
         if (isListening && gameActive) {
-          // Keep listening if still active
+          try { recognition.start(); } catch(e) {}
         }
       };
 
