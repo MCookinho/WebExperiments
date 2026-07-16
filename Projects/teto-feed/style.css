@@ -647,6 +647,11 @@ body {
     color: var(--pink);
 }
 
+.video-more {
+    text-align: center;
+    margin-top: 40px;
+}
+
 /* ===== DISCOGRAPHY ===== */
 .discography-section {
     background: var(--black);
