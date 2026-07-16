@@ -137,6 +137,7 @@ const colliders = [];
 let mapMeshes = [];
 let floorYData = null;
 let useMeshCollision = false;
+let proceduralLayouts = [];
 const meshRaycaster = new THREE.Raycaster();
 const _rayOrigin = new THREE.Vector3();
 const _rayDir = new THREE.Vector3(0, -1, 0);
@@ -418,6 +419,43 @@ function buildWallGridFromAABBs() {
       }
     }
   }
+}
+
+function buildWallGridFromLayouts() {
+  wallGrid.fill(0);
+  const cellSize = 2.5;
+  const floorH = 3.6;
+  const gW = 60, gH = 60;
+  const halfW = gW / 2, halfH = gH / 2;
+  floorYData = new Array(gridW * gridH);
+  for (let i = 0; i < floorYData.length; i++) floorYData[i] = [];
+  for (let f = 0; f < proceduralLayouts.length; f++) {
+    const map = proceduralLayouts[f];
+    const baseY = f * floorH;
+    for (let gz = 0; gz < gridH; gz++) {
+      for (let gx = 0; gx < gridW; gx++) {
+        const wx = gx * GRID_SIZE + gridOffsetX + GRID_SIZE / 2;
+        const wz = gz * GRID_SIZE + gridOffsetZ + GRID_SIZE / 2;
+        const lx = Math.round(wx / cellSize + halfW);
+        const lz = Math.round(wz / cellSize + halfH);
+        if (lx < 0 || lx >= gW || lz < 0 || lz >= gH) continue;
+        const idx = gz * gridW + gx;
+        if (map[lz][lx] === 1) {
+          wallGrid[idx] = 1;
+        } else {
+          const arr = floorYData[idx];
+          if (arr.length === 0 || Math.abs(arr[arr.length - 1] - baseY) > 0.15) {
+            arr.push(baseY);
+          }
+        }
+      }
+    }
+  }
+  for (let i = 0; i < floorYData.length; i++) floorYData[i].sort((a, b) => a - b);
+  useMeshCollision = true;
+  let wallCount = 0;
+  for (let i = 0; i < wallGrid.length; i++) if (wallGrid[i]) wallCount++;
+  console.log(`Layout grid: ${wallCount}/${wallGrid.length} wall cells, ${proceduralLayouts.length} floors`);
 }
 
 function isGridWall(gx, gz) {
@@ -710,52 +748,12 @@ $('start-btn').addEventListener('click', async () => {
 
   try {
     $('loading').style.display = 'flex';
-    $('loading-text').textContent = 'Carregando mapa...';
-
-    const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/');
-    const gltfLoader = new GLTFLoader();
-    gltfLoader.setDRACOLoader(dracoLoader);
-    let gltf;
-    try {
-      gltf = await gltfLoader.loadAsync('map.glb');
-    } catch (e) {
-      console.warn('GLB load failed, using procedural map:', e);
-      $('loading-text').textContent = 'Mapa GLB falhou, gerando mapa...';
-      gltf = null;
-    }
-
-    if (gltf) {
-      const mapRoot = gltf.scene;
-      mapRoot.traverse((child) => {
-        if (child.isMesh) {
-          child.castShadow = true;
-          child.receiveShadow = true;
-          if (child.material) {
-            const mats = Array.isArray(child.material) ? child.material : [child.material];
-            mats.forEach(m => {
-              if (m.map) m.map.colorSpace = THREE.SRGBColorSpace;
-            });
-          }
-          mapMeshes.push(child);
-        }
-      });
-      scene.add(mapRoot);
-      scene.updateMatrixWorld(true);
-
-      const mapBBox = new THREE.Box3().setFromObject(mapRoot);
-      const mapSize = new THREE.Vector3();
-      mapBBox.getSize(mapSize);
-      console.log('Map loaded. Size:', mapSize.toArray().map(v=>v.toFixed(1)), 'Meshes:', mapMeshes.length);
-
-      initGrid(mapBBox.min.x, mapBBox.min.z, mapBBox.max.x, mapBBox.max.z);
-      useMeshCollision = true;
-      buildWallGridFromMeshes(mapMeshes);
-    } else {
-      buildFallbackMap();
-      initGrid(-70, -70, 70, 70);
-      buildWallGridFromAABBs();
-    }
+    $('loading-text').textContent = 'Gerando mapa...';
+    await new Promise(r => setTimeout(r, 10));
+    proceduralLayouts = [];
+    buildFallbackMap();
+    initGrid(-70, -70, 70, 70);
+    buildWallGridFromLayouts();
 
     let openCount = 0;
     for (let i = 0; i < wallGrid.length; i++) if (wallGrid[i] === 0) openCount++;
@@ -842,130 +840,321 @@ function findBotSpawnPos(playerP) {
 /* ─── PROCEDURAL MAP ─── */
 function buildFallbackMap() {
   const C = 2.5;
-  const WH = 3.2;
-  const FLOORS = 3;
-  const MW = 24;
-  const MH = 24;
+  const WH = 3.6;
+  const FLOORS = 4;
+  const GW = 60;
+  const GH = 60;
+  const halfW = GW / 2;
+  const halfH = GH / 2;
 
-  const wallMat = new THREE.MeshStandardMaterial({ color: 0x3d3530, roughness: 0.92 });
-  const floorMat = new THREE.MeshStandardMaterial({ color: 0x181512, roughness: 0.88 });
-  const ceilMat = new THREE.MeshStandardMaterial({ color: 0x221e1a, roughness: 0.95 });
-  const stairMat = new THREE.MeshStandardMaterial({ color: 0x2a2520, roughness: 0.9 });
+  function mulberry32(a) {
+    return function() {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  function makeTex(w, h, fn) {
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    const ctx = c.getContext('2d');
+    fn(ctx, w, h);
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.magFilter = THREE.LinearFilter;
+    return t;
+  }
+
+  const wallTex = makeTex(128, 128, (ctx, w, h) => {
+    ctx.fillStyle = '#bfb5a5';
+    ctx.fillRect(0, 0, w, h);
+    for (let i = 0; i < 2000; i++) {
+      ctx.fillStyle = `rgba(${80+Math.random()*40},${70+Math.random()*30},${60+Math.random()*25},${Math.random()*0.08})`;
+      ctx.fillRect(Math.random()*w, Math.random()*h, 1+Math.random()*2, 1+Math.random()*2);
+    }
+    const bh = 16;
+    for (let row = 0; row < h / bh; row++) {
+      const y = row * bh;
+      ctx.strokeStyle = 'rgba(140,130,115,0.5)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      const bw = row % 2 === 0 ? 64 : 32;
+      for (let x = bw; x < w; x += 64) {
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + bh); ctx.stroke();
+      }
+    }
+  });
+
+  const floorTex = makeTex(128, 128, (ctx, w, h) => {
+    const ts = 32;
+    for (let z = 0; z < 4; z++) {
+      for (let x = 0; x < 4; x++) {
+        const base = (x + z) % 2 === 0 ? [195, 188, 175] : [175, 168, 155];
+        const r = base[0] + (Math.random()-0.5)*8;
+        const g = base[1] + (Math.random()-0.5)*8;
+        const b = base[2] + (Math.random()-0.5)*8;
+        ctx.fillStyle = `rgb(${r},${g},${b})`;
+        ctx.fillRect(x*ts+1, z*ts+1, ts-1, ts-1);
+      }
+    }
+    for (let i = 0; i < 400; i++) {
+      ctx.fillStyle = `rgba(0,0,0,${Math.random()*0.04})`;
+      ctx.fillRect(Math.random()*w, Math.random()*h, 1, 1);
+    }
+  });
+
+  const ceilTex = makeTex(128, 128, (ctx, w, h) => {
+    ctx.fillStyle = '#e0d8cc';
+    ctx.fillRect(0, 0, w, h);
+    for (let i = 0; i < 600; i++) {
+      ctx.fillStyle = `rgba(0,0,0,${Math.random()*0.03})`;
+      ctx.fillRect(Math.random()*w, Math.random()*h, 1, 1);
+    }
+    ctx.strokeStyle = 'rgba(180,175,165,0.4)';
+    ctx.lineWidth = 1;
+    for (let y = 0; y < h; y += 32) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+    for (let x = 0; x < w; x += 32) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+  });
+
+  const corridorTex = makeTex(128, 128, (ctx, w, h) => {
+    const ts = 32;
+    for (let z = 0; z < 4; z++) {
+      for (let x = 0; x < 4; x++) {
+        const base = (x + z) % 2 === 0 ? [140, 132, 118] : [155, 147, 132];
+        ctx.fillStyle = `rgb(${base[0]},${base[1]},${base[2]})`;
+        ctx.fillRect(x*ts+1, z*ts+1, ts-1, ts-1);
+      }
+    }
+  });
+
+  const wallMat = new THREE.MeshStandardMaterial({ map: wallTex, roughness: 0.85, metalness: 0.02 });
+  const floorMat = new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.65, metalness: 0.05 });
+  const ceilMat = new THREE.MeshStandardMaterial({ map: ceilTex, roughness: 0.9 });
+  const corridorFloorMat = new THREE.MeshStandardMaterial({ map: corridorTex, roughness: 0.6, metalness: 0.05 });
+  const baseboardMat = new THREE.MeshStandardMaterial({ color: 0x3a3530, roughness: 0.6, metalness: 0.1 });
+  const pillarMat = new THREE.MeshStandardMaterial({ color: 0xa09585, roughness: 0.7, metalness: 0.05 });
+  const stairMat = new THREE.MeshStandardMaterial({ color: 0x888078, roughness: 0.75, metalness: 0.08 });
+  const lightFixMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xfff5e0, emissiveIntensity: 0.8 });
 
   const floorGeo = new THREE.PlaneGeometry(C, C);
   floorGeo.rotateX(-Math.PI / 2);
   const ceilGeo = new THREE.PlaneGeometry(C, C);
   ceilGeo.rotateX(Math.PI / 2);
-  const wallGeoH = new THREE.BoxGeometry(C, WH, 0.2);
-  const wallGeoV = new THREE.BoxGeometry(0.2, WH, C);
+  const wallGeoH = new THREE.BoxGeometry(C + 0.1, WH, 0.2);
+  const wallGeoV = new THREE.BoxGeometry(0.2, WH, C + 0.1);
+  const baseboardGeoH = new THREE.BoxGeometry(C + 0.1, 0.25, 0.04);
+  const baseboardGeoV = new THREE.BoxGeometry(0.04, 0.25, C + 0.1);
+  const pillarGeo = new THREE.BoxGeometry(0.45, WH, 0.45);
+  const lightFixGeo = new THREE.BoxGeometry(0.6, 0.05, 0.6);
 
-  function genPlan(floorIdx) {
-    const p = [];
-    for (let z = 0; z < MH; z++) {
-      p[z] = [];
-      for (let x = 0; x < MW; x++) {
-        if (x === 0 || x === MW - 1 || z === 0 || z === MH - 1) { p[z][x] = 1; continue; }
-        p[z][x] = 0;
+  function genLayout(floorIdx) {
+    const rng = mulberry32(floorIdx * 31337 + 42);
+    const map = [];
+    for (let z = 0; z < GH; z++) {
+      map[z] = [];
+      for (let x = 0; x < GW; x++) map[z][x] = 1;
+    }
+    const rooms = [];
+
+    const mcX = Math.floor(halfW);
+    const mcZ = Math.floor(halfH);
+
+    for (let z = 1; z < GH - 1; z++) { map[z][mcX - 1] = 0; map[z][mcX] = 0; }
+    for (let x = 1; x < GW - 1; x++) { map[mcZ - 1][x] = 0; map[mcZ][x] = 0; }
+
+    const numSides = 2 + Math.floor(rng() * 3);
+    for (let s = 0; s < numSides; s++) {
+      const isVert = s < numSides / 2;
+      if (isVert) {
+        const cx = 6 + Math.floor(rng() * (mcX - 9));
+        for (let z = 1; z < GH - 1; z++) { map[z][cx] = 0; if (cx + 1 < GW - 1) map[z][cx + 1] = 0; }
+        const cz = Math.min(mcZ - 2, Math.max(2, mcZ + Math.floor((rng() - 0.5) * 10)));
+        for (let x = Math.min(cx, mcX - 1); x <= Math.max(cx, mcX); x++) map[cz][x] = 0;
+      } else {
+        const cz = 6 + Math.floor(rng() * (mcZ - 9));
+        for (let x = 1; x < GW - 1; x++) { map[cz][x] = 0; if (cz + 1 < GH - 1) map[cz + 1][x] = 0; }
       }
     }
-    const mid = Math.floor(MW / 2);
-    const cw = 2;
-    for (let x = 1; x < MW - 1; x++) { for (let d = 0; d < cw; d++) { p[mid - 1 - d][x] = 1; p[mid + 1 + d][x] = 1; } }
-    for (let z = 1; z < MH - 1; z++) { for (let d = 0; d < cw; d++) { p[z][mid - 1 - d] = 1; p[z][mid + 1 + d] = 1; } }
-    for (let x = 1; x < MW - 1; x += 3) { for (let d = 0; d < cw; d++) { p[mid - 1 - d][x] = 0; p[mid + 1 + d][x] = 0; } }
-    for (let z = 1; z < MH - 1; z += 3) { for (let d = 0; d < cw; d++) { p[z][mid - 1 - d] = 0; p[z][mid + 1 + d] = 0; } }
 
-    const quarters = [
-      [2, 2, mid - 2, mid - 2],
-      [mid + 2, 2, MW - 3, mid - 2],
-      [2, mid + 2, mid - 2, MH - 3],
-      [mid + 2, mid + 2, MW - 3, MH - 3],
-    ];
-    for (const [x0, z0, x1, z1] of quarters) {
-      const qw = x1 - x0 + 1;
-      const qh = z1 - z0 + 1;
-      const rs = 3;
-      for (let wz = z0; wz <= z1; wz += rs) {
-        for (let wx = x0; wx <= x1; wx += rs) {
-          if (wz < MH - 1 && wx < MW - 1) p[wz][wx] = 1;
-          if (wz + 1 <= z1 && wx < MW - 1) p[wz + 1][wx] = 1;
-          if (wz < MH - 1 && wx + 1 <= x1) p[wz][wx + 1] = 1;
-          if (wz + 1 <= z1 && wx + 1 <= x1) p[wz + 1][wx + 1] = 1;
+    function canPlace(rx, rz, rw, rh) {
+      if (rx < 1 || rz < 1 || rx + rw >= GW - 1 || rz + rh >= GH - 1) return false;
+      for (let z = rz - 1; z <= rz + rh; z++)
+        for (let x = rx - 1; x <= rx + rw; x++)
+          if (z >= 0 && z < GH && x >= 0 && x < GW && map[z][x] === 0) return false;
+      return true;
+    }
+
+    function carveRoom(rx, rz, rw, rh) {
+      for (let z = rz; z < rz + rh; z++)
+        for (let x = rx; x < rx + rw; x++) map[z][x] = 0;
+      const room = { x: rx, z: rz, w: rw, h: rh, cx: rx + Math.floor(rw / 2), cz: rz + Math.floor(rh / 2) };
+      rooms.push(room);
+
+      for (let attempt = 0; attempt < 4; attempt++) {
+        const side = Math.floor(rng() * 4);
+        if (side === 0) {
+          const dx = rx + 1 + Math.floor(rng() * Math.max(1, rw - 2));
+          for (let dz = rz - 1; dz >= 0; dz--) {
+            if (map[dz][dx] === 0) { for (let zz = rz - 1; zz > dz; zz--) map[zz][dx] = 0; return; }
+            if (dz === 0 || map[dz - 1][dx] === 0) { for (let zz = rz - 1; zz >= dz; zz--) map[zz][dx] = 0; return; }
+          }
+        } else if (side === 1) {
+          const dx = rx + 1 + Math.floor(rng() * Math.max(1, rw - 2));
+          for (let dz = rz + rh; dz < GH; dz++) {
+            if (map[dz][dx] === 0) { for (let zz = rz + rh; zz < dz; zz++) map[zz][dx] = 0; return; }
+            if (dz === GH - 1 || map[dz + 1][dx] === 0) { for (let zz = rz + rh; zz <= dz; zz++) map[zz][dx] = 0; return; }
+          }
+        } else if (side === 2) {
+          const dz = rz + 1 + Math.floor(rng() * Math.max(1, rh - 2));
+          for (let dx = rx - 1; dx >= 0; dx--) {
+            if (map[dz][dx] === 0) { for (let xx = rx - 1; xx > dx; xx--) map[dz][xx] = 0; return; }
+            if (dx === 0 || map[dz][dx - 1] === 0) { for (let xx = rx - 1; xx >= dx; xx--) map[dz][xx] = 0; return; }
+          }
+        } else {
+          const dz = rz + 1 + Math.floor(rng() * Math.max(1, rh - 2));
+          for (let dx = rx + rw; dx < GW; dx++) {
+            if (map[dz][dx] === 0) { for (let xx = rx + rw; xx < dx; xx++) map[dz][xx] = 0; return; }
+            if (dx === GW - 1 || map[dz][dx + 1] === 0) { for (let xx = rx + rw; xx <= dx; xx++) map[dz][xx] = 0; return; }
+          }
         }
       }
-      for (let wz = z0 + 1; wz < z1; wz += rs) {
-        for (let wx = x0 + 1; wx < x1; wx++) { if (Math.abs(wx - x0 - rs) < 1) p[wz][wx] = 0; }
-      }
-      for (let wx = x0 + 1; wx < x1; wx += rs) {
-        for (let wz = z0 + 1; wz < z1; wz++) { if (Math.abs(wz - z0 - rs) < 1) p[wz][wx] = 0; }
-      }
     }
 
-    const sx = MW - 4, sz = MH - 4;
-    p[sz][sx] = 0; p[sz][sx + 1] = 0; p[sz + 1][sx] = 0; p[sz + 1][sx + 1] = 0;
-    if (floorIdx < FLOORS - 1) {
-      p[2][2] = 0; p[2][3] = 0; p[3][2] = 0; p[3][3] = 0;
+    for (let i = 0; i < 150; i++) {
+      const rw = 4 + Math.floor(rng() * 7);
+      const rh = 4 + Math.floor(rng() * 7);
+      const rx = 1 + Math.floor(rng() * (GW - rw - 2));
+      const rz = 1 + Math.floor(rng() * (GH - rh - 2));
+      if (canPlace(rx, rz, rw, rh)) carveRoom(rx, rz, rw, rh);
     }
-    return p;
+
+    for (let z = 0; z < GH; z++) { map[z][0] = 1; map[z][GW - 1] = 1; }
+    for (let x = 0; x < GW; x++) { map[0][x] = 1; map[GH - 1][x] = 1; }
+
+    return { map, rooms };
   }
 
-  function buildLevel(baseY, plan) {
-    for (let z = 0; z < MH; z++) {
-      for (let x = 0; x < MW; x++) {
-        if (plan[z][x] === 0) {
-          const wx = (x - MW / 2) * C;
-          const wz = (z - MH / 2) * C;
-          const fl = new THREE.Mesh(floorGeo, floorMat);
-          fl.position.set(wx, baseY, wz); fl.receiveShadow = true; scene.add(fl);
-          const cl = new THREE.Mesh(ceilGeo, ceilMat);
-          cl.position.set(wx, baseY + WH, wz); scene.add(cl);
-          const above = z > 0 && plan[z - 1][x] === 1;
-          const below = z < MH - 1 && plan[z + 1][x] === 1;
-          const left = x > 0 && plan[z][x - 1] === 1;
-          const right = x < MW - 1 && plan[z][x + 1] === 1;
-          if (above) { const w = new THREE.Mesh(wallGeoH, wallMat); w.position.set(wx, baseY + WH / 2, wz - C / 2); w.castShadow = true; w.receiveShadow = true; scene.add(w); addColliderFromMesh(w); }
-          if (below) { const w = new THREE.Mesh(wallGeoH, wallMat); w.position.set(wx, baseY + WH / 2, wz + C / 2); w.castShadow = true; w.receiveShadow = true; scene.add(w); addColliderFromMesh(w); }
-          if (left) { const w = new THREE.Mesh(wallGeoV, wallMat); w.position.set(wx - C / 2, baseY + WH / 2, wz); w.castShadow = true; w.receiveShadow = true; scene.add(w); addColliderFromMesh(w); }
-          if (right) { const w = new THREE.Mesh(wallGeoV, wallMat); w.position.set(wx + C / 2, baseY + WH / 2, wz); w.castShadow = true; w.receiveShadow = true; scene.add(w); addColliderFromMesh(w); }
+  function addMesh(geo, mat, px, py, pz) {
+    const m = new THREE.Mesh(geo, mat);
+    m.position.set(px, py, pz);
+    m.castShadow = true;
+    m.receiveShadow = true;
+    scene.add(m);
+    addColliderFromMesh(m);
+    return m;
+  }
+
+  function buildLevel(baseY, layout) {
+    const { map, rooms } = layout;
+
+    for (let z = 0; z < GH; z++) {
+      for (let x = 0; x < GW; x++) {
+        if (map[z][x] !== 0) continue;
+        const wx = (x - halfW) * C;
+        const wz = (z - halfH) * C;
+        const isCorridor = Math.abs(x - mcX) <= 1 || Math.abs(z - mcZ) <= 1;
+        addMesh(floorGeo, isCorridor ? corridorFloorMat : floorMat, wx, baseY, wz);
+        addMesh(ceilGeo, ceilMat, wx, baseY + WH, wz);
+
+        if (z > 0 && map[z - 1][x] === 1) {
+          addMesh(wallGeoH, wallMat, wx, baseY + WH / 2, wz - C / 2);
+          addMesh(baseboardGeoH, baseboardMat, wx, baseY + 0.125, wz - C / 2 + 0.12);
+        }
+        if (z < GH - 1 && map[z + 1][x] === 1) {
+          addMesh(wallGeoH, wallMat, wx, baseY + WH / 2, wz + C / 2);
+          addMesh(baseboardGeoH, baseboardMat, wx, baseY + 0.125, wz + C / 2 - 0.12);
+        }
+        if (x > 0 && map[z][x - 1] === 1) {
+          addMesh(wallGeoV, wallMat, wx - C / 2, baseY + WH / 2, wz);
+          addMesh(baseboardGeoV, baseboardMat, wx - C / 2 + 0.12, baseY + 0.125, wz);
+        }
+        if (x < GW - 1 && map[z][x + 1] === 1) {
+          addMesh(wallGeoV, wallMat, wx + C / 2, baseY + WH / 2, wz);
+          addMesh(baseboardGeoV, baseboardMat, wx + C / 2 - 0.12, baseY + 0.125, wz);
         }
       }
     }
-    for (let z = 1; z < MH - 1; z += 2) {
-      for (let x = 1; x < MW - 1; x += 2) {
-        if (plan[z][x] === 0) {
-          const pl = new THREE.PointLight(0xffffff, 0.8, 12, 2);
-          pl.position.set((x - MW / 2) * C, baseY + WH - 0.3, (z - MH / 2) * C);
+
+    for (const room of rooms) {
+      if (room.w >= 5 && room.h >= 5) {
+        const corners = [
+          [room.x + 1, room.z + 1], [room.x + room.w - 2, room.z + 1],
+          [room.x + 1, room.z + room.h - 2], [room.x + room.w - 2, room.z + room.h - 2],
+        ];
+        for (const [px, pz] of corners) {
+          if (px > 0 && px < GW && pz > 0 && pz < GH && map[pz][px] === 0) {
+            addMesh(pillarGeo, pillarMat, (px - halfW) * C, baseY + WH / 2, (pz - halfH) * C);
+          }
+        }
+      }
+    }
+
+    for (const room of rooms) {
+      const lpx = (room.cx - halfW) * C;
+      const lpz = (room.cz - halfH) * C;
+      addMesh(lightFixGeo, lightFixMat, lpx, baseY + WH - 0.04, lpz);
+      const pl = new THREE.PointLight(0xfff0d4, 0.5, 14, 1.5);
+      pl.position.set(lpx, baseY + WH - 0.2, lpz);
+      scene.add(pl);
+    }
+
+    for (let z = 3; z < GH - 3; z += 6) {
+      for (let x = 3; x < GW - 3; x += 6) {
+        if (map[z][x] === 0 && (Math.abs(x - mcX) <= 1 || Math.abs(z - mcZ) <= 1)) {
+          const lpx = (x - halfW) * C;
+          const lpz = (z - halfH) * C;
+          addMesh(lightFixGeo, lightFixMat, lpx, baseY + WH - 0.04, lpz);
+          const pl = new THREE.PointLight(0xfff5e0, 0.3, 10, 1.5);
+          pl.position.set(lpx, baseY + WH - 0.2, lpz);
           scene.add(pl);
         }
       }
     }
   }
 
-  function buildStairs(baseY, x0, z0) {
-    const steps = 10;
+  function buildStairwell(sx, sz, startFloor, endFloor) {
+    const steps = 14;
     const stepH = WH / steps;
-    const stepD = C * 1.5 / steps;
-    for (let i = 0; i < steps; i++) {
-      const geo = new THREE.BoxGeometry(C * 1.2, stepH * 0.9, stepD);
-      const m = new THREE.Mesh(geo, stairMat);
-      m.position.set((x0 - MW / 2) * C, baseY + stepH * (i + 0.5), (z0 - MH / 2) * C + i * stepD - steps * stepD / 2);
-      m.castShadow = true; m.receiveShadow = true;
-      scene.add(m); addColliderFromMesh(m);
+    const stepW = C * 1.2;
+    const stepD = 0.3;
+    for (let f = startFloor; f < endFloor; f++) {
+      const baseY = f * WH;
+      for (let i = 0; i < steps; i++) {
+        const geo = new THREE.BoxGeometry(stepW, stepH * 0.9, stepD);
+        const m = new THREE.Mesh(geo, stairMat);
+        m.position.set((sx - halfW) * C, baseY + stepH * (i + 0.5), (sz - halfH) * C + (i - steps / 2) * stepD);
+        m.castShadow = true; m.receiveShadow = true;
+        scene.add(m); addColliderFromMesh(m);
+      }
+      addMesh(new THREE.BoxGeometry(stepW, 0.15, C), stairMat, (sx - halfW) * C, baseY + WH, (sz - halfH) * C);
     }
   }
 
+  const mcX = Math.floor(halfW);
+
+  const mcZ = Math.floor(halfH);
+
   for (let f = 0; f < FLOORS; f++) {
-    const baseY = f * WH;
-    const plan = genPlan(f);
-    buildLevel(baseY, plan);
+    const layout = genLayout(f);
+    proceduralLayouts.push(layout);
+    buildLevel(f * WH, layout);
   }
 
-  const sx = MW - 3, sz = MH - 3;
-  buildStairs(0, sx, sz);
-  buildStairs(WH, 3, 3);
+  buildStairwell(5, 5, 0, FLOORS);
+  buildStairwell(GW - 6, GH - 6, 0, FLOORS);
+  buildStairwell(5, GH - 6, 0, FLOORS);
+  buildStairwell(GW - 6, 5, 0, FLOORS);
 
-scene.background = new THREE.Color(0xcccccc);
-  scene.fog = new THREE.Fog(0x0a0808, 40, 100);
+  for (let i = colliders.length - 1; i >= 0; i--) {
+    const b = colliders[i];
+    if (b.max.y - b.min.y < 0.3 || (b.max.x - b.min.x) > 30 || (b.max.z - b.min.z) > 30) colliders.splice(i, 1);
+  }
+
+  scene.background = new THREE.Color(0xc8c0b8);
+  scene.fog = new THREE.Fog(0xc8c0b8, 50, 140);
 }
 
 window.addEventListener('resize', () => {
