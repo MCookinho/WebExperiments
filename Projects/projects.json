@@ -10,11 +10,11 @@
             "date": "2024-01-15"
         },
         {
-            "name": "Exemplo 2",
-            "description": "Segundo projeto de exemplo para testar a funcionalidade do site.",
+            "name": "AI Thing",
+            "description": "I asked an AI to build a website and let it do everything on its own, and then it created that monstrosity...",
             "tags": ["exemplo", "teste"],
-            "image": "",
-            "url": "Projects/exemplo-2/",
+            "image": "Projects/exemplo-2/AI-Thing/thumb.gif",
+            "url": "Projects/exemplo-2/AI-Thing",
             "color": "#00d4ff",
             "date": "2024-02-10"
         },
