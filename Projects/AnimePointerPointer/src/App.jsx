@@ -1,23 +1,21 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './App.css'
 
-const TOTAL_IMAGES = 100
-const LOADING_DELAY = 1200
-const POINTER_DELAY = 2000
 const RECENT_LIMIT = 6
+const recentIndices = []
 
-function getViewportSize() {
+function getViewport() {
   return { x: document.documentElement.clientWidth, y: document.documentElement.clientHeight }
 }
 
-function useViewportSize() {
-  const [size, setSize] = useState(getViewportSize())
+function useViewport() {
+  const [v, setV] = useState(getViewport())
   useEffect(() => {
-    const handleResize = () => setSize(getViewportSize())
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
+    const onResize = () => setV(getViewport())
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
   }, [])
-  return size
+  return v
 }
 
 function useDelayedValue(value, delay) {
@@ -30,128 +28,37 @@ function useDelayedValue(value, delay) {
 }
 
 function distance(a, b) {
-  return Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2)
+  return (a.x - b.x) ** 2 + (a.y - b.y) ** 2
 }
 
-function normalizeMouseToImage(mouse, viewport) {
-  return { x: mouse.x / viewport.x, y: mouse.y / viewport.y }
-}
-
-function scaleVector(v, factor) {
-  return { x: v.x * factor, y: v.y * factor }
-}
-
-function multiplyVectors(a, b) {
-  return { x: a.x * b.x, y: a.y * b.y }
-}
-
-function addVectors(a, b) {
-  return { x: a.x + b.x, y: a.y + b.y }
-}
-
-function subtractVectors(a, b) {
-  return { x: a.x - b.x, y: a.y - b.y }
-}
-
-function cssTranslate(x, y, unit = 'px') {
-  return `translate(${x}${unit}, ${y}${unit})`
-}
-
-function findClosestImage(mouseNorm, positions, recentIndices) {
-  let bestIndex = undefined
+function findClosestImage(mouse, positions) {
+  let bestIdx = undefined
   let bestDist = Number.MAX_VALUE
-
   for (let i = 0; i < positions.length; i++) {
-    const pos = positions[i]
-    const d = distance(mouseNorm, pos)
+    const d = distance(mouse, positions[i])
     if (d < bestDist && !recentIndices.includes(i)) {
       bestDist = d
-      bestIndex = i
+      bestIdx = i
     }
   }
-
-  recentIndices.unshift(bestIndex)
+  recentIndices.unshift(bestIdx)
   recentIndices.length = Math.min(recentIndices.length, RECENT_LIMIT)
-  return bestIndex
+  return bestIdx
 }
 
-function getDisplaySize(imageSize, viewport) {
-  const iw = imageSize.x
-  const ih = imageSize.y
-  const vw = viewport.x
-  const vh = viewport.y
-
-  const imageRatio = iw / ih
-  const viewportRatio = vw / vh
-
-  const scale = imageRatio > viewportRatio ? vw / iw : vh / ih
-
-  return { x: iw * scale, y: ih * scale }
-}
-
-async function loadPositions() {
-  const res = await fetch('/positions.json')
-  const data = await res.json()
-  return data.map(([x, y]) => ({ x, y }))
-}
-
-function useImageLoader(src) {
-  const [state, setState] = useState({ image: undefined, status: 'loading' })
-
+function usePositions() {
+  const [positions, setPositions] = useState([])
   useEffect(() => {
-    if (!src) {
-      setState({ image: undefined, status: 'loading' })
-      return
-    }
-    const img = document.createElement('img')
-    const onLoad = () => setState({ image: img, status: 'loaded' })
-    const onError = () => setState({ image: undefined, status: 'failed' })
-    img.addEventListener('load', onLoad)
-    img.addEventListener('error', onError)
-    img.src = src
-    return () => {
-      img.removeEventListener('load', onLoad)
-      img.removeEventListener('error', onError)
-    }
-  }, [src])
-
-  return state
-}
-
-function useImageStyle(viewport, mouse, imageIndex, positions, imageLoader) {
-  const [style, setStyle] = useState(undefined)
-
-  useEffect(() => {
-    if (!imageLoader.image || !mouse || imageIndex === undefined) {
-      setStyle(undefined)
-      return
-    }
-
-    const img = imageLoader.image
-    const mouseNorm = normalizeMouseToImage(mouse, viewport)
-    const fingerPos = positions[imageIndex]
-    const displaySize = getDisplaySize({ x: img.width, y: img.height }, viewport)
-
-    const imageScale = scaleVector(displaySize, 1.2)
-    const fingerOffset = scaleVector(subtractVectors(fingerPos, mouseNorm), -1)
-    const imageCenter = multiplyVectors(fingerOffset, imageScale)
-    const transformOrigin = `${fingerPos.x * 100}% ${fingerPos.y * 100}%`
-
-    setStyle({
-      width: `${displaySize.x}px`,
-      height: `${displaySize.y}px`,
-      transform: `${cssTranslate(imageCenter.x, imageCenter.y, 'px')} scale(1.2)`,
-      transformOrigin,
-    })
-  }, [imageLoader.image, mouse, imageIndex, positions, viewport])
-
-  return style
+    fetch('/positions.json')
+      .then(r => r.json())
+      .then(data => setPositions(data.map(([x, y]) => ({ x, y }))))
+  }, [])
+  return positions
 }
 
 function LoadingScreen({ position }) {
-  const hasPointer = useDelayedValue(position, LOADING_DELAY)
-  const hasHover = window.matchMedia('(any-hover: hover)').matches
-
+  const hasPointer = useDelayedValue(position, 1200)
+  const hasHover = typeof window !== 'undefined' && window.matchMedia('(any-hover: hover)').matches
   return (
     <div className={`Loading ${position ? 'mod-loader' : ''}`}>
       <div>
@@ -179,76 +86,109 @@ function CursorDot({ position }) {
   )
 }
 
-function App() {
-  const viewport = useViewportSize()
-  const recentIndices = useRef([])
+export default function App() {
+  const viewport = useViewport()
+  const positions = usePositions()
 
-  const [positions, setPositions] = useState([])
-  const [mouseNorm, setMouseNorm] = useState()
-  const [pointerPos, setPointerPos] = useState()
-  const [selectedIndex, setSelectedIndex] = useState()
-  const [selectedImage, setSelectedImage] = useState()
   const [isOutside, setIsOutside] = useState(false)
+  const [rawPointer, setRawPointer] = useState()
+  const [imageStyle, setImageStyle] = useState()
+  const [loadedImg, setLoadedImg] = useState()
+
+  const delayedPointer = useDelayedValue(rawPointer, 2000)
+  const pointer = isOutside ? undefined : rawPointer
+
+  const imgRef = useRef(null)
+  const imgIndexRef = useRef()
 
   useEffect(() => {
-    loadPositions().then(setPositions)
-  }, [])
-
-  useEffect(() => {
-    const onMove = (e) => {
-      const pos = Array.isArray(e) ? { x: e[0], y: e[1] } : { x: e.clientX, y: e.clientY }
-      setPointerPos(pos)
+    const onMouseMove = (e) => setRawPointer({ x: e.clientX, y: e.clientY })
+    const onTouchMove = (e) => {
+      if (e.touches.length > 0) {
+        setRawPointer({ x: e.touches[0].clientX, y: e.touches[0].clientY })
+      }
     }
-    const onLeave = () => setIsOutside(true)
-    const onEnter = () => setIsOutside(false)
+    const onMouseLeave = () => setIsOutside(true)
+    const onMouseEnter = () => setIsOutside(false)
 
-    window.addEventListener('mousemove', onMove)
-    window.addEventListener('touchmove', onMove)
-    document.addEventListener('mouseleave', onLeave)
-    document.addEventListener('mouseenter', onEnter)
-
+    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('touchmove', onTouchMove)
+    document.addEventListener('mouseleave', onMouseLeave)
+    document.addEventListener('mouseenter', onMouseEnter)
     return () => {
-      window.removeEventListener('mousemove', onMove)
-      window.removeEventListener('touchmove', onMove)
-      document.removeEventListener('mouseleave', onLeave)
-      document.removeEventListener('mouseenter', onEnter)
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('touchmove', onTouchMove)
+      document.removeEventListener('mouseleave', onMouseLeave)
+      document.removeEventListener('mouseenter', onMouseEnter)
     }
   }, [])
 
-  const delayedPointer = useDelayedValue(pointerPos, 2000)
-
   useEffect(() => {
-    if (delayedPointer && positions.length > 0) {
-      const norm = normalizeMouseToImage(delayedPointer, viewport)
-      const idx = findClosestImage(norm, positions, recentIndices.current)
-      setSelectedIndex(idx)
+    if (!delayedPointer || positions.length === 0) {
+      imgIndexRef.current = undefined
+      setLoadedImg(undefined)
+      setImageStyle(undefined)
+      return
     }
+
+    const mouseNorm = { x: delayedPointer.x / viewport.x, y: delayedPointer.y / viewport.y }
+    const idx = findClosestImage(mouseNorm, positions)
+
+    if (idx === undefined) {
+      imgIndexRef.current = undefined
+      setLoadedImg(undefined)
+      setImageStyle(undefined)
+      return
+    }
+
+    imgIndexRef.current = idx
+    const img = new Image()
+    img.onload = () => {
+      if (imgIndexRef.current !== idx) return
+      setLoadedImg(img)
+
+      const fingerPos = positions[idx]
+      const iw = img.width
+      const ih = img.height
+      const vw = viewport.x
+      const vh = viewport.y
+
+      const imageRatio = iw / ih
+      const viewportRatio = vw / vh
+      const scale = imageRatio > viewportRatio ? vw / iw : vh / ih
+      const displayW = iw * scale
+      const displayH = ih * scale
+
+      const fingerOffsetX = (fingerPos.x - mouseNorm.x) * -1 * displayW * 1.2
+      const fingerOffsetY = (fingerPos.y - mouseNorm.y) * -1 * displayH * 1.2
+
+      const imageX = fingerOffsetX + (mouseNorm.x - fingerPos.x) * displayW
+      const imageY = fingerOffsetY + (mouseNorm.y - fingerPos.y) * displayH
+
+      setImageStyle({
+        width: `${displayW}px`,
+        height: `${displayH}px`,
+        transform: `translate(${fingerOffsetX}px, ${fingerOffsetY}px) scale(1.2)`,
+        transformOrigin: `${fingerPos.x * 100}% ${fingerPos.y * 100}%`,
+      })
+    }
+    img.src = `/images/${idx}.svg`
   }, [delayedPointer, positions, viewport])
 
-  const imageSrc = selectedIndex !== undefined ? `/images/${selectedIndex}.svg` : undefined
-  const loader = useImageLoader(imageSrc)
-
-  useEffect(() => {
-    if (loader.image && loader.status === 'loaded') {
-      setSelectedImage(loader.image)
-    }
-  }, [loader])
-
-  const imageStyle = useImageStyle(viewport, pointerPos, selectedIndex, positions, loader)
+  const imageSrc = imgIndexRef.current !== undefined ? `/images/${imgIndexRef.current}.svg` : undefined
 
   return (
     <>
-      <div className="Interactions" style={{ width: viewport.x, height: viewport.y }}>
-        {pointerPos && <CursorDot position={pointerPos} />}
-      </div>
+      <div className="Interactions" style={{ width: viewport.x, height: viewport.y }} />
       <div className="App" style={{ width: viewport.x, height: viewport.y }}>
-        {selectedImage && selectedIndex !== undefined && imageStyle ? (
+        {!isOutside && pointer && <CursorDot position={pointer} />}
+        {loadedImg && imageStyle ? (
           <>
             <div style={{ position: 'absolute', transform: 'scale(1.1)' }}>
               <img
                 style={{ ...imageStyle, filter: 'blur(8px)' }}
                 alt="someone pointing at your pointer"
-                key={selectedIndex}
+                key={imageSrc}
                 src={imageSrc}
               />
             </div>
@@ -256,7 +196,7 @@ function App() {
               <img
                 style={imageStyle}
                 alt="someone pointing at your pointer"
-                key={selectedIndex}
+                key={imageSrc}
                 src={imageSrc}
               />
             </div>
@@ -268,5 +208,3 @@ function App() {
     </>
   )
 }
-
-export default App

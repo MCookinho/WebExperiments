@@ -112,33 +112,32 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0a0808);
 scene.fog = new THREE.Fog(0xaaaaaa, 80, 200);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+const renderer = new THREE.WebGLRenderer({ antialias: false });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.4;
+renderer.shadowMap.type = THREE.PCFShadowMap;
+renderer.toneMapping = THREE.NoToneMapping;
 document.body.appendChild(renderer.domElement);
 renderer.domElement.id = 'game-canvas';
 
 const camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 500);
 
-scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-scene.add(new THREE.HemisphereLight(0x87CEEB, 0x556633, 0.8));
+scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+scene.add(new THREE.HemisphereLight(0x87CEEB, 0x556633, 0.4));
 
 const dirLight = new THREE.DirectionalLight(0xfff5e0, 1.4);
 dirLight.position.set(40, 60, 30);
 dirLight.castShadow = true;
-dirLight.shadow.mapSize.width = 2048;
-dirLight.shadow.mapSize.height = 2048;
+dirLight.shadow.mapSize.width = 1024;
+dirLight.shadow.mapSize.height = 1024;
 dirLight.shadow.camera.near = 0.5;
-dirLight.shadow.camera.far = 200;
-dirLight.shadow.camera.left = -80;
-dirLight.shadow.camera.right = 80;
-dirLight.shadow.camera.top = 80;
-dirLight.shadow.camera.bottom = -80;
-dirLight.shadow.bias = -0.001;
+dirLight.shadow.camera.far = 120;
+dirLight.shadow.camera.left = -60;
+dirLight.shadow.camera.right = 60;
+dirLight.shadow.camera.top = 60;
+dirLight.shadow.camera.bottom = -60;
+dirLight.shadow.bias = -0.002;
 scene.add(dirLight);
 scene.add(dirLight.target);
 
@@ -327,14 +326,14 @@ function updatePlayer(dt) {
 }
 
 /* ─── GRID FOR PATHFINDING ─── */
-let GRID_SIZE = 0.5;
+let GRID_SIZE = 1.0;
 let gridW = 10, gridH = 10;
 let gridOffsetX = -5, gridOffsetZ = -5;
 let wallGrid = new Uint8Array(100);
 
 function initGrid(minX, minZ, maxX, maxZ) {
   const margin = 2;
-  GRID_SIZE = 0.5;
+  GRID_SIZE = 1.0;
   gridOffsetX = Math.floor((minX - margin) / GRID_SIZE) * GRID_SIZE;
   gridOffsetZ = Math.floor((minZ - margin) / GRID_SIZE) * GRID_SIZE;
   gridW = Math.ceil(((maxX + margin) - gridOffsetX) / GRID_SIZE);
@@ -557,7 +556,7 @@ function updateBot(dt) {
   const pg = worldToGrid(playerPos);
 
   botRecalcTimer += dt;
-  const recalcRate = dist < 12 ? 0.2 : 0.5;
+  const recalcRate = dist < 12 ? 0.5 : 1.5;
   if (botRecalcTimer >= recalcRate || !botPath) {
     botRecalcTimer = 0;
     const p = bfsPath(bg.x, bg.z, pg.x, pg.z);
@@ -668,8 +667,10 @@ function updateAudio() {
 /* ─── MINIMAP ─── */
 const mmCanvas = $('minimap-canvas');
 const mmCtx = mmCanvas.getContext('2d');
+let mmFrame = 0;
 
 function updateMinimap() {
+  if (++mmFrame % 6 !== 0) return;
   mmCtx.fillStyle = '#0a0808';
   mmCtx.fillRect(0, 0, 160, 160);
   const mapExtentX = gridW * GRID_SIZE;
@@ -1020,27 +1021,27 @@ function buildFallbackMap() {
   ];
 
   const materials = {
-    asphalt: new THREE.MeshStandardMaterial({ map: asphaltTex, roughness: 0.88, metalness: 0.05 }),
-    sidewalk: new THREE.MeshStandardMaterial({ map: sidewalkTex, roughness: 0.72, metalness: 0.02 }),
-    grass: new THREE.MeshStandardMaterial({ map: grassTex, roughness: 0.95, metalness: 0 }),
-    concrete: new THREE.MeshStandardMaterial({ map: concreteTex, roughness: 0.78, metalness: 0.05 }),
-    roof: new THREE.MeshStandardMaterial({ map: roofTex, roughness: 0.85, metalness: 0.05 }),
-    pole: new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.4, metalness: 0.5 }),
-    lampBulb: new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xfff0c0, emissiveIntensity: 1.2 }),
-    treeTrunk: new THREE.MeshStandardMaterial({ color: 0x5a3a1a, roughness: 0.9, metalness: 0 }),
-    treeLeaves: new THREE.MeshStandardMaterial({ color: 0x2a6e1a, roughness: 0.85, metalness: 0 }),
-    treeLeavesDark: new THREE.MeshStandardMaterial({ color: 0x1e5510, roughness: 0.85, metalness: 0 }),
-    bench: new THREE.MeshStandardMaterial({ color: 0x6a4a2a, roughness: 0.7, metalness: 0.05 }),
-    benchMetal: new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.4, metalness: 0.5 }),
-    trashcan: new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.5, metalness: 0.3 }),
-    crosswalk: new THREE.MeshStandardMaterial({ color: 0xe8e8e0, roughness: 0.7, metalness: 0 }),
-    fence: new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.5, metalness: 0.4 }),
-    fountain: new THREE.MeshStandardMaterial({ color: 0x888880, roughness: 0.4, metalness: 0.1 }),
-    water: new THREE.MeshStandardMaterial({ color: 0x3388aa, roughness: 0.1, metalness: 0.2, transparent: true, opacity: 0.7 }),
+    asphalt: new THREE.MeshLambertMaterial({ map: asphaltTex }),
+    sidewalk: new THREE.MeshLambertMaterial({ map: sidewalkTex }),
+    grass: new THREE.MeshLambertMaterial({ map: grassTex }),
+    concrete: new THREE.MeshLambertMaterial({ map: concreteTex }),
+    roof: new THREE.MeshLambertMaterial({ map: roofTex }),
+    pole: new THREE.MeshLambertMaterial({ color: 0x555555 }),
+    lampBulb: new THREE.MeshBasicMaterial({ color: 0xfff0c0 }),
+    treeTrunk: new THREE.MeshLambertMaterial({ color: 0x5a3a1a }),
+    treeLeaves: new THREE.MeshLambertMaterial({ color: 0x2a6e1a }),
+    treeLeavesDark: new THREE.MeshLambertMaterial({ color: 0x1e5510 }),
+    bench: new THREE.MeshLambertMaterial({ color: 0x6a4a2a }),
+    benchMetal: new THREE.MeshLambertMaterial({ color: 0x3a3a3a }),
+    trashcan: new THREE.MeshLambertMaterial({ color: 0x2a2a2a }),
+    crosswalk: new THREE.MeshLambertMaterial({ color: 0xe8e8e0 }),
+    fence: new THREE.MeshLambertMaterial({ color: 0x555555 }),
+    fountain: new THREE.MeshLambertMaterial({ color: 0x888880 }),
+    water: new THREE.MeshLambertMaterial({ color: 0x3388aa, transparent: true, opacity: 0.7 }),
   };
 
   const buildingMats = brickColors.map(([r, g, b]) =>
-    new THREE.MeshStandardMaterial({ map: makeBrickTex(r, g, b), roughness: 0.82, metalness: 0.02 })
+    new THREE.MeshLambertMaterial({ map: makeBrickTex(r, g, b) })
   );
 
   const groundType = [];
@@ -1305,11 +1306,11 @@ function buildFallbackMap() {
   }
 
   const streetLights = [];
-  for (let z = 0; z < GH; z += BLOCK_SIZE) {
-    for (let x = 0; x < GW; x += BLOCK_SIZE) {
-      for (let corner = 0; corner < 4; corner++) {
+  for (let z = 0; z < GH; z += BLOCK_SIZE * 3) {
+    for (let x = 0; x < GW; x += BLOCK_SIZE * 3) {
+      for (let corner = 0; corner < 2; corner++) {
         const lx = x + (corner % 2 === 0 ? 0 : STREET_W - 1);
-        const lz = z + (corner < 2 ? 0 : STREET_W - 1);
+        const lz = z + (corner < 1 ? 0 : STREET_W - 1);
         if (lx < 0 || lx >= GW || lz < 0 || lz >= GH) continue;
 
         let sx = lx, sz = lz;
@@ -1446,15 +1447,13 @@ function buildFallbackMap() {
     const merged = mergeGeometries(geos, false);
     if (!merged) continue;
     const m = new THREE.Mesh(merged, mat);
-    m.castShadow = true;
-    m.receiveShadow = true;
     scene.add(m);
     mapMeshes.push(m);
     for (const g of geos) g.dispose();
   }
 
   for (const sl of streetLights) {
-    const pl = new THREE.PointLight(0xfff0d0, 1.0, 22, 1.5);
+    const pl = new THREE.PointLight(0xfff0d0, 0.6, 18, 2);
     pl.position.set(sl.x, 4.6, sl.z);
     scene.add(pl);
   }
@@ -1471,7 +1470,7 @@ function buildFallbackMap() {
   }
 
   scene.background = new THREE.Color(0x7ec8e3);
-  scene.fog = new THREE.Fog(0x7ec8e3, 60, 180);
+  scene.fog = new THREE.Fog(0x7ec8e3, 50, 130);
 }
 
 window.addEventListener('resize', () => {

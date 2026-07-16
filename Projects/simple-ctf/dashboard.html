@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,51 +18,51 @@
 
     <div class="dashboard" id="dashboardContent" style="display: none;">
         <div class="dashboard-header">
-            <h1>Painel Administrativo</h1>
-            <span id="welcomeMsg" style="color: var(--text-muted);">Bem-vindo</span>
+            <h1>Admin Dashboard</h1>
+            <span id="welcomeMsg" style="color: var(--text-muted);">Welcome</span>
         </div>
 
         <div class="dashboard-grid">
             <div class="dash-card">
-                <h3>Status do Sistema</h3>
-                <p>Todos os serviços operacionais.<br>
+                <h3>System Status</h3>
+                <p>All services operational.<br>
                 Uptime: 99.97%<br>
-                Último scan: 2024-01-15</p>
+                Last scan: 2024-01-15</p>
             </div>
             <div class="dash-card">
-                <h3>Clientes Ativos</h3>
+                <h3>Active Clients</h3>
                 <p>Total: 512<br>
                 Enterprise: 89<br>
                 Professional: 203<br>
                 Starter: 220</p>
             </div>
             <div class="dash-card">
-                <h3>Incidentes Recentes</h3>
-                <p>Críticos: 0<br>
-                Altos: 2 (resolvidos)<br>
-                Médios: 5<br>
-                Baixos: 12</p>
+                <h3>Recent Incidents</h3>
+                <p>Critical: 0<br>
+                High: 2 (resolved)<br>
+                Medium: 5<br>
+                Low: 12</p>
             </div>
         </div>
 
         <!-- CTF: This is the final reward for completing the challenge -->
         <div class="flag-box" id="finalFlag">
-            <h2>Parabéns, Hacker!</h2>
+            <h2>Congratulations, Hacker!</h2>
             <p style="color: var(--text-muted); margin-bottom: 1rem;">
-                Você completou o desafio CTF da TechVault Corp!<br>
-                Aqui está sua flag final:
+                You completed the TechVault Corp CTF challenge!<br>
+                Here is your final flag:
             </p>
             <div class="flag-text">flag{y0u_4r3_th3_t3chv4ult_m4st3r}</div>
             <p style="color: var(--text-muted); margin-top: 1rem; font-size: 0.85rem;">
-                Você explorou: Recon, Source Analysis, File Discovery, Crypto, e Auth Bypass
+                You exploited: Recon, Source Analysis, File Discovery, Crypto, and Auth Bypass
             </p>
         </div>
     </div>
 
     <div id="accessDenied" style="display: none; text-align: center; padding: 4rem 2rem;">
-        <h2 style="color: var(--danger);">Acesso Negado</h2>
-        <p style="color: var(--text-muted); margin-top: 1rem;">Você precisa estar logado para acessar esta página.</p>
-        <a href="login.html" class="btn-primary" style="display: inline-block; margin-top: 1.5rem;">Fazer Login</a>
+        <h2 style="color: var(--danger);">Access Denied</h2>
+        <p style="color: var(--text-muted); margin-top: 1rem;">You need to be logged in to access this page.</p>
+        <a href="login.html" class="btn-primary" style="display: inline-block; margin-top: 1.5rem;">Sign In</a>
     </div>
 
     <script>
@@ -79,7 +79,7 @@
                     const payload = JSON.parse(atob(tokenParts[1]));
                     if (payload.user === 'sysadmin' && payload.role === 'admin') {
                         document.getElementById('dashboardContent').style.display = 'block';
-                        document.getElementById('welcomeMsg').textContent = `Bem-vindo, ${sessionData.username || 'Admin'}`;
+                        document.getElementById('welcomeMsg').textContent = `Welcome, ${sessionData.username || 'Admin'}`;
                         document.getElementById('accessDenied').style.display = 'none';
                     } else {
                         throw new Error('Unauthorized');
