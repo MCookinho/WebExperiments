@@ -109,7 +109,7 @@ const STAM_REGEN = 10;
 /* ─── RENDERER ─── */
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0a0808);
-scene.fog = new THREE.Fog(0x0a0808, 20, 80);
+scene.fog = new THREE.Fog(0xaaaaaa, 80, 200);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -117,23 +117,19 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.9;
+renderer.toneMappingExposure = 1.8;
 document.body.appendChild(renderer.domElement);
 renderer.domElement.id = 'game-canvas';
 
-const camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 200);
+const camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 500);
 
-scene.add(new THREE.AmbientLight(0xffe8cc, 0.15));
-scene.add(new THREE.HemisphereLight(0xffeedd, 0x221100, 0.2));
+scene.add(new THREE.AmbientLight(0xffffff, 1.5));
+scene.add(new THREE.HemisphereLight(0xffffff, 0xaaaaaa, 1.0));
 
-const flashlight = new THREE.SpotLight(0xffeedd, 3, 25, Math.PI / 5, 0.4, 1.5);
-flashlight.castShadow = true;
-flashlight.shadow.mapSize.set(1024, 1024);
-flashlight.shadow.bias = -0.002;
-camera.add(flashlight);
-flashlight.position.set(0, -0.3, -0.5);
-flashlight.target.position.set(0, -0.3, -5);
-camera.add(flashlight.target);
+const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+dirLight.position.set(50, 100, 30);
+scene.add(dirLight);
+
 scene.add(camera);
 
 /* ─── COLLISION ─── */
@@ -714,12 +710,52 @@ $('start-btn').addEventListener('click', async () => {
 
   try {
     $('loading').style.display = 'flex';
-    $('loading-text').textContent = 'Gerando mapa...';
+    $('loading-text').textContent = 'Carregando mapa...';
 
-    buildFallbackMap();
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/');
+    const gltfLoader = new GLTFLoader();
+    gltfLoader.setDRACOLoader(dracoLoader);
+    let gltf;
+    try {
+      gltf = await gltfLoader.loadAsync('map.glb');
+    } catch (e) {
+      console.warn('GLB load failed, using procedural map:', e);
+      $('loading-text').textContent = 'Mapa GLB falhou, gerando mapa...';
+      gltf = null;
+    }
 
-    initGrid(-70, -70, 70, 70);
-    buildWallGridFromAABBs();
+    if (gltf) {
+      const mapRoot = gltf.scene;
+      mapRoot.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+          if (child.material) {
+            const mats = Array.isArray(child.material) ? child.material : [child.material];
+            mats.forEach(m => {
+              if (m.map) m.map.colorSpace = THREE.SRGBColorSpace;
+            });
+          }
+          mapMeshes.push(child);
+        }
+      });
+      scene.add(mapRoot);
+      scene.updateMatrixWorld(true);
+
+      const mapBBox = new THREE.Box3().setFromObject(mapRoot);
+      const mapSize = new THREE.Vector3();
+      mapBBox.getSize(mapSize);
+      console.log('Map loaded. Size:', mapSize.toArray().map(v=>v.toFixed(1)), 'Meshes:', mapMeshes.length);
+
+      initGrid(mapBBox.min.x, mapBBox.min.z, mapBBox.max.x, mapBBox.max.z);
+      useMeshCollision = true;
+      buildWallGridFromMeshes(mapMeshes);
+    } else {
+      buildFallbackMap();
+      initGrid(-70, -70, 70, 70);
+      buildWallGridFromAABBs();
+    }
 
     let openCount = 0;
     for (let i = 0; i < wallGrid.length; i++) if (wallGrid[i] === 0) openCount++;
@@ -760,7 +796,7 @@ $('start-btn').addEventListener('click', async () => {
 
 function findSpawnPos() {
   if (useMeshCollision && floorYData) {
-    for (let r = 0; r < 30; r += 2) {
+    for (let r = 0; r < 60; r += 2) {
       for (let dx = -r; dx <= r; dx += 2) {
         for (let dz = -r; dz <= r; dz += 2) {
           if (!testCollisionAt(dx, dz, PR)) {
@@ -771,7 +807,7 @@ function findSpawnPos() {
       }
     }
   }
-  for (let r = 0; r < 50; r += 3) {
+  for (let r = 0; r < 60; r += 3) {
     for (let dx = -r; dx <= r; dx += 3) {
       for (let dz = -r; dz <= r; dz += 3) {
         if (!testCollisionAt(dx, dz, PR)) {
@@ -894,11 +930,11 @@ function buildFallbackMap() {
         }
       }
     }
-    for (let z = 1; z < MH - 1; z += 3) {
-      for (let x = 1; x < MW - 1; x += 3) {
+    for (let z = 1; z < MH - 1; z += 2) {
+      for (let x = 1; x < MW - 1; x += 2) {
         if (plan[z][x] === 0) {
-          const pl = new THREE.PointLight(0xffaa55, 0.5, 8, 2);
-          pl.position.set((x - MW / 2) * C, baseY + WH - 0.4, (z - MH / 2) * C);
+          const pl = new THREE.PointLight(0xffffff, 0.8, 12, 2);
+          pl.position.set((x - MW / 2) * C, baseY + WH - 0.3, (z - MH / 2) * C);
           scene.add(pl);
         }
       }
@@ -928,8 +964,8 @@ function buildFallbackMap() {
   buildStairs(0, sx, sz);
   buildStairs(WH, 3, 3);
 
-  scene.background = new THREE.Color(0x0a0808);
-  scene.fog = new THREE.Fog(0x0a0808, 15, 55);
+scene.background = new THREE.Color(0xcccccc);
+  scene.fog = new THREE.Fog(0x0a0808, 40, 100);
 }
 
 window.addEventListener('resize', () => {
