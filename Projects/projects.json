@@ -14,13 +14,13 @@
             "description": "I asked an AI to build a website and let it do everything on its own, and then it created that monstrosity...",
             "tags": ["exemplo", "teste"],
             "image": "Projects/AI-Thing/thumb.gif",
-            "url": "Projects/exemplo-2/AI-Thing",
+            "url": "Projects/AI-Thing",
             "color": "#00d4ff",
             "date": "2024-02-10"
         },
         {
-            "name": "Exemplo 3",
-            "description": "Terceiro projeto de exemplo para completar a demonstração.",
+            "name": "Test",
+            "description": "Just Testing the website.",
             "tags": ["exemplo", "demo"],
             "image": "",
             "url": "Projects/exemplo-3/",
