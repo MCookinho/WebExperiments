@@ -858,20 +858,31 @@
       if (!recognition) return;
 
       recognition.onresult = (e) => {
-        const transcript = e.results[0][0].transcript;
-        const interimTranscript = e.results[0][e.results[0].length - 1].transcript;
-        const isFinal = e.results[0].isFinal;
+        let finalTranscript = '';
+        let interimTranscript = '';
 
-        // Show live transcript
+        for (let i = 0; i < e.results.length; i++) {
+          const result = e.results[i];
+          if (result.isFinal) {
+            finalTranscript += result[0].transcript;
+          } else {
+            interimTranscript += result[0].transcript;
+          }
+        }
+
         const liveEl = document.getElementById('liveTranscript');
         const textEl = document.getElementById('transcriptText');
         liveEl.classList.add('active');
-        textEl.textContent = interimTranscript;
-        textEl.classList.add('has-text');
 
-        if (isFinal) {
+        const displayText = finalTranscript + interimTranscript;
+        if (displayText.length > 0) {
+          textEl.textContent = displayText;
+          textEl.classList.add('has-text');
+        }
+
+        if (finalTranscript.length > 0 && !interimTranscript) {
           stopListening();
-          checkAnswer(transcript);
+          checkAnswer(finalTranscript);
         }
       };
 
