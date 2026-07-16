@@ -82,7 +82,7 @@ function validateCredentials(username, password) {
     // 4. OR modify the validateCredentials function in DevTools
     
     if (username !== ADMIN_CREDENTIALS.username) {
-        return { success: false, message: 'Usuário não encontrado' };
+        return { success: false, message: 'User not found' };
     }
     
     // CTF: MD5 comparison - the hash can be reversed
@@ -90,10 +90,10 @@ function validateCredentials(username, password) {
     const passwordHash = computeMD5(password);
     
     if (passwordHash !== ADMIN_CREDENTIALS.passwordHash) {
-        return { success: false, message: 'Senha incorreta' };
+        return { success: false, message: 'Incorrect password' };
     }
     
-    return { success: true, message: 'Autenticação bem-sucedida' };
+    return { success: true, message: 'Authentication successful' };
 }
 
 /**
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const password = document.getElementById('password').value;
             
             if (!username || !password) {
-                showLoginError('Preencha todos os campos');
+                showLoginError('Please fill in all fields');
                 return;
             }
             
