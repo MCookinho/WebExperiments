@@ -47,6 +47,10 @@ canvas#game-canvas{display:block;z-index:1}
 #loading p{color:#666;font-size:.9rem}
 #loading .error{color:#ff4444;font-size:.8rem;margin-top:.5rem;max-width:400px;text-align:center}
 
+#tap-to-play{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:1002;color:#fff;cursor:pointer}
+#tap-to-play h2{font-size:1.8rem;color:#ff0040;text-shadow:0 0 20px #ff0040;letter-spacing:5px;margin-bottom:1rem}
+#tap-to-play p{color:#888;font-size:.9rem;letter-spacing:3px;animation:pulse 1.5s ease-in-out infinite}
+
 /* ─── MOBILE CONTROLS ─── */
 #mobile-controls{display:none;pointer-events:none;background:transparent}
 #joystick-zone{position:absolute;left:10px;bottom:10px;width:140px;height:140px;pointer-events:auto;touch-action:none}
@@ -87,6 +91,7 @@ canvas#game-canvas{display:block;z-index:1}
 </div>
 
 <div id="loading"><div class="spinner"></div><p id="loading-text">Loading...</p><div class="error" id="loading-error"></div></div>
+<div id="tap-to-play"><h2>MBAPPÉ NEXTBOT</h2><p>CLICK TO PLAY</p></div>
 
 <div id="crosshair"></div>
 <div id="stamina-bar"><div id="stamina-fill"></div></div>
@@ -923,25 +928,30 @@ $('overlay').style.display = 'none';
     await loadMusic();
 
     $('loading').style.display = 'none';
-    $('overlay').style.display = 'none';
-    $('crosshair').style.display = 'block';
-    $('stamina-bar').style.display = 'block';
-    $('stamina-hint').style.display = 'block';
-    $('minimap-wrap').style.display = 'block';
-    gameStarted = true;
+    $('tap-to-play').style.display = 'flex';
+    if (isMobile) $('tap-to-play').querySelector('p').textContent = 'TAP TO PLAY';
 
-    if (isMobile) {
-      $('mobile-warning').style.display = 'block';
-      $('joystick-base').style.display = 'none';
-      $('btn-sprint').style.display = 'none';
-      $('btn-jump').style.display = 'none';
-    } else {
-      renderer.domElement.requestPointerLock();
-    }
-    if (listener.context.state === 'suspended') await listener.context.resume();
-    startMusic();
-    clock.start();
-    animate();
+    $('tap-to-play').addEventListener('click', async () => {
+      $('tap-to-play').style.display = 'none';
+      $('crosshair').style.display = 'block';
+      $('stamina-bar').style.display = 'block';
+      $('stamina-hint').style.display = 'block';
+      $('minimap-wrap').style.display = 'block';
+      gameStarted = true;
+
+      if (isMobile) {
+        $('mobile-warning').style.display = 'block';
+        $('joystick-base').style.display = 'none';
+        $('btn-sprint').style.display = 'none';
+        $('btn-jump').style.display = 'none';
+      } else {
+        renderer.domElement.requestPointerLock();
+      }
+      if (listener.context.state === 'suspended') await listener.context.resume();
+      startMusic();
+      clock.start();
+      animate();
+    }, { once: true });
 
   } catch (err) {
     console.error('Game init failed:', err);
