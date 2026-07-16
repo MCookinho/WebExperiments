@@ -726,23 +726,23 @@
       "Lobo mau comeu pinto, pinto mau comeu lobo"
     ];
 
+    const TWISTER_TIME = 10;
     let currentTwister = '';
     let currentIndex = 0;
     let points = 0;
     let streak = 0;
     let bestScore = parseInt(localStorage.getItem('traveiBest') || '0');
     let timerInterval = null;
-    let timeLeft = 10.0;
+    let timeLeft = TWISTER_TIME;
     let isListening = false;
     let recognition = null;
     let gameActive = false;
+    let answerProcessed = false;
 
     const circumference = 2 * Math.PI * 36;
 
-    // Initialize
     document.getElementById('best').textContent = bestScore;
 
-    // Particles
     function createParticles() {
       const container = document.getElementById('particles');
       const colors = ['#7c3aed', '#a855f7', '#e879f9', '#c084fc'];
@@ -760,21 +760,6 @@
       }
     }
     createParticles();
-
-    // Speech Recognition setup
-    function setupRecognition() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        alert('Seu navegador não suporta reconhecimento de voz. Use Chrome ou Edge.');
-        return null;
-      }
-      const rec = new SpeechRecognition();
-      rec.lang = 'pt-BR';
-      rec.continuous = true;
-      rec.interimResults = true;
-      rec.maxAlternatives = 3;
-      return rec;
-    }
 
     function normalize(str) {
       return str.toLowerCase()
@@ -795,8 +780,8 @@
     }
 
     function startTimer() {
-      timeLeft = 10.0;
-      document.getElementById('timerText').textContent = '10.0';
+      timeLeft = TWISTER_TIME;
+      document.getElementById('timerText').textContent = TWISTER_TIME + '.0';
       document.getElementById('timerProgress').style.strokeDashoffset = '0';
       document.getElementById('timerProgress').classList.remove('warning', 'danger');
 
@@ -808,7 +793,7 @@
           timerUp();
         }
         document.getElementById('timerText').textContent = Math.max(0, timeLeft).toFixed(1);
-        const pct = 1 - (timeLeft / 10);
+        const pct = 1 - (timeLeft / TWISTER_TIME);
         document.getElementById('timerProgress').style.strokeDashoffset = (pct * circumference).toString();
 
         if (timeLeft <= 2) {
@@ -828,16 +813,20 @@
       gameActive = false;
       stopListening();
       showResult(false, '⏱️ Tempo esgotado!');
+      setTimeout(() => {
+        document.getElementById('gameoverScreen').classList.add('show');
+        document.getElementById('finalScore').textContent = points;
+        document.getElementById('bestScoreText').textContent = bestScore > 0 ? 'Seu recorde: ' + bestScore + ' ✨' : '';
+      }, 1500);
     }
 
     function loadTwister() {
-      // Shuffle if needed
       if (currentIndex >= TRAVA_LINGUAS.length) {
         currentIndex = 0;
         TRAVA_LINGUAS.sort(() => Math.random() - 0.5);
       }
       currentTwister = TRAVA_LINGUAS[currentIndex];
-      document.getElementById('twisterNumber').textContent = `TRAVA-LÍNGUA #${points + 1}`;
+      document.getElementById('twisterNumber').textContent = 'TRAVA-LÍNGUA #' + (points + 1);
       document.getElementById('twisterText').textContent = currentTwister;
       clearLiveTranscript();
       currentIndex++;
@@ -846,6 +835,7 @@
     function startGame() {
       document.getElementById('startScreen').classList.add('hidden');
       document.getElementById('gameoverScreen').classList.remove('show');
+      document.getElementById('resultCard').className = 'result-card';
       points = 0;
       streak = 0;
       currentIndex = 0;
@@ -853,20 +843,42 @@
       updateScores();
       loadTwister();
       gameActive = true;
+      setTimeout(() => startListening(), 500);
+    }
 
-      recognition = setupRecognition();
-      if (!recognition) return;
+    function restartGame() {
+      document.getElementById('gameoverScreen').classList.remove('show');
+      startGame();
+    }
+
+    function startListening() {
+      if (!gameActive) return;
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert('Seu navegador não suporta reconhecimento de voz. Use Chrome ou Edge.');
+        return;
+      }
+
+      answerProcessed = false;
+
+      recognition = new SpeechRecognition();
+      recognition.lang = 'pt-BR';
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 3;
 
       recognition.onresult = (e) => {
+        if (answerProcessed) return;
+
         let finalTranscript = '';
         let interimTranscript = '';
 
         for (let i = 0; i < e.results.length; i++) {
-          const result = e.results[i];
-          if (result.isFinal) {
-            finalTranscript += result[0].transcript;
+          if (e.results[i].isFinal) {
+            finalTranscript += e.results[i][0].transcript;
           } else {
-            interimTranscript += result[0].transcript;
+            interimTranscript += e.results[i][0].transcript;
           }
         }
 
@@ -881,43 +893,21 @@
         }
 
         if (finalTranscript.length > 0 && !interimTranscript) {
+          answerProcessed = true;
           stopListening();
           checkAnswer(finalTranscript);
         }
       };
 
       recognition.onerror = (e) => {
-        if (e.error !== 'no-speech' && e.error !== 'aborted') {
-          console.error('Speech error:', e.error);
+        console.error('Speech error:', e.error);
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+          document.getElementById('micLabel').textContent = 'Microfone bloqueado!';
         }
       };
 
-      recognition.onend = () => {
-        if (isListening && gameActive) {
-          try { recognition.start(); } catch(e) {}
-        }
-      };
+      recognition.onend = () => {};
 
-      // Auto-start listening
-      setTimeout(() => toggleMic(), 500);
-    }
-
-    function restartGame() {
-      document.getElementById('gameoverScreen').classList.remove('show');
-      startGame();
-    }
-
-    function toggleMic() {
-      if (!gameActive) return;
-      if (isListening) {
-        stopListening();
-      } else {
-        startListening();
-      }
-    }
-
-    function startListening() {
-      if (!recognition || !gameActive) return;
       try {
         isListening = true;
         document.getElementById('micBtn').classList.add('listening');
@@ -925,7 +915,7 @@
         recognition.start();
         startTimer();
       } catch(e) {
-        console.error(e);
+        console.error('Recognition start error:', e);
       }
     }
 
@@ -933,7 +923,10 @@
       isListening = false;
       document.getElementById('micBtn').classList.remove('listening');
       document.getElementById('micLabel').textContent = 'Toque para falar';
-      try { recognition?.stop(); } catch(e) {}
+      if (recognition) {
+        try { recognition.abort(); } catch(e) {}
+        recognition = null;
+      }
     }
 
     function clearLiveTranscript() {
@@ -969,7 +962,7 @@
         setTimeout(() => {
           document.getElementById('gameoverScreen').classList.add('show');
           document.getElementById('finalScore').textContent = points;
-          document.getElementById('bestScoreText').textContent = bestScore > 0 ? `Seu recorde: ${bestScore} ✨` : '';
+          document.getElementById('bestScoreText').textContent = bestScore > 0 ? 'Seu recorde: ' + bestScore + ' ✨' : '';
         }, 2000);
       }
     }
@@ -981,7 +974,7 @@
       document.getElementById('resultTitle').textContent = title;
 
       if (transcript) {
-        document.getElementById('heardText').textContent = `"${transcript}"`;
+        document.getElementById('heardText').textContent = '"' + transcript + '"';
         document.getElementById('heardText').style.display = 'inline-block';
       } else {
         document.getElementById('heardText').style.display = 'none';
@@ -992,7 +985,7 @@
       document.getElementById('resultCard').className = 'result-card';
       loadTwister();
       gameActive = true;
-      setTimeout(() => toggleMic(), 400);
+      setTimeout(() => startListening(), 400);
     }
 
     function updateScores() {
