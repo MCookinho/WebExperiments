@@ -118,18 +118,29 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.8;
+renderer.toneMappingExposure = 1.4;
 document.body.appendChild(renderer.domElement);
 renderer.domElement.id = 'game-canvas';
 
 const camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 500);
 
-scene.add(new THREE.AmbientLight(0xffffff, 1.5));
-scene.add(new THREE.HemisphereLight(0xffffff, 0xaaaaaa, 1.0));
+scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+scene.add(new THREE.HemisphereLight(0x87CEEB, 0x556633, 0.8));
 
-const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-dirLight.position.set(50, 100, 30);
+const dirLight = new THREE.DirectionalLight(0xfff5e0, 1.4);
+dirLight.position.set(40, 60, 30);
+dirLight.castShadow = true;
+dirLight.shadow.mapSize.width = 2048;
+dirLight.shadow.mapSize.height = 2048;
+dirLight.shadow.camera.near = 0.5;
+dirLight.shadow.camera.far = 200;
+dirLight.shadow.camera.left = -80;
+dirLight.shadow.camera.right = 80;
+dirLight.shadow.camera.top = 80;
+dirLight.shadow.camera.bottom = -80;
+dirLight.shadow.bias = -0.001;
 scene.add(dirLight);
+scene.add(dirLight.target);
 
 scene.add(camera);
 
@@ -850,7 +861,7 @@ function buildFallbackMap() {
       return ((t ^ t >>> 14) >>> 0) / 4294967296;
     };
   }
-  const rng = mulberry32(12345);
+  const rng = mulberry32(42);
 
   function makeTex(w, h, fn) {
     const c = document.createElement('canvas');
@@ -864,91 +875,197 @@ function buildFallbackMap() {
     return t;
   }
 
-  const asphaltTex = makeTex(64, 64, (ctx, w, h) => {
-    ctx.fillStyle = '#3a3a3a';
+  const asphaltTex = makeTex(128, 128, (ctx, w, h) => {
+    ctx.fillStyle = '#3c3c3c';
+    ctx.fillRect(0, 0, w, h);
+    for (let i = 0; i < 800; i++) {
+      const v = 45 + Math.random() * 25;
+      ctx.fillStyle = `rgba(${v},${v},${v},${0.3 + Math.random() * 0.4})`;
+      const sz = 1 + Math.random() * 3;
+      ctx.fillRect(Math.random()*w, Math.random()*h, sz, sz * (0.5 + Math.random()));
+    }
+    for (let i = 0; i < 60; i++) {
+      ctx.fillStyle = `rgba(30,30,30,${0.05 + Math.random()*0.1})`;
+      const sz = 2 + Math.random() * 6;
+      ctx.beginPath();
+      ctx.arc(Math.random()*w, Math.random()*h, sz, 0, Math.PI*2);
+      ctx.fill();
+    }
+  });
+
+  const sidewalkTex = makeTex(128, 128, (ctx, w, h) => {
+    ctx.fillStyle = '#b0aa9e';
+    ctx.fillRect(0, 0, w, h);
+    for (let i = 0; i < 500; i++) {
+      const v = 155 + Math.random() * 25;
+      ctx.fillStyle = `rgb(${v},${v-3},${v-8})`;
+      ctx.fillRect(Math.random()*w, Math.random()*h, 1+Math.random()*2, 1+Math.random());
+    }
+    ctx.strokeStyle = 'rgba(90,86,80,0.35)';
+    ctx.lineWidth = 1;
+    const ts = 32;
+    for (let y = 0; y <= h; y += ts) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+    for (let x = 0; x <= w; x += ts) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+    for (let i = 0; i < 8; i++) {
+      ctx.fillStyle = `rgba(80,75,65,${0.03 + Math.random()*0.05})`;
+      ctx.fillRect(Math.random()*w, Math.random()*h, 4+Math.random()*8, 1);
+    }
+  });
+
+  const grassTex = makeTex(128, 128, (ctx, w, h) => {
+    ctx.fillStyle = '#3a7a28';
+    ctx.fillRect(0, 0, w, h);
+    for (let i = 0; i < 800; i++) {
+      const r = 40 + Math.random() * 30;
+      const g = 100 + Math.random() * 55;
+      const b = 25 + Math.random() * 20;
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      const blade = Math.random() > 0.7;
+      if (blade) {
+        ctx.fillRect(Math.random()*w, Math.random()*h, 1, 2+Math.random()*3);
+      } else {
+        ctx.fillRect(Math.random()*w, Math.random()*h, 1, 1);
+      }
+    }
+    for (let i = 0; i < 30; i++) {
+      ctx.fillStyle = `rgba(25,60,15,${0.1+Math.random()*0.15})`;
+      ctx.beginPath();
+      ctx.arc(Math.random()*w, Math.random()*h, 2+Math.random()*4, 0, Math.PI*2);
+      ctx.fill();
+    }
+  });
+
+  function makeBrickTex(baseR, baseG, baseB) {
+    return makeTex(128, 128, (ctx, w, h) => {
+      ctx.fillStyle = `rgb(${baseR},${baseG},${baseB})`;
+      ctx.fillRect(0, 0, w, h);
+      const bh = 8;
+      for (let row = 0; row < h / bh; row++) {
+        const y = row * bh;
+        const off = row % 2 === 0 ? 0 : 16;
+        for (let x = off; x < w; x += 32) {
+          const dr = (Math.random()-0.5) * 20;
+          const dg = (Math.random()-0.5) * 15;
+          const db = (Math.random()-0.5) * 10;
+          ctx.fillStyle = `rgb(${baseR+dr},${baseG+dg},${baseB+db})`;
+          ctx.fillRect(x+1, y+1, 30, bh-2);
+          ctx.fillStyle = `rgba(0,0,0,${0.02+Math.random()*0.04})`;
+          ctx.fillRect(x+1, y+1, 30, bh-2);
+        }
+      }
+      for (let i = 0; i < 200; i++) {
+        ctx.fillStyle = `rgba(0,0,0,${Math.random()*0.03})`;
+        ctx.fillRect(Math.random()*w, Math.random()*h, 1, 1);
+      }
+    });
+  }
+
+  const concreteTex = makeTex(128, 128, (ctx, w, h) => {
+    ctx.fillStyle = '#8a8a82';
+    ctx.fillRect(0, 0, w, h);
+    for (let i = 0; i < 600; i++) {
+      const v = 120 + Math.random() * 25;
+      ctx.fillStyle = `rgb(${v},${v-1},${v-3})`;
+      ctx.fillRect(Math.random()*w, Math.random()*h, 1+Math.random()*2, 1+Math.random());
+    }
+    for (let i = 0; i < 20; i++) {
+      ctx.fillStyle = `rgba(60,60,55,${0.05+Math.random()*0.08})`;
+      ctx.beginPath();
+      ctx.arc(Math.random()*w, Math.random()*h, 3+Math.random()*5, 0, Math.PI*2);
+      ctx.fill();
+    }
+  });
+
+  const roofTex = makeTex(64, 64, (ctx, w, h) => {
+    ctx.fillStyle = '#4a4a4a';
     ctx.fillRect(0, 0, w, h);
     for (let i = 0; i < 300; i++) {
-      const v = 50 + Math.random() * 20;
+      const v = 60 + Math.random() * 20;
       ctx.fillStyle = `rgb(${v},${v},${v})`;
       ctx.fillRect(Math.random()*w, Math.random()*h, 1+Math.random()*2, 1+Math.random());
     }
-    ctx.strokeStyle = 'rgba(255,200,50,0.6)';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([6, 8]);
-    ctx.beginPath(); ctx.moveTo(w/2, 0); ctx.lineTo(w/2, h); ctx.stroke();
   });
 
-  const sidewalkTex = makeTex(64, 64, (ctx, w, h) => {
-    ctx.fillStyle = '#9a9a90';
+  const windowTex = makeTex(64, 64, (ctx, w, h) => {
+    ctx.fillStyle = '#1a2535';
     ctx.fillRect(0, 0, w, h);
-    for (let i = 0; i < 200; i++) {
-      const v = 140 + Math.random() * 20;
-      ctx.fillStyle = `rgb(${v},${v},${v-5})`;
-      ctx.fillRect(Math.random()*w, Math.random()*h, 1+Math.random(), 1+Math.random());
-    }
-    ctx.strokeStyle = 'rgba(80,80,75,0.4)';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(2, 2, w-4, h-4);
-  });
-
-  const grassTex = makeTex(64, 64, (ctx, w, h) => {
-    ctx.fillStyle = '#2d5a1e';
-    ctx.fillRect(0, 0, w, h);
-    for (let i = 0; i < 400; i++) {
-      const g = 60 + Math.random() * 40;
-      ctx.fillStyle = `rgb(${30+Math.random()*20},${g},${20+Math.random()*15})`;
-      ctx.fillRect(Math.random()*w, Math.random()*h, 1, 1+Math.random()*2);
-    }
-  });
-
-  const brickTex = makeTex(64, 64, (ctx, w, h) => {
-    ctx.fillStyle = '#8B4513';
-    ctx.fillRect(0, 0, w, h);
-    const bh = 8;
-    for (let row = 0; row < h / bh; row++) {
-      const y = row * bh;
-      const off = row % 2 === 0 ? 0 : 16;
-      for (let x = off; x < w; x += 32) {
-        const r = 120 + Math.random() * 30;
-        const g = 50 + Math.random() * 15;
-        const b = 15 + Math.random() * 10;
-        ctx.fillStyle = `rgb(${r},${g},${b})`;
-        ctx.fillRect(x+1, y+1, 30, bh-1);
+    for (let i = 0; i < 60; i++) {
+      const bright = Math.random() > 0.6;
+      if (bright) {
+        const r = 200 + Math.random() * 55;
+        const g = 180 + Math.random() * 50;
+        const b = 80 + Math.random() * 40;
+        ctx.fillStyle = `rgba(${r},${g},${b},${0.4+Math.random()*0.4})`;
+      } else {
+        ctx.fillStyle = `rgba(20,30,50,${0.3+Math.random()*0.3})`;
       }
+      const wx = 4 + Math.floor(Math.random() * 6) * 10;
+      const wy = 4 + Math.floor(Math.random() * 6) * 10;
+      ctx.fillRect(wx, wy, 7, 7);
     }
   });
 
-  const concreteTex = makeTex(64, 64, (ctx, w, h) => {
-    ctx.fillStyle = '#7a7a72';
+  const curbTex = makeTex(64, 32, (ctx, w, h) => {
+    ctx.fillStyle = '#aaa598';
     ctx.fillRect(0, 0, w, h);
-    for (let i = 0; i < 300; i++) {
-      const v = 110 + Math.random() * 20;
-      ctx.fillStyle = `rgb(${v},${v},${v-2})`;
-      ctx.fillRect(Math.random()*w, Math.random()*h, 1+Math.random(), 1+Math.random());
+    ctx.fillStyle = '#999488';
+    ctx.fillRect(0, h*0.5, w, h*0.5);
+    for (let i = 0; i < 100; i++) {
+      const v = 150 + Math.random() * 20;
+      ctx.fillStyle = `rgb(${v},${v-2},${v-5})`;
+      ctx.fillRect(Math.random()*w, Math.random()*h, 1, 1);
     }
   });
 
-  const asphaltMat = new THREE.MeshStandardMaterial({ map: asphaltTex, roughness: 0.9, metalness: 0.05 });
-  const sidewalkMat = new THREE.MeshStandardMaterial({ map: sidewalkTex, roughness: 0.7, metalness: 0.02 });
-  const grassMat = new THREE.MeshStandardMaterial({ map: grassTex, roughness: 0.95, metalness: 0 });
-  const brickMat = new THREE.MeshStandardMaterial({ map: brickTex, roughness: 0.8, metalness: 0.02 });
-  const concreteMat = new THREE.MeshStandardMaterial({ map: concreteTex, roughness: 0.75, metalness: 0.05 });
-  const roofMat = new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.8 });
-  const fenceMat = new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.5, metalness: 0.3 });
-  const poleMat = new THREE.MeshStandardMaterial({ color: 0x666666, roughness: 0.4, metalness: 0.4 });
-  const lightBulbMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xfff0d0, emissiveIntensity: 1.0 });
+  const brickColors = [
+    [155, 75, 45],
+    [130, 65, 50],
+    [175, 160, 140],
+    [120, 115, 105],
+    [145, 80, 65],
+    [100, 95, 88],
+  ];
+
+  const materials = {
+    asphalt: new THREE.MeshStandardMaterial({ map: asphaltTex, roughness: 0.88, metalness: 0.05 }),
+    sidewalk: new THREE.MeshStandardMaterial({ map: sidewalkTex, roughness: 0.72, metalness: 0.02 }),
+    grass: new THREE.MeshStandardMaterial({ map: grassTex, roughness: 0.95, metalness: 0 }),
+    concrete: new THREE.MeshStandardMaterial({ map: concreteTex, roughness: 0.78, metalness: 0.05 }),
+    roof: new THREE.MeshStandardMaterial({ map: roofTex, roughness: 0.85, metalness: 0.05 }),
+    window: new THREE.MeshStandardMaterial({ map: windowTex, roughness: 0.3, metalness: 0.2 }),
+    curb: new THREE.MeshStandardMaterial({ map: curbTex, roughness: 0.65, metalness: 0.05 }),
+    pole: new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.4, metalness: 0.5 }),
+    lampBulb: new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xfff0c0, emissiveIntensity: 1.2 }),
+    treeTrunk: new THREE.MeshStandardMaterial({ color: 0x5a3a1a, roughness: 0.9, metalness: 0 }),
+    treeLeaves: new THREE.MeshStandardMaterial({ color: 0x2a6e1a, roughness: 0.85, metalness: 0 }),
+    treeLeavesDark: new THREE.MeshStandardMaterial({ color: 0x1e5510, roughness: 0.85, metalness: 0 }),
+    bench: new THREE.MeshStandardMaterial({ color: 0x6a4a2a, roughness: 0.7, metalness: 0.05 }),
+    benchMetal: new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.4, metalness: 0.5 }),
+    trashcan: new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.5, metalness: 0.3 }),
+    crosswalk: new THREE.MeshStandardMaterial({ color: 0xe8e8e0, roughness: 0.7, metalness: 0 }),
+    fence: new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.5, metalness: 0.4 }),
+    fountain: new THREE.MeshStandardMaterial({ color: 0x888880, roughness: 0.4, metalness: 0.1 }),
+    water: new THREE.MeshStandardMaterial({ color: 0x3388aa, roughness: 0.1, metalness: 0.2, transparent: true, opacity: 0.7 }),
+  };
+
+  const buildingMats = brickColors.map(([r, g, b]) =>
+    new THREE.MeshStandardMaterial({ map: makeBrickTex(r, g, b), roughness: 0.82, metalness: 0.02 })
+  );
 
   const groundType = [];
   const wallMap = [];
   const buildingHeights = [];
+  const buildingMatIdx = [];
   for (let z = 0; z < GH; z++) {
     groundType[z] = [];
     wallMap[z] = [];
     buildingHeights[z] = [];
+    buildingMatIdx[z] = [];
     for (let x = 0; x < GW; x++) {
       groundType[z][x] = 'void';
       wallMap[z][x] = 0;
       buildingHeights[z][x] = 0;
+      buildingMatIdx[z][x] = 0;
     }
   }
 
@@ -962,31 +1079,48 @@ function buildFallbackMap() {
     return false;
   }
 
-  function isSidewalk(x, z) {
-    if (isStreet(x, z)) return false;
-    for (let s = 0; s < GW; s += BLOCK_SIZE) {
-      if ((x === s + STREET_W || x === s + STREET_W + 1) && z >= 0 && z < GH) return true;
-      if (x >= s && x < s + STREET_W && (z === s + STREET_W || z === s + STREET_W + 1)) return true;
-    }
-    for (let s = 0; s < GH; s += BLOCK_SIZE) {
-      if ((z === s + STREET_W || z === s + STREET_W + 1) && x >= 0 && x < GW) return true;
-      if (z >= s && z < s + STREET_W && (x === s + STREET_W || x === s + STREET_W + 1)) return true;
-    }
-    return false;
+  function isIntersection(x, z) {
+    const onStreetX = isStreet(x, 0);
+    const onStreetZ = isStreet(0, z);
+    return onStreetX && onStreetZ;
   }
+
+  const centerBlockX = Math.floor(GW / 2 / BLOCK_SIZE);
+  const centerBlockZ = Math.floor(GH / 2 / BLOCK_SIZE);
+  const plazaBlockX = 2;
+  const plazaBlockZ = 2;
 
   for (let z = 0; z < GH; z++) {
     for (let x = 0; x < GW; x++) {
       if (isStreet(x, z)) groundType[z][x] = 'street';
-      else if (isSidewalk(x, z)) groundType[z][x] = 'sidewalk';
     }
   }
 
-  const parkBlocks = [[1, 1], [2, 2]];
+  for (let z = 0; z < GH; z++) {
+    for (let x = 0; x < GW; x++) {
+      if (groundType[z][x] !== 'street') continue;
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          const nx = x + dx, nz = z + dz;
+          if (nx >= 0 && nx < GW && nz >= 0 && nz < GH && groundType[nz][nx] !== 'street') {
+            groundType[nz][nx] = 'sidewalk';
+          }
+        }
+      }
+    }
+  }
+
+  for (let z = 0; z < GH; z++) {
+    for (let x = 0; x < GW; x++) {
+      if (groundType[z][x] === 'void') groundType[z][x] = 'sidewalk';
+    }
+  }
+
   for (let bz = 0; bz < Math.floor(GH / BLOCK_SIZE); bz++) {
     for (let bx = 0; bx < Math.floor(GW / BLOCK_SIZE); bx++) {
-      const isPark = parkBlocks.some(([px, pz]) => bx === px && bz === pz);
-      if (isPark) {
+      const isPlaza = bx === plazaBlockX && bz === plazaBlockZ;
+
+      if (isPlaza) {
         const startX = bx * BLOCK_SIZE + STREET_W + SIDEWALK_W;
         const endX = Math.min((bx + 1) * BLOCK_SIZE - SIDEWALK_W, GW);
         const startZ = bz * BLOCK_SIZE + STREET_W + SIDEWALK_W;
@@ -1008,34 +1142,41 @@ function buildFallbackMap() {
       if (blockW < 4 || blockH < 4) continue;
 
       const numBuildings = 1 + Math.floor(rng() * 2);
+      const placed = [];
       for (let b = 0; b < numBuildings; b++) {
         const bw = 3 + Math.floor(rng() * Math.min(5, blockW - 2));
         const bh = 3 + Math.floor(rng() * Math.min(5, blockH - 2));
         const bx0 = blockStartX + Math.floor(rng() * Math.max(1, blockW - bw));
         const bz0 = blockStartZ + Math.floor(rng() * Math.max(1, blockH - bh));
-        const bhHeight = 2 + Math.floor(rng() * 4);
+        const bhHeight = 2 + Math.floor(rng() * 6);
+        const matI = Math.floor(rng() * buildingMats.length);
+
+        let overlap = false;
+        for (const p of placed) {
+          if (bx0 < p.x + p.w && bx0 + bw > p.x && bz0 < p.z + p.h && bz0 + bh > p.z) { overlap = true; break; }
+        }
+        if (overlap) continue;
+        placed.push({ x: bx0, z: bz0, w: bw, h: bh });
 
         for (let z = bz0; z < bz0 + bh && z < GH; z++) {
           for (let x = bx0; x < bx0 + bw && x < GW; x++) {
             groundType[z][x] = 'floor';
             buildingHeights[z][x] = bhHeight;
+            buildingMatIdx[z][x] = matI;
           }
         }
 
-        if (bw >= 5 && bh >= 5) {
-          const hasAlley = rng() > 0.4;
-          if (hasAlley) {
-            const alleyDir = rng() > 0.5;
-            if (alleyDir) {
-              const ax = bx0 + Math.floor(bw / 2);
-              for (let z = bz0; z < bz0 + bh && z < GH; z++) {
-                if (ax >= 0 && ax < GW) { groundType[z][ax] = 'sidewalk'; buildingHeights[z][ax] = 0; }
-              }
-            } else {
-              const az = bz0 + Math.floor(bh / 2);
-              for (let x = bx0; x < bx0 + bw && x < GW; x++) {
-                if (az >= 0 && az < GH) { groundType[az][x] = 'sidewalk'; buildingHeights[az][x] = 0; }
-              }
+        if (bw >= 5 && bh >= 5 && rng() > 0.3) {
+          const alleyDir = rng() > 0.5;
+          if (alleyDir) {
+            const ax = bx0 + Math.floor(bw / 2);
+            for (let z = bz0; z < bz0 + bh && z < GH; z++) {
+              if (ax >= 0 && ax < GW) { groundType[z][ax] = 'sidewalk'; buildingHeights[z][ax] = 0; }
+            }
+          } else {
+            const az = bz0 + Math.floor(bh / 2);
+            for (let x = bx0; x < bx0 + bw && x < GW; x++) {
+              if (az >= 0 && az < GH) { groundType[az][x] = 'sidewalk'; buildingHeights[az][x] = 0; }
             }
           }
         }
@@ -1059,22 +1200,12 @@ function buildFallbackMap() {
 
   for (let z = 0; z < GH; z++) {
     for (let x = 0; x < GW; x++) {
-      if (groundType[z][x] === 'floor') {
-        const h = buildingHeights[z][x];
-        if (h > 0) wallMap[z][x] = 1;
-      }
+      if (groundType[z][x] === 'floor' && buildingHeights[z][x] > 0) wallMap[z][x] = 1;
     }
   }
 
-  const boundaryH = 6;
-  for (let x = 0; x < GW; x++) {
-    wallMap[0][x] = 1;
-    wallMap[GH - 1][x] = 1;
-  }
-  for (let z = 0; z < GH; z++) {
-    wallMap[z][0] = 1;
-    wallMap[z][GW - 1] = 1;
-  }
+  for (let x = 0; x < GW; x++) { wallMap[0][x] = 1; wallMap[GH - 1][x] = 1; }
+  for (let z = 0; z < GH; z++) { wallMap[z][0] = 1; wallMap[z][GW - 1] = 1; }
 
   const geoByMaterial = new Map();
   function collectBox(mat, x, y, z, sx, sy, sz) {
@@ -1084,21 +1215,37 @@ function buildFallbackMap() {
     geoByMaterial.get(mat).push(g);
   }
 
+  function collectCylinder(mat, x, y, z, rTop, rBot, h, segs) {
+    if (!geoByMaterial.has(mat)) geoByMaterial.set(mat, []);
+    const g = new THREE.CylinderGeometry(rTop, rBot, h, segs || 8);
+    g.translate(x, y + h / 2, z);
+    geoByMaterial.get(mat).push(g);
+  }
+
+  function collectCone(mat, x, y, z, r, h, segs) {
+    if (!geoByMaterial.has(mat)) geoByMaterial.set(mat, []);
+    const g = new THREE.ConeGeometry(r, h, segs || 8);
+    g.translate(x, y + h / 2, z);
+    geoByMaterial.get(mat).push(g);
+  }
+
   for (let z = 0; z < GH; z++) {
     for (let x = 0; x < GW; x++) {
       const wx = (x - halfW) * C;
       const wz = (z - halfH) * C;
       const gt = groundType[z][x];
 
-      if (gt === 'street') collectBox(asphaltMat, wx, -0.05, wz, C, 0.1, C);
-      else if (gt === 'sidewalk') collectBox(sidewalkMat, wx, 0.0, wz, C, 0.15, C);
-      else if (gt === 'grass') collectBox(grassMat, wx, -0.1, wz, C, 0.2, C);
-      else if (gt === 'floor') {
+      if (gt === 'street') {
+        collectBox(materials.asphalt, wx, -0.05, wz, C, 0.1, C);
+      } else if (gt === 'sidewalk') {
+        collectBox(materials.sidewalk, wx, 0.0, wz, C, 0.15, C);
+      } else if (gt === 'grass') {
+        collectBox(materials.grass, wx, -0.1, wz, C, 0.2, C);
+      } else if (gt === 'floor') {
         const h = buildingHeights[z][x];
         if (h > 0 && wallMap[z][x] === 1) {
-          collectBox(brickMat, wx, 0, wz, C, h * 1.2, C);
-        } else if (h > 0) {
-          collectBox(concreteMat, wx, h * 1.2 - 0.15, wz, C, 0.15, C);
+          const mat = buildingMats[buildingMatIdx[z][x]];
+          collectBox(mat, wx, 0, wz, C, h * 1.2, C);
         }
       }
     }
@@ -1112,11 +1259,41 @@ function buildFallbackMap() {
       const wx = (x - halfW) * C;
       const wz = (z - halfH) * C;
       const wallH = h * 1.2;
+      const mat = buildingMats[buildingMatIdx[z][x]];
 
-      if (z === 0 || wallMap[z-1][x] !== 1) collectBox(brickMat, wx, 0, wz - C/2, C + 0.1, wallH, 0.2);
-      if (z === GH-1 || wallMap[z+1][x] !== 1) collectBox(brickMat, wx, 0, wz + C/2, C + 0.1, wallH, 0.2);
-      if (x === 0 || wallMap[z][x-1] !== 1) collectBox(brickMat, wx - C/2, 0, wz, 0.2, wallH, C + 0.1);
-      if (x === GW-1 || wallMap[z][x+1] !== 1) collectBox(brickMat, wx + C/2, 0, wz, 0.2, wallH, C + 0.1);
+      const n = (z > 0 && wallMap[z-1][x] !== 1);
+      const s = (z < GH-1 && wallMap[z+1][x] !== 1);
+      const w = (x > 0 && wallMap[z][x-1] !== 1);
+      const e = (x < GW-1 && wallMap[z][x+1] !== 1);
+
+      if (n) collectBox(mat, wx, 0, wz - C/2, C + 0.1, wallH, 0.2);
+      if (s) collectBox(mat, wx, 0, wz + C/2, C + 0.1, wallH, 0.2);
+      if (w) collectBox(mat, wx - C/2, 0, wz, 0.2, wallH, C + 0.1);
+      if (e) collectBox(mat, wx + C/2, 0, wz, 0.2, wallH, C + 0.1);
+
+      if (h >= 3) {
+        const windowRows = Math.floor(h * 1.2 / 2.2);
+        for (let wr = 0; wr < windowRows; wr++) {
+          const wy = 1.0 + wr * 2.2;
+          if (wy + 1.0 >= wallH) continue;
+          if (n || s) {
+            const nw = Math.max(1, Math.floor(C / 1.2));
+            for (let wi = 0; wi < nw; wi++) {
+              const wox = -C/2 + 0.6 + wi * 1.2;
+              if (n) collectBox(materials.window, wx + wox, wy, wz - C/2 - 0.05, 0.8, 1.0, 0.05);
+              if (s) collectBox(materials.window, wx + wox, wy, wz + C/2 + 0.05, 0.8, 1.0, 0.05);
+            }
+          }
+          if (w || e) {
+            const nw = Math.max(1, Math.floor(C / 1.2));
+            for (let wi = 0; wi < nw; wi++) {
+              const woz = -C/2 + 0.6 + wi * 1.2;
+              if (w) collectBox(materials.window, wx - C/2 - 0.05, wy, wz + woz, 0.05, 1.0, 0.8);
+              if (e) collectBox(materials.window, wx + C/2 + 0.05, wy, wz + woz, 0.05, 1.0, 0.8);
+            }
+          }
+        }
+      }
     }
   }
 
@@ -1127,20 +1304,128 @@ function buildFallbackMap() {
       if (h <= 0) continue;
       const wx = (x - halfW) * C;
       const wz = (z - halfH) * C;
-      collectBox(roofMat, wx, h * 1.2, wz, C + 0.1, 0.15, C + 0.1);
+      collectBox(materials.roof, wx, h * 1.2, wz, C + 0.1, 0.15, C + 0.1);
+
+      if (h >= 5 && rng() > 0.6) {
+        const ox = (rng() - 0.5) * C * 0.4;
+        const oz = (rng() - 0.5) * C * 0.4;
+        collectBox(materials.concrete, wx + ox, h * 1.2 + 0.15, wz + oz, 1.0, 0.6, 0.6);
+      }
     }
   }
 
-  const boundaryH = 6;
-  for (let x = 0; x < GW; x++) {
-    const wx = (x - halfW) * C;
-    collectBox(concreteMat, wx, 0, -halfH * C - C / 2, C + 0.1, boundaryH, 0.3);
-    collectBox(concreteMat, wx, 0, (GH - 1 - halfH) * C + C / 2, C + 0.1, boundaryH, 0.3);
-  }
   for (let z = 0; z < GH; z++) {
-    const wz = (z - halfH) * C;
-    collectBox(concreteMat, -halfW * C - C / 2, 0, wz, 0.3, boundaryH, C + 0.1);
-    collectBox(concreteMat, (GW - 1 - halfW) * C + C / 2, 0, wz, 0.3, boundaryH, C + 0.1);
+    for (let x = 0; x < GW; x++) {
+      const isEdgeX = (x === 0 || x === GW - 1);
+      const isEdgeZ = (z === 0 || z === GH - 1);
+      if (!isEdgeX && !isEdgeZ) continue;
+      const wx = (x - halfW) * C;
+      const wz = (z - halfH) * C;
+      if (isEdgeX && isEdgeZ) {
+        collectBox(materials.concrete, wx, 0, wz, 0.4, 6, 0.4);
+      } else if (isEdgeX) {
+        collectBox(materials.concrete, wx, 0, wz, 0.4, 6, C + 0.1);
+      } else {
+        collectBox(materials.concrete, wx, 0, wz, C + 0.1, 6, 0.4);
+      }
+    }
+  }
+
+  const streetLights = [];
+  for (let z = 0; z < GH; z += BLOCK_SIZE) {
+    for (let x = 0; x < GW; x += BLOCK_SIZE) {
+      for (let corner = 0; corner < 4; corner++) {
+        const lx = x + (corner % 2 === 0 ? 0 : STREET_W - 1);
+        const lz = z + (corner < 2 ? 0 : STREET_W - 1);
+        if (lx < 0 || lx >= GW || lz < 0 || lz >= GH) continue;
+
+        let sx = lx, sz = lz;
+        if (groundType[sz][sx] !== 'street') {
+          for (let dx = -1; dx <= 1; dx++) {
+            for (let dz = -1; dz <= 1; dz++) {
+              const nx = lx + dx, nz = lz + dz;
+              if (nx >= 0 && nx < GW && nz >= 0 && nz < GH && groundType[nz][nx] === 'street') {
+                sx = nx; sz = nz; break;
+              }
+            }
+            if (groundType[sz][sx] === 'street') break;
+          }
+        }
+        if (groundType[sz][sx] !== 'street') continue;
+
+        const wx = (sx - halfW) * C;
+        const wz = (sz - halfH) * C;
+        if (streetLights.some(l => Math.abs(l.x - wx) < C * 2 && Math.abs(l.z - wz) < C * 2)) continue;
+
+        collectCylinder(materials.pole, wx, 0, wz, 0.06, 0.08, 5.5, 8);
+        collectBox(materials.pole, wx, 5.0, wz, 0.08, 0.08, 2.0);
+        collectBox(materials.lampBulb, wx, 4.8, wz + 0.8, 0.3, 0.15, 0.3);
+
+        streetLights.push({ x: wx, z: wz + 0.8 });
+      }
+    }
+  }
+
+  for (let z = 0; z < GH; z++) {
+    for (let x = 0; x < GW; x++) {
+      if (!isIntersection(x, z)) continue;
+      const wx = (x - halfW) * C;
+      const wz = (z - halfH) * C;
+      collectBox(materials.crosswalk, wx, 0.02, wz, C * 0.8, 0.02, C * 0.15);
+      collectBox(materials.crosswalk, wx, 0.02, wz, C * 0.15, 0.02, C * 0.8);
+    }
+  }
+
+  for (let z = 0; z < GH; z++) {
+    for (let x = 0; x < GW; x++) {
+      if (groundType[z][x] !== 'street') continue;
+      let adjSidewalk = false;
+      for (const [dx, dz] of [[1,0],[-1,0],[0,1],[0,-1]]) {
+        const nx = x + dx, nz = z + dz;
+        if (nx >= 0 && nx < GW && nz >= 0 && nz < GH && groundType[nz][nx] === 'sidewalk') {
+          adjSidewalk = true; break;
+        }
+      }
+      if (!adjSidewalk) continue;
+      if (isIntersection(x, z)) continue;
+
+      const wx = (x - halfW) * C;
+      const wz = (z - halfH) * C;
+      if (rng() > 0.5) {
+        collectBox(materials.curb, wx, 0.15, wz, C, 0.12, C);
+      }
+    }
+  }
+
+  const treePositions = [];
+  for (let z = 0; z < GH; z++) {
+    for (let x = 0; x < GW; x++) {
+      if (groundType[z][x] !== 'sidewalk') continue;
+      if (rng() > 0.96) {
+        let nearStreet = false;
+        for (const [dx, dz] of [[1,0],[-1,0],[0,1],[0,-1]]) {
+          const nx = x + dx, nz = z + dz;
+          if (nx >= 0 && nx < GW && nz >= 0 && nz < GH && groundType[nz][nx] === 'street') {
+            nearStreet = true; break;
+          }
+        }
+        if (!nearStreet) continue;
+
+        const wx = (x - halfW) * C + (rng() - 0.5) * 0.5;
+        const wz = (z - halfH) * C + (rng() - 0.5) * 0.5;
+        if (treePositions.some(t => Math.abs(t.x - wx) < C * 2 && Math.abs(t.z - wz) < C * 2)) continue;
+        treePositions.push({ x: wx, z: wz });
+
+        const trunkH = 2.5 + rng() * 1.5;
+        collectCylinder(materials.treeTrunk, wx, 0.15, wz, 0.12, 0.18, trunkH, 6);
+
+        const leafMat = rng() > 0.5 ? materials.treeLeaves : materials.treeLeavesDark;
+        const crownR = 1.2 + rng() * 0.8;
+        const crownH = 1.8 + rng() * 1.0;
+        collectCone(leafMat, wx, trunkH * 0.6, wz, crownR, crownH, 7);
+        collectCone(leafMat, wx, trunkH * 0.6 + crownH * 0.4, wz, crownR * 0.7, crownH * 0.7, 7);
+      }
+    }
   }
 
   for (let z = 0; z < GH; z++) {
@@ -1148,38 +1433,56 @@ function buildFallbackMap() {
       if (groundType[z][x] !== 'grass') continue;
       const wx = (x - halfW) * C;
       const wz = (z - halfH) * C;
-      if (rng() > 0.7) {
-        collectBox(fenceMat, wx, 0, wz, 0.08, 1.0, C * 0.8);
-      }
-      if (rng() > 0.85) {
-        collectBox(concreteMat, wx, 0, wz, C * 0.3, 0.6, C * 0.3);
+
+      if (rng() > 0.5) {
+        const trunkH = 2.0 + rng() * 1.0;
+        collectCylinder(materials.treeTrunk, wx, 0.1, wz, 0.1, 0.15, trunkH, 6);
+        const leafMat = rng() > 0.5 ? materials.treeLeaves : materials.treeLeavesDark;
+        const crownR = 1.0 + rng() * 0.6;
+        collectCone(leafMat, wx, trunkH * 0.5, wz, crownR, 1.6, 7);
+        collectCone(leafMat, wx, trunkH * 0.5 + 1.0, wz, crownR * 0.65, 1.2, 7);
       }
     }
   }
 
-  const streetLights = [];
-  for (let i = 0; i < 18; i++) {
-    let attempts = 0;
-    while (attempts < 50) {
-      attempts++;
-      const sx = Math.floor(rng() * GW);
-      const sz = Math.floor(rng() * GH);
-      if (groundType[sz][sx] !== 'street') continue;
-      const wx = (sx - halfW) * C;
-      const wz = (sz - halfH) * C;
-      const tooClose = streetLights.some(l => Math.abs(l.x - wx) < C * 3 && Math.abs(l.z - wz) < C * 3);
-      if (tooClose) continue;
-
-      collectBox(poleMat, wx, 0, wz, 0.12, 5, 0.12);
-      const armLen = 1.5 + rng() * 1;
-      const armDir = rng() > 0.5 ? 1 : -1;
-      collectBox(poleMat, wx + armDir * armLen / 2, 4.8, wz, armLen, 0.1, 0.1);
-      collectBox(lightBulbMat, wx + armDir * armLen, 4.5, wz, 0.3, 0.2, 0.3);
-
-      streetLights.push({ x: wx + armDir * armLen, z: wz });
-      break;
+  for (let z = 0; z < GH; z++) {
+    for (let x = 0; x < GW; x++) {
+      if (groundType[z][x] !== 'sidewalk') continue;
+      let facingStreet = -1;
+      for (const [dx, dz, dir] of [[1,0,0],[-1,0,1],[0,1,2],[0,-1,3]]) {
+        const nx = x + dx, nz = z + dz;
+        if (nx >= 0 && nx < GW && nz >= 0 && nz < GH && groundType[nz][nx] === 'street') {
+          facingStreet = dir; break;
+        }
+      }
+      if (facingStreet < 0) continue;
+      if (rng() > 0.92) {
+        const wx = (x - halfW) * C;
+        const wz = (z - halfH) * C;
+        if (facingStreet === 0 || facingStreet === 1) {
+          collectBox(materials.bench, wx, 0.15, wz, 1.2, 0.08, 0.4);
+          collectBox(materials.benchMetal, wx - 0.5, 0, wz, 0.08, 0.5, 0.35);
+          collectBox(materials.benchMetal, wx + 0.5, 0, wz, 0.08, 0.5, 0.35);
+        } else {
+          collectBox(materials.bench, wx, 0.15, wz, 0.4, 0.08, 1.2);
+          collectBox(materials.benchMetal, wx, 0, wz - 0.5, 0.35, 0.5, 0.08);
+          collectBox(materials.benchMetal, wx, 0, wz + 0.5, 0.35, 0.5, 0.08);
+        }
+      }
+      if (rng() > 0.95) {
+        const wx = (x - halfW) * C + (rng() - 0.5) * 0.6;
+        const wz = (z - halfH) * C + (rng() - 0.5) * 0.6;
+        collectCylinder(materials.trashcan, wx, 0.15, wz, 0.2, 0.22, 0.7, 8);
+      }
     }
   }
+
+  const pcx = (plazaBlockX * BLOCK_SIZE + BLOCK_SIZE / 2 - halfW) * C;
+  const pcz = (plazaBlockZ * BLOCK_SIZE + BLOCK_SIZE / 2 - halfH) * C;
+  collectCylinder(materials.fountain, pcx, 0.2, pcz, 2.5, 3.0, 0.8, 16);
+  collectCylinder(materials.fountain, pcx, 0.8, pcz, 1.8, 2.0, 0.5, 16);
+  collectCylinder(materials.water, pcx, 0.9, pcz, 1.7, 1.7, 0.3, 16);
+  collectCylinder(materials.fountain, pcx, 1.2, pcz, 0.3, 0.4, 1.0, 8);
 
   for (const [mat, geos] of geoByMaterial) {
     if (geos.length === 0) continue;
@@ -1194,8 +1497,8 @@ function buildFallbackMap() {
   }
 
   for (const sl of streetLights) {
-    const pl = new THREE.PointLight(0xfff0d0, 1.2, 25, 1.5);
-    pl.position.set(sl.x, 4.3, sl.z);
+    const pl = new THREE.PointLight(0xfff0d0, 1.0, 22, 1.5);
+    pl.position.set(sl.x, 4.6, sl.z);
     scene.add(pl);
   }
 
@@ -1210,8 +1513,8 @@ function buildFallbackMap() {
     if (b.max.y - b.min.y < 0.3 || (b.max.x - b.min.x) > 30 || (b.max.z - b.min.z) > 30) colliders.splice(i, 1);
   }
 
-  scene.background = new THREE.Color(0x87CEEB);
-  scene.fog = new THREE.Fog(0x87CEEB, 80, 200);
+  scene.background = new THREE.Color(0x7ec8e3);
+  scene.fog = new THREE.Fog(0x7ec8e3, 60, 180);
 }
 
 window.addEventListener('resize', () => {
