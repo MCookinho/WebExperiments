@@ -3,11 +3,11 @@
         {
             "name": "TETO FEED",
             "description": "The ultimate Kasane Teto fan hub — music player, discography, profile, gallery, quotes, countdown & mini game!",
-            "tags": ["Anime", "VTuber", "Music", "Fan Hub", "Game"],
+            "tags": ["Anime", "Music", "Game"],
             "image": "Projects/teto-feed/thumb.gif",
             "url": "Projects/teto-feed/",
             "color": "#ff6b9d",
-            "date": "2024-01-15"
+            "date": "2026-07-16"
         },
         {
             "name": "AI Thing",
@@ -16,7 +16,7 @@
             "image": "Projects/AI-Thing/thumb.gif",
             "url": "Projects/AI-Thing",
             "color": "#00d4ff",
-            "date": "2024-02-10"
+            "date": "2026-07-16"
         },
         {
             "name": "Travei Legal",
@@ -25,7 +25,7 @@
             "image": "Projects/travei-legal/thumb.gif",
             "url": "Projects/travei-legal/",
             "color": "#ff00ff",
-            "date": "2024-03-05"
+            "date": "2026-07-16"
         },
         {
             "name": "Mbappe Nextbot",
@@ -34,7 +34,7 @@
             "image": "Projects/mbappe-nextbot/thumb.png",
             "url": "Projects/mbappe-nextbot/",
             "color": "#ff00ff",
-            "date": "2024-03-05"
+            "date": "2026-07-16"
         }
     ]
 }
