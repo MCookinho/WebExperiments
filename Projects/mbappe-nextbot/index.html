@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MBAPPÉ NEXTBOT</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{overflow:hidden;background:#000;font-family:'Courier New',monospace;cursor:none}
+canvas{display:block}
+
+#overlay{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;color:#fff}
+#overlay h1{font-size:clamp(2rem,6vw,5rem);color:#ff0040;text-shadow:0 0 30px #ff0040,0 0 60px #ff0000;animation:pulse 1.5s ease-in-out infinite}
+#overlay .sub{font-size:1rem;color:#666;margin:0.5rem 0 2rem;letter-spacing:4px}
+#overlay .controls-info{margin-top:1rem;padding:1.5rem 2.5rem;border:1px solid #222;border-radius:4px;background:rgba(255,0,64,0.02);font-size:0.85rem;line-height:2}
+#overlay .controls-info span{color:#ff0040;font-weight:bold}
+#start-btn{margin-top:2rem;padding:1rem 3rem;font-size:1.3rem;font-family:'Courier New',monospace;font-weight:700;background:#ff0040;color:#fff;border:none;border-radius:2px;cursor:pointer;text-transform:uppercase;letter-spacing:4px;transition:all .3s}
+#start-btn:hover{background:#ff2060;box-shadow:0 0 40px rgba(255,0,64,.6)}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.03)}}
+
+#crosshair{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:100;pointer-events:none;display:none}
+#crosshair::before,#crosshair::after{content:'';position:absolute;background:rgba(255,255,255,.6)}
+#crosshair::before{top:8px;left:0;width:20px;height:2px}
+#crosshair::after{top:0;left:8px;width:2px;height:20px}
+
+#stamina-bar{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);width:200px;height:6px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.1);border-radius:3px;z-index:100;display:none}
+#stamina-fill{height:100%;width:100%;background:#40ff40;border-radius:2px;transition:width .05s linear}
+
+#warning{position:fixed;top:20px;left:50%;transform:translateX(-50%);font-size:1.3rem;color:#ff0040;text-shadow:0 0 15px #ff0040;z-index:100;display:none;animation:blink .4s ease-in-out infinite;letter-spacing:3px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+
+#vhs-overlay{position:fixed;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.15) 0px,rgba(0,0,0,.15) 1px,transparent 1px,transparent 3px);pointer-events:none;z-index:99;display:none}
+
+#jumpscare-video{position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:2000;display:none}
+#capture-overlay{position:fixed;inset:0;background:#000;z-index:1999;display:none}
+
+#minimap-wrap{position:fixed;top:15px;right:15px;width:160px;height:160px;border:1px solid rgba(255,0,64,.4);background:rgba(0,0,0,.8);z-index:100;display:none;border-radius:4px;overflow:hidden}
+#minimap-canvas{width:160px;height:160px}
+
+#stamina-hint{position:fixed;bottom:42px;left:50%;transform:translateX(-50%);font-size:.65rem;color:rgba(255,255,255,.3);z-index:100;display:none}
+
+#death-text{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3rem;color:#ff0040;z-index:2001;display:none;text-shadow:0 0 20px #ff0040;font-weight:700;letter-spacing:5px}
+</style>
+</head>
+<body>
+
+<div id="overlay">
+  <h1>MBAPPÉ NEXTBOT</h1>
+  <div class="sub">ELE VAI TE PEGAR</div>
+  <div class="controls-info">
+    <p><span>W A S D</span> &mdash; Mover</p>
+    <p><span>SHIFT</span> &mdash; Correr</p>
+    <p><span>ESPAÇO</span> &mdash; Pular</p>
+    <p><span>MOUSE</span> &mdash; Olhar</p>
+    <p><span>CLICK</span> &mdash; Soltar cursor</p>
+  </div>
+  <button id="start-btn">JOGAR</button>
+</div>
+
+<div id="crosshair"></div>
+<div id="stamina-bar"><div id="stamina-fill"></div></div>
+<div id="stamina-hint">Segure SHIFT para correr</div>
+<div id="warning">⚡ ELE ESTÁ PERTO ⚡</div>
+<div id="vhs-overlay"></div>
+<div id="minimap-wrap"><canvas id="minimap-canvas" width="160" height="160"></canvas></div>
+
+<div id="capture-overlay"></div>
+<video id="jumpscare-video" playsinline></video>
+<div id="death-text">CAPTURADO</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+/* ─── CONSTANTS ─── */
+const C = 4;
+const WH = 4.8;
+const PR = 0.35;
+const EYE = 1.7;
+const GRAV = -28;
+const JUMP = 9.5;
+const WALK = 6.5;
+const RUN = 11.5;
+const BOT_BASE = 7.5;
+const BOT_FAST = 12.5;
+const CAP_R = 1.8;
+const MAX_STAM = 100;
+const STAM_DRAIN = 30;
+const STAM_REGEN = 10;
+
+/* ─── MAP ─── */
+const MAP = [
+  "################################",
+  "#..............................#",
+  "#..............................#",
+  "#..............................#",
+  "#.....######.......####........#",
+  "#.....#....#.......#..#........#",
+  "#.....#....#.......#..#........#",
+  "#.....#....#..#....#..#........#",
+  "#.....#....#..#....#..###......#",
+  "#.....######..#......#.........#",
+  "#.............#......#.........#",
+  "#.............#......#.........#",
+  "#.....###..#..#......#####.....#",
+  "#.....#....#..#..........#.....#",
+  "#.....#....#..#..........#.....#",
+  "#.....#....#..#####......#.....#",
+  "#.....#....#.....#......#......#",
+  "#.....######.....#......#......#",
+  "#................#......#......#",
+  "#................#......#......#",
+  "#.....####.......########......#",
+  "#.....#..............#.........#",
+  "#.....#..............#.........#",
+  "#.....#....########..#..####...#",
+  "#.....#....#.........#..#..#...#",
+  "#..........#.........#..#..#...#",
+  "#..........#.........#..#..#...#",
+  "#.....######.........#..####...#",
+  "#....................#.........#",
+  "#....................#.........#",
+  "#.....###...########...........#",
+  "#.....#.....#..................#",
+  "#.....#.....#..................#",
+  "#.....#.....#....####...####...#",
+  "#.....#.....#....#..#...#..#...#",
+  "#...........#....#..#...#..#...#",
+  "#...........#....#..#...#..#...#",
+  "#.....#######....####...####...#",
+  "#..............................#",
+  "#..............................#",
+  "################################",
+];
+
+const MAP_H = MAP.length;
+const MAP_W = MAP[0].length;
+
+function isWall(gx, gz) {
+  if (gx < 0 || gx >= MAP_W || gz < 0 || gz >= MAP_H) return true;
+  return MAP[gz][gx] === '#';
+}
+
+/* ─── RENDERER ─── */
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x050505);
+scene.fog = new THREE.FogExp2(0x050505, 0.045);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.5;
+document.body.appendChild(renderer.domElement);
+
+const camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 120);
+
+/* ─── LIGHTING ─── */
+scene.add(new THREE.AmbientLight(0x110a15, 0.4));
+
+const flashlight = new THREE.SpotLight(0xffeedd, 4, 22, Math.PI / 4.5, 0.5, 1.8);
+flashlight.castShadow = true;
+flashlight.shadow.mapSize.set(1024, 1024);
+flashlight.shadow.bias = -0.002;
+camera.add(flashlight);
+flashlight.position.set(0, -0.3, -0.5);
+flashlight.target.position.set(0, -0.3, -6);
+camera.add(flashlight.target);
+scene.add(camera);
+
+/* ─── MATERIALS ─── */
+const wallMat = new THREE.MeshStandardMaterial({ color: 0x3d3530, roughness: 0.92, metalness: 0 });
+const wallMat2 = new THREE.MeshStandardMaterial({ color: 0x332e28, roughness: 0.95, metalness: 0 });
+const floorMat = new THREE.MeshStandardMaterial({ color: 0x181512, roughness: 0.88, metalness: 0.05 });
+const ceilMat = new THREE.MeshStandardMaterial({ color: 0x221e1a, roughness: 0.95, metalness: 0 });
+const baseboardMat = new THREE.MeshStandardMaterial({ color: 0x222018, roughness: 0.8, metalness: 0 });
+
+/* ─── GEOMETRIES (reused) ─── */
+const floorGeo = new THREE.PlaneGeometry(C, C);
+floorGeo.rotateX(-Math.PI / 2);
+const ceilGeo = new THREE.PlaneGeometry(C, C);
+ceilGeo.rotateX(Math.PI / 2);
+const wallGeoH = new THREE.BoxGeometry(C, WH, 0.25);
+const wallGeoV = new THREE.BoxGeometry(0.25, WH, C);
+const bbGeoH = new THREE.BoxGeometry(C, 0.3, 0.26);
+const bbGeoV = new THREE.BoxGeometry(0.26, 0.3, C);
+
+/* ─── BUILD MAP ─── */
+const wallBoxes = [];
+const openCells = [];
+
+for (let z = 0; z < MAP_H; z++) {
+  for (let x = 0; x < MAP_W; x++) {
+    const wx = x * C;
+    const wz = z * C;
+
+    if (!isWall(x, z)) {
+      openCells.push({ x, z });
+
+      const fl = new THREE.Mesh(floorGeo, floorMat);
+      fl.position.set(wx + C / 2, 0, wz + C / 2);
+      fl.receiveShadow = true;
+      scene.add(fl);
+
+      const cl = new THREE.Mesh(ceilGeo, ceilMat);
+      cl.position.set(wx + C / 2, WH, wz + C / 2);
+      scene.add(cl);
+
+      if (Math.random() < 0.08) {
+        const pl = new THREE.PointLight(0xffaa55, 0.6, 10, 2);
+        pl.position.set(wx + C / 2, WH - 0.4, wz + C / 2);
+        scene.add(pl);
+      }
+    }
+
+    if (isWall(x, z)) {
+      const mats = [wallMat, wallMat2];
+      const m = mats[Math.floor(Math.random() * mats.length)];
+
+      if (!isWall(x + 1, z)) {
+        const w = new THREE.Mesh(wallGeoV, m);
+        w.position.set((x + 1) * C, WH / 2, wz + C / 2);
+        w.castShadow = true; w.receiveShadow = true;
+        scene.add(w);
+        const bb = new THREE.Mesh(bbGeoV, baseboardMat);
+        bb.position.set((x + 1) * C, 0.15, wz + C / 2);
+        scene.add(bb);
+        wallBoxes.push({ minX: (x + 1) * C - 0.125, maxX: (x + 1) * C + 0.125, minZ: wz, maxZ: wz + C });
+      }
+      if (!isWall(x - 1, z)) {
+        const w = new THREE.Mesh(wallGeoV, m);
+        w.position.set(x * C, WH / 2, wz + C / 2);
+        w.castShadow = true; w.receiveShadow = true;
+        scene.add(w);
+        const bb = new THREE.Mesh(bbGeoV, baseboardMat);
+        bb.position.set(x * C, 0.15, wz + C / 2);
+        scene.add(bb);
+        wallBoxes.push({ minX: x * C - 0.125, maxX: x * C + 0.125, minZ: wz, maxZ: wz + C });
+      }
+      if (!isWall(x, z + 1)) {
+        const w = new THREE.Mesh(wallGeoH, m);
+        w.position.set(wx + C / 2, WH / 2, (z + 1) * C);
+        w.castShadow = true; w.receiveShadow = true;
+        scene.add(w);
+        const bb = new THREE.Mesh(bbGeoH, baseboardMat);
+        bb.position.set(wx + C / 2, 0.15, (z + 1) * C);
+        scene.add(bb);
+        wallBoxes.push({ minX: wx, maxX: wx + C, minZ: (z + 1) * C - 0.125, maxZ: (z + 1) * C + 0.125 });
+      }
+      if (!isWall(x, z - 1)) {
+        const w = new THREE.Mesh(wallGeoH, m);
+        w.position.set(wx + C / 2, WH / 2, z * C);
+        w.castShadow = true; w.receiveShadow = true;
+        scene.add(w);
+        const bb = new THREE.Mesh(bbGeoH, baseboardMat);
+        bb.position.set(wx + C / 2, 0.15, z * C);
+        scene.add(bb);
+        wallBoxes.push({ minX: wx, maxX: wx + C, minZ: z * C - 0.125, maxZ: z * C + 0.125 });
+      }
+    }
+  }
+}
+
+/* ─── FLICKERING LIGHTS ─── */
+const flickerLights = [];
+for (let i = 0; i < 20; i++) {
+  const cell = openCells[Math.floor(Math.random() * openCells.length)];
+  const fl = new THREE.PointLight(0xff8833, 0, 8, 2);
+  fl.position.set(cell.x * C + C / 2, WH - 0.3, cell.z * C + C / 2);
+  scene.add(fl);
+  flickerLights.push({ light: fl, timer: Math.random() * 5, on: false, dur: 0.1 + Math.random() * 0.3 });
+}
+
+/* ─── SPAWN ─── */
+function findSpawn(pred) {
+  let best = null, bestD = 0;
+  for (const c of openCells) {
+    if (pred(c)) {
+      const d = c.x * c.x + c.z * c.z;
+      if (d > bestD) { bestD = d; best = c; }
+    }
+  }
+  return best || openCells[0];
+}
+
+const playerSpawn = findSpawn(c => c.x <= 3 && c.z <= 3);
+const botSpawnCell = findSpawn(c => {
+  const dx = c.x - playerSpawn.x;
+  const dz = c.z - playerSpawn.z;
+  return (dx * dx + dz * dz) > 400;
+});
+
+const playerPos = new THREE.Vector3(playerSpawn.x * C + C / 2, EYE, playerSpawn.z * C + C / 2);
+const playerVel = new THREE.Vector3(0, 0, 0);
+let onGround = true;
+const euler = new THREE.Euler(0, 0, 0, 'YXZ');
+const keys = {};
+let locked = false;
+let stamina = MAX_STAM;
+let sprinting = false;
+let headBob = 0;
+
+/* ─── INPUT ─── */
+document.addEventListener('keydown', e => { keys[e.code] = true; if (e.code === 'ShiftLeft') sprinting = true; });
+document.addEventListener('keyup', e => { keys[e.code] = false; if (e.code === 'ShiftLeft') sprinting = false; });
+
+renderer.domElement.addEventListener('click', () => {
+  if (!locked && gameStarted && !gameOver) renderer.domElement.requestPointerLock();
+});
+document.addEventListener('pointerlockchange', () => {
+  locked = document.pointerLockElement === renderer.domElement;
+});
+document.addEventListener('mousemove', e => {
+  if (!locked) return;
+  euler.y -= e.movementX * 0.002;
+  euler.x -= e.movementY * 0.002;
+  euler.x = Math.max(-Math.PI / 2 + 0.01, Math.min(Math.PI / 2 - 0.01, euler.x));
+  camera.quaternion.setFromEuler(euler);
+});
+
+/* ─── COLLISION (per-axis sliding) ─── */
+function testCollisionX(px, pz, r) {
+  for (const b of wallBoxes) {
+    const closestZ = Math.max(b.minZ, Math.min(pz, b.maxZ));
+    const dz = Math.abs(pz - closestZ);
+    if (dz >= r) continue;
+    if (px + r > b.minX && px - r < b.maxX) return true;
+  }
+  return false;
+}
+
+function testCollisionZ(px, pz, r) {
+  for (const b of wallBoxes) {
+    const closestX = Math.max(b.minX, Math.min(px, b.maxX));
+    const dx = Math.abs(px - closestX);
+    if (dx >= r) continue;
+    if (pz + r > b.minZ && pz - r < b.maxZ) return true;
+  }
+  return false;
+}
+
+/* ─── PLAYER UPDATE ─── */
+let bobTimer = 0;
+let shakeAmount = 0;
+
+function updatePlayer(dt) {
+  const fwd = new THREE.Vector3();
+  camera.getWorldDirection(fwd);
+  fwd.y = 0;
+  fwd.normalize();
+  const right = new THREE.Vector3().crossVectors(fwd, new THREE.Vector3(0, 1, 0)).normalize();
+
+  const move = new THREE.Vector3();
+  if (keys['KeyW']) move.add(fwd);
+  if (keys['KeyS']) move.sub(fwd);
+  if (keys['KeyD']) move.add(right);
+  if (keys['KeyA']) move.sub(right);
+  if (move.lengthSq() > 0) move.normalize();
+
+  const canSprint = sprinting && stamina > 0 && move.lengthSq() > 0;
+  const spd = canSprint ? RUN : WALK;
+  if (canSprint) stamina = Math.max(0, stamina - STAM_DRAIN * dt);
+  else stamina = Math.min(MAX_STAM, stamina + STAM_REGEN * dt);
+
+  const dx = move.x * spd * dt;
+  const dz = move.z * spd * dt;
+
+  let nx = playerPos.x + dx;
+  let nz = playerPos.z + dz;
+
+  if (!testCollisionX(nx, playerPos.z, PR)) playerPos.x = nx;
+  if (!testCollisionZ(playerPos.x, nz, PR)) playerPos.z = nz;
+
+  if (keys['Space'] && onGround) {
+    playerVel.y = JUMP;
+    onGround = false;
+  }
+  playerVel.y += GRAV * dt;
+  playerPos.y += playerVel.y * dt;
+  if (playerPos.y <= EYE) { playerPos.y = EYE; playerVel.y = 0; onGround = true; }
+
+  if (move.lengthSq() > 0 && onGround) {
+    const bobSpeed = canSprint ? 14 : 10;
+    headBob += dt * bobSpeed;
+    const bobY = Math.sin(headBob) * (canSprint ? 0.06 : 0.03);
+    const bobX = Math.cos(headBob * 0.5) * (canSprint ? 0.02 : 0.01);
+    camera.position.set(playerPos.x + bobX, playerPos.y + bobY, playerPos.z);
+  } else {
+    headBob = 0;
+    camera.position.set(playerPos.x, playerPos.y, playerPos.z);
+  }
+
+  if (shakeAmount > 0) {
+    camera.position.x += (Math.random() - 0.5) * shakeAmount;
+    camera.position.y += (Math.random() - 0.5) * shakeAmount;
+    shakeAmount *= 0.92;
+    if (shakeAmount < 0.001) shakeAmount = 0;
+  }
+
+  document.getElementById('stamina-fill').style.width = (stamina / MAX_STAM * 100) + '%';
+  document.getElementById('stamina-fill').style.background = stamina < 25 ? '#ff3030' : '#40ff40';
+}
+
+/* ─── PATHFINDING (BFS) ─── */
+function bfsPath(sx, sz, gx, gz) {
+  if (sx === gx && sz === gz) return [{ x: gx, z: gz }];
+  if (isWall(gx, gz)) return null;
+  const visited = new Set();
+  const queue = [[{ x: sx, z: sz }]];
+  const k = (x, z) => (x << 16) | (z & 0xFFFF);
+  visited.add(k(sx, sz));
+  const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+  while (queue.length > 0) {
+    const path = queue.shift();
+    const cur = path[path.length - 1];
+    for (const [dx, dz] of dirs) {
+      const nx = cur.x + dx, nz = cur.z + dz;
+      if (nx === gx && nz === gz) return [...path, { x: nx, z: nz }];
+      const key = k(nx, nz);
+      if (!isWall(nx, nz) && !visited.has(key)) {
+        visited.add(key);
+        queue.push([...path, { x: nx, z: nz }]);
+      }
+    }
+  }
+  return null;
+}
+
+/* ─── NEXTBOT ─── */
+const nextbotTex = new THREE.TextureLoader().load('mbappe.png');
+nextbotTex.colorSpace = THREE.SRGBColorSpace;
+const nextbotSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: nextbotTex }));
+nextbotSprite.scale.set(3, 4.5, 1);
+nextbotSprite.position.set(botSpawnCell.x * C + C / 2, 2.2, botSpawnCell.z * C + C / 2);
+scene.add(nextbotSprite);
+
+const botLight = new THREE.PointLight(0xff0022, 2, 18);
+botLight.position.copy(nextbotSprite.position);
+botLight.position.y = 3;
+scene.add(botLight);
+
+const botLight2 = new THREE.PointLight(0xff0000, 0.8, 10);
+botLight2.position.copy(nextbotSprite.position);
+botLight2.position.y = 1;
+scene.add(botLight2);
+
+let botPath = null;
+let botPathIdx = 0;
+let botRecalcTimer = 0;
+let botStuckTimer = 0;
+const botLastPos = new THREE.Vector3().copy(nextbotSprite.position);
+let botActivated = false;
+const BOT_ACTIVATION_DIST = 40;
+
+function updateBot(dt) {
+  const dist = nextbotSprite.position.distanceTo(playerPos);
+
+  if (dist < BOT_ACTIVATION_DIST && !botActivated) botActivated = true;
+  if (!botActivated) return;
+
+  const bg = { x: Math.floor(nextbotSprite.position.x / C), z: Math.floor(nextbotSprite.position.z / C) };
+  const pg = { x: Math.floor(playerPos.x / C), z: Math.floor(playerPos.z / C) };
+
+  botRecalcTimer += dt;
+  const recalcRate = dist < 10 ? 0.15 : 0.35;
+  if (botRecalcTimer >= recalcRate || !botPath) {
+    botRecalcTimer = 0;
+    const p = bfsPath(bg.x, bg.z, pg.x, pg.z);
+    if (p && p.length > 1) { botPath = p; botPathIdx = 1; }
+  }
+
+  const stuck = nextbotSprite.position.distanceTo(botLastPos) < 0.03;
+  if (stuck) botStuckTimer += dt;
+  else botStuckTimer = 0;
+  botLastPos.copy(nextbotSprite.position);
+  if (botStuckTimer > 2) { botPath = null; botStuckTimer = 0; }
+
+  if (botPath && botPathIdx < botPath.length) {
+    const tgt = new THREE.Vector3(botPath[botPathIdx].x * C + C / 2, 2.2, botPath[botPathIdx].z * C + C / 2);
+    const dir = new THREE.Vector3().subVectors(tgt, nextbotSprite.position);
+    dir.y = 0;
+    const d = dir.length();
+    if (d < 0.6) { botPathIdx++; }
+    else {
+      dir.normalize();
+      const spd = dist < 12 ? BOT_FAST : BOT_BASE;
+      const mv = dir.multiplyScalar(spd * dt);
+      let nx = nextbotSprite.position.x + mv.x;
+      let nz = nextbotSprite.position.z + mv.z;
+      if (!testCollisionX(nx, nextbotSprite.position.z, 0.6)) nextbotSprite.position.x = nx;
+      if (!testCollisionZ(nextbotSprite.position.x, nz, 0.6)) nextbotSprite.position.z = nz;
+    }
+  }
+
+  const bobSpeed = dist < 12 ? 10 : 6;
+  const bobAmp = dist < 12 ? 0.2 : 0.1;
+  nextbotSprite.position.y = 2.2 + Math.sin(Date.now() * 0.001 * bobSpeed) * bobAmp;
+
+  botLight.position.set(nextbotSprite.position.x, 3.5, nextbotSprite.position.z);
+  botLight2.position.set(nextbotSprite.position.x, 1, nextbotSprite.position.z);
+
+  const intensity = dist < 8 ? 3.5 : (dist < 20 ? 1.5 : 0.8);
+  botLight.intensity = intensity + Math.sin(Date.now() * 0.01) * 0.5;
+
+  if (dist < CAP_R) triggerCapture();
+}
+
+/* ─── AUDIO ─── */
+const listener = new THREE.AudioListener();
+camera.add(listener);
+
+let musicBuffer = null, musicSource = null, musicGain = null, musicPlaying = false;
+
+async function loadMusic() {
+  try {
+    const resp = await fetch('mbappe_song.mp3');
+    const buf = await resp.arrayBuffer();
+    musicBuffer = await listener.context.decodeAudioData(buf);
+  } catch (e) { console.warn('Music load failed:', e); }
+}
+
+function startMusic() {
+  if (!musicBuffer || musicPlaying) return;
+  musicSource = listener.context.createBufferSource();
+  musicSource.buffer = musicBuffer;
+  musicSource.loop = true;
+  musicGain = listener.context.createGain();
+  musicGain.gain.value = 0;
+  musicSource.connect(musicGain);
+  musicGain.connect(listener.context.destination);
+  musicSource.start();
+  musicPlaying = true;
+}
+
+function updateAudio() {
+  if (!musicPlaying || !musicGain) return;
+  const dist = nextbotSprite.position.distanceTo(playerPos);
+  const maxDist = 35;
+  const raw = Math.max(0, 1 - dist / maxDist);
+  const vol = raw * raw * raw;
+  musicGain.gain.setTargetAtTime(Math.min(vol, 0.95), listener.context.currentTime, 0.08);
+
+  const warn = document.getElementById('warning');
+  const vhs = document.getElementById('vhs-overlay');
+  if (dist < 14) {
+    warn.style.display = 'block';
+    vhs.style.display = 'block';
+    const pulse = 0.6 + (1 - dist / 14) * 0.4;
+    warn.style.opacity = pulse;
+  } else {
+    warn.style.display = 'none';
+    vhs.style.display = 'none';
+  }
+
+  if (dist < 10) shakeAmount = Math.max(shakeAmount, (1 - dist / 10) * 0.015);
+}
+
+/* ─── MINIMAP ─── */
+const mmCanvas = document.getElementById('minimap-canvas');
+const mmCtx = mmCanvas.getContext('2d');
+
+function updateMinimap() {
+  mmCtx.fillStyle = '#0a0a0a';
+  mmCtx.fillRect(0, 0, 160, 160);
+
+  const sc = 4.5;
+  const px = playerPos.x / C;
+  const pz = playerPos.z / C;
+  const ox = 80 - px * sc;
+  const oz = 80 - pz * sc;
+
+  mmCtx.fillStyle = '#2a2520';
+  for (let z = 0; z < MAP_H; z++) {
+    for (let x = 0; x < MAP_W; x++) {
+      if (!isWall(x, z)) continue;
+      const sx = x * sc + ox;
+      const sz = z * sc + oz;
+      if (sx < -sc || sx > 160 + sc || sz < -sc || sz > 160 + sc) continue;
+      mmCtx.fillRect(sx, sz, sc, sc);
+    }
+  }
+
+  mmCtx.fillStyle = '#40ff40';
+  mmCtx.beginPath();
+  mmCtx.arc(80, 80, 2.5, 0, Math.PI * 2);
+  mmCtx.fill();
+
+  const bpx = nextbotSprite.position.x / C;
+  const bpz = nextbotSprite.position.z / C;
+  mmCtx.fillStyle = '#ff0040';
+  mmCtx.beginPath();
+  mmCtx.arc(bpx * sc + ox, bpz * sc + oz, 3, 0, Math.PI * 2);
+  mmCtx.fill();
+
+  const dir = new THREE.Vector3();
+  camera.getWorldDirection(dir);
+  mmCtx.strokeStyle = 'rgba(64,255,64,.5)';
+  mmCtx.lineWidth = 1;
+  mmCtx.beginPath();
+  mmCtx.moveTo(80, 80);
+  mmCtx.lineTo(80 + dir.x * 10, 80 + dir.z * 10);
+  mmCtx.stroke();
+}
+
+/* ─── GAME STATE ─── */
+let gameStarted = false;
+let gameOver = false;
+
+function triggerCapture() {
+  if (gameOver) return;
+  gameOver = true;
+  document.exitPointerLock();
+
+  if (musicPlaying && musicGain) {
+    musicGain.gain.setTargetAtTime(1.0, listener.context.currentTime, 0.01);
+  }
+
+  document.getElementById('death-text').style.display = 'block';
+  document.getElementById('crosshair').style.display = 'none';
+  document.getElementById('stamina-bar').style.display = 'none';
+  document.getElementById('stamina-hint').style.display = 'none';
+  document.getElementById('warning').style.display = 'none';
+  document.getElementById('vhs-overlay').style.display = 'none';
+  document.getElementById('minimap-wrap').style.display = 'none';
+
+  setTimeout(() => {
+    document.getElementById('death-text').style.display = 'none';
+    const vid = document.getElementById('jumpscare-video');
+    const cap = document.getElementById('capture-overlay');
+    cap.style.display = 'block';
+    vid.style.display = 'block';
+    vid.src = 'ankara_messi.mp4';
+    vid.play();
+    vid.onended = () => {
+      window.close();
+      window.location.href = 'about:blank';
+      document.documentElement.innerHTML = '<head></head><body style="margin:0;display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;font-family:monospace;font-size:2rem;letter-spacing:5px">FIM DE JOGO</body>';
+    };
+  }, 1200);
+}
+
+/* ─── FLICKER UPDATE ─── */
+function updateFlicker(dt) {
+  for (const f of flickerLights) {
+    f.timer -= dt;
+    if (f.timer <= 0) {
+      f.on = !f.on;
+      f.light.intensity = f.on ? (0.4 + Math.random() * 0.8) : 0;
+      f.timer = f.on ? f.dur : (0.5 + Math.random() * 4);
+    }
+  }
+}
+
+/* ─── INIT ─── */
+await loadMusic();
+
+document.getElementById('start-btn').addEventListener('click', async () => {
+  document.getElementById('overlay').style.display = 'none';
+  document.getElementById('crosshair').style.display = 'block';
+  document.getElementById('stamina-bar').style.display = 'block';
+  document.getElementById('stamina-hint').style.display = 'block';
+  document.getElementById('minimap-wrap').style.display = 'block';
+  gameStarted = true;
+  renderer.domElement.requestPointerLock();
+  if (listener.context.state === 'suspended') await listener.context.resume();
+  startMusic();
+  clock.start();
+  animate();
+});
+
+const clock = new THREE.Clock();
+
+function animate() {
+  if (gameOver) { renderer.render(scene, camera); return; }
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  if (locked) updatePlayer(dt);
+  updateBot(dt);
+  updateAudio();
+  updateMinimap();
+  updateFlicker(dt);
+  renderer.render(scene, camera);
+}
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>
