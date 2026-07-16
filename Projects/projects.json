@@ -35,6 +35,15 @@
             "url": "Projects/mbappe-nextbot/",
             "color": "#ff00ff",
             "date": "2026-07-16"
+        },
+        {
+            "name": "Simple CTF",
+            "description": " Simple web attack ctf",
+            "tags": ["CTF"],
+            "image": "",
+            "url": "Projects/simple-ctf/",
+            "color": "#ff00ff",
+            "date": "2026-07-16"
         }
     ]
 }
