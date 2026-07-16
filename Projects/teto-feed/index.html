@@ -542,39 +542,137 @@
 
     <section id="game" class="section game-section">
         <div class="container">
-            <h2 class="section-title glitch" data-text="🎮 TETO CLICKER GAME">🎮 TETO CLICKER GAME</h2>
-            <p class="section-subtitle">Click the baguette to collect points!</p>
+            <h2 class="section-title glitch" data-text="🎮 TETO CLICKER">🎮 TETO CLICKER</h2>
+            <p class="section-subtitle">Click the Teto to collect baguettes!</p>
 
             <div class="game-container">
                 <div class="game-hud">
-                    <div class="game-score">
-                        <span>🥖</span>
-                        <span id="gameScore">0</span>
+                    <div class="hud-left">
+                        <div class="game-score">
+                            <span class="score-icon">🥖</span>
+                            <span id="gameScore">0</span>
+                        </div>
+                        <div class="game-cps">CPS: <span id="gameCps">0</span></div>
                     </div>
-                    <div class="game-level">
-                        Level: <span id="gameLevel">1</span>
+                    <div class="hud-right">
+                        <div class="game-level">
+                            <div class="level-badge">LV <span id="gameLevel">1</span></div>
+                            <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
+                        </div>
+                        <div class="game-combo" id="comboDisplay">
+                            <span id="comboCount">x1</span> COMBO
+                        </div>
                     </div>
                 </div>
+
                 <div class="game-area">
-                    <button class="teto-clicker" id="tetoClicker" onclick="clickBaguette()">
-                        🥖
+                    <div class="game-bg-effects" id="gameBg"></div>
+                    <button class="teto-clicker" id="tetoClicker" onclick="clickTeto(event)">
+                        <div class="teto-avatar">
+                            <div class="teto-face">
+                                <div class="teto-hair"></div>
+                                <div class="teto-head"></div>
+                                <div class="teto-eyes">
+                                    <div class="eye left"></div>
+                                    <div class="eye right"></div>
+                                </div>
+                                <div class="teto-mouth"></div>
+                                <div class="teto-drill left"></div>
+                                <div class="teto-drill right"></div>
+                            </div>
+                        </div>
+                        <div class="click-ripple"></div>
                     </button>
                     <div class="click-particles" id="clickParticles"></div>
                 </div>
-                <div class="game-upgrades">
-                    <h4>Upgrades</h4>
-                    <button class="upgrade-btn" id="upgrade1" onclick="buyUpgrade(1)">
-                        <span>🥖 +1 per click</span>
-                        <span class="upgrade-cost">Cost: 10</span>
-                    </button>
-                    <button class="upgrade-btn" id="upgrade2" onclick="buyUpgrade(2)">
-                        <span>⚡ Auto-click</span>
-                        <span class="upgrade-cost">Cost: 50</span>
-                    </button>
-                    <button class="upgrade-btn" id="upgrade3" onclick="buyUpgrade(3)">
-                        <span>🔥 x2 Multiplier</span>
-                        <span class="upgrade-cost">Cost: 200</span>
-                    </button>
+
+                <div class="game-shop">
+                    <div class="shop-header">
+                        <h4>🛒 SHOP</h4>
+                        <button class="shop-toggle" id="shopToggle" onclick="toggleShop()">▼</button>
+                    </div>
+                    <div class="shop-items" id="shopItems">
+                        <button class="upgrade-btn" id="upgrade1" onclick="buyUpgrade(1)">
+                            <div class="upgrade-info">
+                                <span class="upgrade-name">🥖 Extra Baguette</span>
+                                <span class="upgrade-desc">+1 per click</span>
+                            </div>
+                            <div class="upgrade-right">
+                                <span class="upgrade-level" id="upgrade1Level">0</span>
+                                <span class="upgrade-cost" id="upgrade1Cost">15</span>
+                            </div>
+                        </button>
+                        <button class="upgrade-btn" id="upgrade2" onclick="buyUpgrade(2)">
+                            <div class="upgrade-info">
+                                <span class="upgrade-name">🐱 Teto Assistant</span>
+                                <span class="upgrade-desc">+1 baguette/sec</span>
+                            </div>
+                            <div class="upgrade-right">
+                                <span class="upgrade-level" id="upgrade2Level">0</span>
+                                <span class="upgrade-cost" id="upgrade2Cost">100</span>
+                            </div>
+                        </button>
+                        <button class="upgrade-btn" id="upgrade3" onclick="buyUpgrade(3)">
+                            <div class="upgrade-info">
+                                <span class="upgrade-name">🎵 Music Boost</span>
+                                <span class="upgrade-desc">+5 baguettes/sec</span>
+                            </div>
+                            <div class="upgrade-right">
+                                <span class="upgrade-level" id="upgrade3Level">0</span>
+                                <span class="upgrade-cost" id="upgrade3Cost">1000</span>
+                            </div>
+                        </button>
+                        <button class="upgrade-btn" id="upgrade4" onclick="buyUpgrade(4)">
+                            <div class="upgrade-info">
+                                <span class="upgrade-name">⚡ Combo Master</span>
+                                <span class="upgrade-desc">Combo lasts longer</span>
+                            </div>
+                            <div class="upgrade-right">
+                                <span class="upgrade-level" id="upgrade4Level">0</span>
+                                <span class="upgrade-cost" id="upgrade4Cost">500</span>
+                            </div>
+                        </button>
+                        <button class="upgrade-btn" id="upgrade5" onclick="buyUpgrade(5)">
+                            <div class="upgrade-info">
+                                <span class="upgrade-name">🌀 Mesmerize</span>
+                                <span class="upgrade-desc">x2 click power</span>
+                            </div>
+                            <div class="upgrade-right">
+                                <span class="upgrade-level" id="upgrade5Level">0</span>
+                                <span class="upgrade-cost" id="upgrade5Cost">5000</span>
+                            </div>
+                        </button>
+                        <button class="upgrade-btn" id="upgrade6" onclick="buyUpgrade(6)">
+                            <div class="upgrade-info">
+                                <span class="upgrade-name">🤖 SynthV Engine</span>
+                                <span class="upgrade-desc">+50 baguettes/sec</span>
+                            </div>
+                            <div class="upgrade-right">
+                                <span class="upgrade-level" id="upgrade6Level">0</span>
+                                <span class="upgrade-cost" id="upgrade6Cost">10000</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="game-stats-row">
+                    <div class="stat-box">
+                        <span class="stat-label">Total Clicks</span>
+                        <span class="stat-val" id="statClicks">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Best Combo</span>
+                        <span class="stat-val" id="statCombo">x1</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Earned</span>
+                        <span class="stat-val" id="statEarned">0</span>
+                    </div>
+                </div>
+
+                <div class="achievements-section">
+                    <h4>🏆 Achievements</h4>
+                    <div class="achievements-grid" id="achievementsGrid"></div>
                 </div>
             </div>
         </div>

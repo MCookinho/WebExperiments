@@ -275,51 +275,253 @@ function updateCountdown() {
 }
 
 // ===== CLICKER GAME =====
-let gameScore = 0, gameLevel = 1, clickValue = 1, autoClickEnabled = false, multiplier = 1;
-const upgradeCosts = { 1: 10, 2: 50, 3: 200 };
-const upgradeOwned = { 1: false, 2: false, 3: false };
+const GS = {
+    score: 0, totalEarned: 0, totalClicks: 0,
+    level: 1, xp: 0, xpNeeded: 50,
+    clickPower: 1, clickMultiplier: 1,
+    combo: 0, maxCombo: 0, comboTimer: null, comboDuration: 2000,
+    cps: 0, autoClickers: [],
+    shopOpen: true,
+};
 
-function clickBaguette() {
-    gameScore += clickValue * multiplier;
-    document.getElementById('gameScore').textContent = gameScore;
-    gameLevel = Math.floor(gameScore / 100) + 1;
-    document.getElementById('gameLevel').textContent = gameLevel;
-    updateUpgradeButtons();
-    createParticle();
+const UPGRADES = {
+    1: { name: 'Extra Baguette', desc: '+1 per click', baseCost: 15, costMult: 1.5, maxLevel: 50, icon: '🥖' },
+    2: { name: 'Teto Assistant', desc: '+1/sec', baseCost: 100, costMult: 1.4, maxLevel: 30, icon: '🐱' },
+    3: { name: 'Music Boost', desc: '+5/sec', baseCost: 1000, costMult: 1.35, maxLevel: 25, icon: '🎵' },
+    4: { name: 'Combo Master', desc: 'Combo +0.5s', baseCost: 500, costMult: 2, maxLevel: 10, icon: '⚡' },
+    5: { name: 'Mesmerize', desc: 'x2 click power', baseCost: 5000, costMult: 3, maxLevel: 8, icon: '🌀' },
+    6: { name: 'SynthV Engine', desc: '+50/sec', baseCost: 10000, costMult: 1.3, maxLevel: 20, icon: '🤖' },
+};
+
+const UPGRADE_LEVELS = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+
+const ACHIEVEMENTS = [
+    { id: 'click1', name: 'First Click', icon: '🥖', check: () => GS.totalClicks >= 1 },
+    { id: 'click100', name: 'Clicker', icon: '👆', check: () => GS.totalClicks >= 100 },
+    { id: 'click1000', name: 'Click Master', icon: '✋', check: () => GS.totalClicks >= 1000 },
+    { id: 'score100', name: 'Baker', icon: '🍞', check: () => GS.totalEarned >= 100 },
+    { id: 'score1k', name: 'Boulanger', icon: '🥐', check: () => GS.totalEarned >= 1000 },
+    { id: 'score10k', name: 'Pâtissier', icon: '🍰', check: () => GS.totalEarned >= 10000 },
+    { id: 'score100k', name: 'Grand Chef', icon: '👨‍🍳', check: () => GS.totalEarned >= 100000 },
+    { id: 'score1m', name: 'Legendary', icon: '👑', check: () => GS.totalEarned >= 1000000 },
+    { id: 'combo5', name: 'Combo x5', icon: '🔥', check: () => GS.maxCombo >= 5 },
+    { id: 'combo15', name: 'Combo x15', icon: '💥', check: () => GS.maxCombo >= 15 },
+    { id: 'combo30', name: 'Combo x30', icon: '⚡', check: () => GS.maxCombo >= 30 },
+    { id: 'lv5', name: 'Level 5', icon: '⭐', check: () => GS.level >= 5 },
+    { id: 'lv10', name: 'Level 10', icon: '🌟', check: () => GS.level >= 10 },
+    { id: 'lv25', name: 'Level 25', icon: '💫', check: () => GS.level >= 25 },
+    { id: 'buy5', name: 'Shopper', icon: '🛒', check: () => Object.values(UPGRADE_LEVELS).reduce((a, b) => a + b, 0) >= 5 },
+    { id: 'buy20', name: 'Collector', icon: '📦', check: () => Object.values(UPGRADE_LEVELS).reduce((a, b) => a + b, 0) >= 20 },
+];
+
+const UNLOCKED_ACH = new Set();
+
+function getUpgradeCost(id) {
+    const u = UPGRADES[id];
+    return Math.floor(u.baseCost * Math.pow(u.costMult, UPGRADE_LEVELS[id]));
 }
 
-function createParticle() {
+function getClickPower() {
+    let base = 1;
+    base += UPGRADE_LEVELS[1];
+    base *= Math.pow(2, UPGRADE_LEVELS[5]);
+    return base;
+}
+
+function getCps() {
+    let c = 0;
+    c += UPGRADE_LEVELS[2] * 1;
+    c += UPGRADE_LEVELS[3] * 5;
+    c += UPGRADE_LEVELS[6] * 50;
+    return c;
+}
+
+function getComboDuration() {
+    return 2000 + UPGRADE_LEVELS[4] * 500;
+}
+
+function formatNum(n) {
+    if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
+    if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+    return Math.floor(n).toString();
+}
+
+function clickTeto(e) {
+    GS.totalClicks++;
+    GS.combo++;
+    GS.maxCombo = Math.max(GS.maxCombo, GS.combo);
+
+    clearTimeout(GS.comboTimer);
+    GS.comboTimer = setTimeout(() => { GS.combo = 0; updateComboDisplay(); }, getComboDuration());
+
+    const comboMult = 1 + Math.floor(GS.combo / 5) * 0.5;
+    const earned = Math.floor(getClickPower() * comboMult);
+    GS.score += earned;
+    GS.totalEarned += earned;
+    GS.xp += Math.max(1, Math.floor(earned / 5));
+
+    if (GS.xp >= GS.xpNeeded) {
+        GS.xp -= GS.xpNeeded;
+        GS.level++;
+        GS.xpNeeded = Math.floor(50 * Math.pow(1.3, GS.level - 1));
+        showLevelUp();
+    }
+
+    updateGameUI();
+    createParticle(e, earned, comboMult >= 2);
+    checkAchievements();
+
+    const btn = document.getElementById('tetoClicker');
+    btn.classList.remove('clicked');
+    void btn.offsetWidth;
+    btn.classList.add('clicked');
+}
+
+function createParticle(e, value, isGold) {
     const c = document.getElementById('clickParticles');
     const p = document.createElement('div');
-    p.className = 'particle';
-    p.textContent = '+' + (clickValue * multiplier);
-    const r = document.getElementById('tetoClicker').getBoundingClientRect();
+    p.className = 'particle ' + (isGold ? 'gold' : GS.combo >= 10 ? 'cyan' : 'pink');
+    p.textContent = '+' + formatNum(value);
     const cr = c.getBoundingClientRect();
-    p.style.left = (r.left - cr.left + r.width / 2 + (Math.random() * 40 - 20)) + 'px';
-    p.style.top = (r.top - cr.top + r.height / 2) + 'px';
-    p.style.color = '#ff6b9d';
+    p.style.left = (e.clientX - cr.left + (Math.random() * 30 - 15)) + 'px';
+    p.style.top = (e.clientY - cr.top - 10) + 'px';
     c.appendChild(p);
-    setTimeout(() => p.remove(), 1000);
+    setTimeout(() => p.remove(), 1200);
+}
+
+function updateComboDisplay() {
+    const el = document.getElementById('comboDisplay');
+    const cnt = document.getElementById('comboCount');
+    if (GS.combo >= 3) {
+        el.classList.add('active');
+        cnt.textContent = 'x' + GS.combo;
+    } else {
+        el.classList.remove('active');
+    }
+}
+
+function updateGameUI() {
+    document.getElementById('gameScore').textContent = formatNum(GS.score);
+    document.getElementById('gameLevel').textContent = GS.level;
+    document.getElementById('gameCps').textContent = formatNum(getCps());
+    document.getElementById('xpFill').style.width = (GS.xp / GS.xpNeeded * 100) + '%';
+    document.getElementById('statClicks').textContent = formatNum(GS.totalClicks);
+    document.getElementById('statCombo').textContent = 'x' + GS.maxCombo;
+    document.getElementById('statEarned').textContent = formatNum(GS.totalEarned);
+    updateComboDisplay();
+
+    for (let i = 1; i <= 6; i++) {
+        const btn = document.getElementById('upgrade' + i);
+        const cost = getUpgradeCost(i);
+        const lvl = UPGRADE_LEVELS[i];
+        const maxed = lvl >= UPGRADES[i].maxLevel;
+        document.getElementById('upgrade' + i + 'Cost').textContent = maxed ? 'MAX' : formatNum(cost);
+        document.getElementById('upgrade' + i + 'Level').textContent = lvl + '/' + UPGRADES[i].maxLevel;
+        btn.disabled = maxed || GS.score < cost;
+        btn.classList.toggle('maxed', maxed);
+    }
 }
 
 function buyUpgrade(id) {
-    if (gameScore >= upgradeCosts[id] && !upgradeOwned[id]) {
-        gameScore -= upgradeCosts[id];
-        upgradeOwned[id] = true;
-        document.getElementById('gameScore').textContent = gameScore;
-        if (id === 1) clickValue += 1;
-        if (id === 2) { autoClickEnabled = true; setInterval(() => { if (autoClickEnabled) { gameScore++; document.getElementById('gameScore').textContent = gameScore; updateUpgradeButtons(); } }, 1000); }
-        if (id === 3) multiplier *= 2;
-        document.getElementById('upgrade' + id).disabled = true;
-        updateUpgradeButtons();
+    const cost = getUpgradeCost(id);
+    if (GS.score >= cost && UPGRADE_LEVELS[id] < UPGRADES[id].maxLevel) {
+        GS.score -= cost;
+        UPGRADE_LEVELS[id]++;
+        updateGameUI();
+        checkAchievements();
+        saveGame();
     }
 }
 
-function updateUpgradeButtons() {
-    for (let i = 1; i <= 3; i++) {
-        const btn = document.getElementById('upgrade' + i);
-        if (!upgradeOwned[i]) btn.disabled = gameScore < upgradeCosts[i];
+function toggleShop() {
+    GS.shopOpen = !GS.shopOpen;
+    document.getElementById('shopItems').classList.toggle('collapsed', !GS.shopOpen);
+    document.getElementById('shopToggle').textContent = GS.shopOpen ? '▼' : '▶';
+}
+
+function showLevelUp() {
+    const ov = document.createElement('div');
+    ov.className = 'level-up-overlay';
+    ov.innerHTML = '<div class="level-up-text">LEVEL UP!<br>LV ' + GS.level + '</div>';
+    document.body.appendChild(ov);
+    setTimeout(() => ov.remove(), 2100);
+}
+
+function spawnBgParticles() {
+    const bg = document.getElementById('gameBg');
+    if (!bg) return;
+    for (let i = 0; i < 12; i++) {
+        const p = document.createElement('div');
+        p.className = 'bg-particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.animationDuration = (4 + Math.random() * 6) + 's';
+        p.style.animationDelay = Math.random() * 5 + 's';
+        p.style.background = ['#ff6b9d', '#00ffff', '#ffd700', '#ff3366'][Math.floor(Math.random() * 4)];
+        p.style.width = p.style.height = (3 + Math.random() * 4) + 'px';
+        bg.appendChild(p);
     }
+}
+
+function checkAchievements() {
+    ACHIEVEMENTS.forEach(a => {
+        if (!UNLOCKED_ACH.has(a.id) && a.check()) {
+            UNLOCKED_ACH.add(a.id);
+            const el = document.querySelector('[data-ach="' + a.id + '"]');
+            if (el) el.classList.add('unlocked');
+        }
+    });
+}
+
+function renderAchievements() {
+    const grid = document.getElementById('achievementsGrid');
+    grid.innerHTML = ACHIEVEMENTS.map(a =>
+        '<div class="achievement' + (UNLOCKED_ACH.has(a.id) ? ' unlocked' : '') + '" data-ach="' + a.id + '">' +
+        '<div class="achievement-icon">' + a.icon + '</div>' +
+        '<div class="achievement-name">' + a.name + '</div></div>'
+    ).join('');
+}
+
+function saveGame() {
+    const data = {
+        score: GS.score, totalEarned: GS.totalEarned, totalClicks: GS.totalClicks,
+        level: GS.level, xp: GS.xp, xpNeeded: GS.xpNeeded,
+        maxCombo: GS.maxCombo, upgrades: { ...UPGRADE_LEVELS },
+        achievements: [...UNLOCKED_ACH],
+    };
+    localStorage.setItem('tetoClicker', JSON.stringify(data));
+}
+
+function loadGame() {
+    try {
+        const d = JSON.parse(localStorage.getItem('tetoClicker'));
+        if (!d) return;
+        GS.score = d.score || 0;
+        GS.totalEarned = d.totalEarned || 0;
+        GS.totalClicks = d.totalClicks || 0;
+        GS.level = d.level || 1;
+        GS.xp = d.xp || 0;
+        GS.xpNeeded = d.xpNeeded || 50;
+        GS.maxCombo = d.maxCombo || 0;
+        if (d.upgrades) Object.keys(d.upgrades).forEach(k => UPGRADE_LEVELS[k] = d.upgrades[k]);
+        if (d.achievements) d.achievements.forEach(id => UNLOCKED_ACH.add(id));
+    } catch (e) {}
+}
+
+function startAutoIncome() {
+    setInterval(() => {
+        const c = getCps();
+        if (c > 0) {
+            GS.score += c;
+            GS.totalEarned += c;
+            updateGameUI();
+            checkAchievements();
+        }
+    }, 1000);
+}
+
+function startAutoSave() {
+    setInterval(saveGame, 15000);
 }
 
 // ===== SCROLL ANIMATIONS =====
@@ -331,6 +533,14 @@ document.querySelectorAll('.timeline-item, .detail-card, .album-card, .video-car
     el.style.opacity = 0; el.style.transform = 'translateY(30px)'; el.style.transition = 'all 0.6s ease-out';
     observer.observe(el);
 });
+
+// Init game
+loadGame();
+renderAchievements();
+updateGameUI();
+spawnBgParticles();
+startAutoIncome();
+startAutoSave();
 
 // ===== NAVBAR =====
 window.addEventListener('scroll', () => {

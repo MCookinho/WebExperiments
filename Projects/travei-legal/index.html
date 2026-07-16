@@ -686,12 +686,14 @@
 
         if (e.error === 'network' && retryCount < MAX_RETRIES) {
           retryCount++;
+          isListening = false;
+          document.getElementById('micBtn').classList.remove('listening');
           document.getElementById('micLabel').textContent = 'Tentando novamente...';
           setTimeout(function() {
-            if (gameActive && !isListening && !answerProcessed) {
+            if (gameActive && !answerProcessed) {
               startListeningAttempt();
             }
-          }, 500);
+          }, 1000);
           return;
         }
 
@@ -714,23 +716,13 @@
       };
 
       recognition.onend = function() {
-        if (isListening && gameActive && !answerProcessed && retryCount < MAX_RETRIES) {
-          retryCount++;
-          setTimeout(function() {
-            if (gameActive && !isListening && !answerProcessed) {
-              startListeningAttempt();
-            }
-          }, 300);
-          return;
-        }
+        if (answerProcessed || !gameActive) return;
 
-        if (isListening && gameActive && !answerProcessed) {
+        if (isListening) {
           stopTimer();
           isListening = false;
           document.getElementById('micBtn').classList.remove('listening');
           document.getElementById('micLabel').textContent = 'Toque para falar';
-          document.getElementById('textInputSection').classList.add('visible');
-          document.getElementById('textInput').focus();
         }
       };
 
