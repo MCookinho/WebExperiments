@@ -4,7 +4,7 @@
             "name": "Projeto Exemplo",
             "description": "Este é um projeto de exemplo para demonstrar como os cards aparecem no site. Edite o arquivo projects.json para adicionar seus próprios projetos.",
             "tags": ["exemplo", "demo", "template"],
-            "image": "",
+            "image": "Projects/exemplo/kirigiri.jpg",
             "url": "Projects/exemplo/",
             "color": "#6366f1",
             "date": "2024-01-15"
