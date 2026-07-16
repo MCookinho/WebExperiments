@@ -843,7 +843,6 @@
       updateScores();
       loadTwister();
       gameActive = true;
-      setTimeout(() => startListening(), 500);
     }
 
     function restartGame() {
@@ -851,8 +850,17 @@
       startGame();
     }
 
-    function startListening() {
+    function toggleMic() {
       if (!gameActive) return;
+      if (isListening) {
+        stopListening();
+      } else {
+        startListening();
+      }
+    }
+
+    function startListening() {
+      if (!gameActive || isListening) return;
 
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
@@ -864,7 +872,7 @@
 
       recognition = new SpeechRecognition();
       recognition.lang = 'pt-BR';
-      recognition.continuous = true;
+      recognition.continuous = false;
       recognition.interimResults = true;
       recognition.maxAlternatives = 3;
 
@@ -901,12 +909,25 @@
 
       recognition.onerror = (e) => {
         console.error('Speech error:', e.error);
+        isListening = false;
+        document.getElementById('micBtn').classList.remove('listening');
         if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
-          document.getElementById('micLabel').textContent = 'Microfone bloqueado!';
+          document.getElementById('micLabel').textContent = 'Permita o microfone!';
+        } else if (e.error === 'network') {
+          document.getElementById('micLabel').textContent = 'Erro de rede, tente de novo';
+        } else if (e.error !== 'no-speech' && e.error !== 'aborted') {
+          document.getElementById('micLabel').textContent = 'Erro, toque para tentar';
         }
       };
 
-      recognition.onend = () => {};
+      recognition.onend = () => {
+        if (isListening && gameActive && !answerProcessed) {
+          stopTimer();
+          isListening = false;
+          document.getElementById('micBtn').classList.remove('listening');
+          document.getElementById('micLabel').textContent = 'Toque para falar';
+        }
+      };
 
       try {
         isListening = true;
@@ -985,7 +1006,7 @@
       document.getElementById('resultCard').className = 'result-card';
       loadTwister();
       gameActive = true;
-      setTimeout(() => startListening(), 400);
+      document.getElementById('micLabel').textContent = 'Toque para falar';
     }
 
     function updateScores() {

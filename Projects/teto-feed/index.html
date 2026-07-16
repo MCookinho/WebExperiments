@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TETO FEED — Kasane Teto Fan Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="scanlines"></div>
+    <div class="noise"></div>
+
+    <nav class="navbar">
+        <div class="nav-logo">
+            <span class="logo-glitch" data-text="TETO FEED">TETO FEED</span>
+        </div>
+        <div class="nav-links">
+            <a href="#home" class="nav-link active">Home</a>
+            <a href="#player" class="nav-link">Music</a>
+            <a href="#discography" class="nav-link">Discography</a>
+            <a href="#profile" class="nav-link">Profile</a>
+            <a href="#gallery" class="nav-link">Gallery</a>
+            <a href="#game" class="nav-link">Game</a>
+        </div>
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+    </nav>
+
+    <div class="mobile-nav" id="mobileNav">
+        <a href="#home" onclick="toggleMobileMenu()">Home</a>
+        <a href="#player" onclick="toggleMobileMenu()">Music</a>
+        <a href="#discography" onclick="toggleMobileMenu()">Discography</a>
+        <a href="#profile" onclick="toggleMobileMenu()">Profile</a>
+        <a href="#gallery" onclick="toggleMobileMenu()">Gallery</a>
+        <a href="#game" onclick="toggleMobileMenu()">Game</a>
+    </div>
+
+    <header id="home" class="hero">
+        <div class="hero-bg">
+            <div class="hero-image-container">
+                <img src="https://static.zerochan.net/Kasane.Teto.full.788365.jpg" alt="Kasane Teto" class="hero-teto-img">
+            </div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title glitch" data-text="KASANE TETO">KASANE TETO</h1>
+            <p class="hero-subtitle">重音テト — The Diva Born From A Hoax</p>
+            <p class="hero-desc">Welcome to the ultimate Kasane Teto fan hub. Explore her music, lore, discography, and more.</p>
+            <div class="hero-badges">
+                <span class="badge">UTAU</span>
+                <span class="badge">Synthesizer V</span>
+                <span class="badge">Chimera</span>
+                <span class="badge">VIPPERloid</span>
+            </div>
+            <a href="#player" class="cta-btn">🎵 Listen Now</a>
+        </div>
+        <div class="scroll-indicator">
+            <span>SCROLL DOWN</span>
+            <div class="scroll-arrow"></div>
+        </div>
+    </header>
+
+    <section id="player" class="section music-player-section">
+        <div class="container">
+            <h2 class="section-title glitch" data-text="♪ MUSIC PLAYER">♪ MUSIC PLAYER</h2>
+            <p class="section-subtitle">Listen to Kasane Teto's most iconic tracks</p>
+
+            <div class="player-container">
+                <div class="player-main">
+                    <div class="player-artwork">
+                        <img id="playerArtwork" src="https://i.ytimg.com/vi/19y8YTbvri8/maxresdefault.jpg" alt="Now Playing">
+                        <div class="vinyl-effect"></div>
+                    </div>
+                    <div class="player-info">
+                        <h3 id="playerTitle">Mesmerizer</h3>
+                        <p id="playerArtist">32ki feat. Hatsune Miku & Kasane Teto</p>
+                        <div class="player-progress">
+                            <div class="progress-bar" id="progressBar"></div>
+                        </div>
+                        <div class="player-controls">
+                            <button class="ctrl-btn" onclick="prevTrack()">⏮</button>
+                            <button class="ctrl-btn play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+                            <button class="ctrl-btn" onclick="nextTrack()">⏭</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="track-list">
+                    <h4>Playlist</h4>
+                    <div id="trackList"></div>
+                </div>
+            </div>
+
+            <div class="video-section">
+                <h3 class="subsection-title">Featured Music Videos</h3>
+                <div class="video-grid">
+                    <div class="video-card">
+                        <iframe width="100%" height="200" src="https://www.youtube.com/embed/19y8YTbvri8" title="Mesmerizer" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <div class="video-info">
+                            <h4>Mesmerizer</h4>
+                            <p>32ki feat. Miku & Teto</p>
+                            <span class="view-count">39M+ views</span>
+                        </div>
+                    </div>
+                    <div class="video-card">
+                        <iframe width="100%" height="200" src="https://www.youtube.com/embed/g_DeRBIPF-8" title="Ochame Kinou" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <div class="video-info">
+                            <h4>Ochame Kinou (Fukkireta)</h4>
+                            <p>Lamaze-P feat. Kasane Teto</p>
+                            <span class="view-count">50M+ views</span>
+                        </div>
+                    </div>
+                    <div class="video-card">
+                        <iframe width="100%" height="200" src="https://www.youtube.com/embed/rkf1pLv25VU" title="Ochame Kinou Original" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <div class="video-info">
+                            <h4>Ochame Kinou (Original)</h4>
+                            <p>Lamaze-P feat. Kasane Teto</p>
+                            <span class="view-count">15M+ views</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="discography" class="section discography-section">
+        <div class="container">
+            <h2 class="section-title glitch" data-text="♫ DISCOGRAPHY">♫ DISCOGRAPHY</h2>
+            <p class="section-subtitle">A timeline of Teto's musical journey</p>
+
+            <div class="timeline">
+                <div class="timeline-item left">
+                    <div class="timeline-content">
+                        <div class="timeline-date">2008</div>
+                        <h3>Debut — "Mimi no Aru Robot no Uta"</h3>
+                        <p>Teto's first original song. The first UTAU song to enter the Nico Nico Douga Hall of Fame with 100,000 views.</p>
+                        <a href="https://www.youtube.com/results?search_query=kasane+teto+mimi+no+aru+robot+no+uta" target="_blank" class="timeline-link">Watch →</a>
+                    </div>
+                </div>
+                <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <div class="timeline-date">2009</div>
+                        <h3>Yoshihara Lament</h3>
+                        <p>An emotional ballad that showcased Teto's vocal range. Achieved over 1M views on Nico Nico Douga by 2014.</p>
+                        <a href="https://www.youtube.com/results?search_query=kasane+teto+yoshihara+lament" target="_blank" class="timeline-link">Watch →</a>
+                    </div>
+                </div>
+                <div class="timeline-item left">
+                    <div class="timeline-content">
+                        <div class="timeline-date">2010</div>
+                        <h3>Ochame Kinou (Fukkireta)</h3>
+                        <p>The legendary track by Lamaze-P. Became a massive internet meme with the "Fukkireta" head-bobbing animation. One of the most recognizable UTAU songs ever.</p>
+                        <a href="https://www.youtube.com/watch?v=g_DeRBIPF-8" target="_blank" class="timeline-link">Watch →</a>
+                    </div>
+                </div>
+                <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <div class="timeline-date">2012</div>
+                        <h3>0401 — The Best Days of Kasane Teto</h3>
+                        <p>Teto's major debut CD. Charted on the Oricon Daily Album Chart, marking a milestone for UTAU characters.</p>
+                        <a href="https://www.amazon.co.jp/dp/B00A1GDXPC" target="_blank" class="timeline-link">View →</a>
+                    </div>
+                </div>
+                <div class="timeline-item left">
+                    <div class="timeline-content">
+                        <div class="timeline-date">2023</div>
+                        <h3>Synthesizer V AI Release</h3>
+                        <p>Teto gets an AI-powered voicebank for Synthesizer V, bringing her vocals to a whole new level of realism.</p>
+                        <a href="https://kasaneteto.jp/" target="_blank" class="timeline-link">Official Site →</a>
+                    </div>
+                </div>
+                <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <div class="timeline-date">2024</div>
+                        <h3>Mesmerizer — Global Viral Hit</h3>
+                        <p>32ki's "Mesmerizer" feat. Miku & Teto exploded with 39M+ views. Teto becomes a global sensation.</p>
+                        <a href="https://www.youtube.com/watch?v=19y8YTbvri8" target="_blank" class="timeline-link">Watch →</a>
+                    </div>
+                </div>
+                <div class="timeline-item left">
+                    <div class="timeline-content">
+                        <div class="timeline-date">2025</div>
+                        <h3>VOICEPEAK & SynthV 2</h3>
+                        <p>Teto expands to VOICEPEAK text-to-speech and Synthesizer V 2 AI, becoming more accessible than ever.</p>
+                        <a href="https://kasaneteto.jp/" target="_blank" class="timeline-link">Official Site →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="albums-grid">
+                <h3 class="subsection-title">Popular Albums & Singles</h3>
+                <div class="album-cards">
+                    <a href="https://open.spotify.com/artist/4JX0GdKx8EduY2Ck7qac4H" target="_blank" class="album-card">
+                        <div class="album-cover" style="background: linear-gradient(135deg, #ff6b9d, #c9184a);">
+                            <span>🎵</span>
+                        </div>
+                        <div class="album-info">
+                            <h4>PPPP</h4>
+                            <p>feat. Miku & Teto • 2025</p>
+                        </div>
+                    </a>
+                    <a href="https://open.spotify.com/artist/4JX0GdKx8EduY2Ck7qac4H" target="_blank" class="album-card">
+                        <div class="album-cover" style="background: linear-gradient(135deg, #7c3aed, #2563eb);">
+                            <span>🔥</span>
+                        </div>
+                        <div class="album-info">
+                            <h4>Teto Territory</h4>
+                            <p>Temcandoanything & Teto • 2025</p>
+                        </div>
+                    </a>
+                    <a href="https://open.spotify.com/artist/4JX0GdKx8EduY2Ck7qac4H" target="_blank" class="album-card">
+                        <div class="album-cover" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">
+                            <span>⚡</span>
+                        </div>
+                        <div class="album-info">
+                            <h4>Ragebait</h4>
+                            <p>Zynthesiren & Teto • 2025</p>
+                        </div>
+                    </a>
+                    <a href="https://open.spotify.com/artist/4JX0GdKx8EduY2Ck7qac4H" target="_blank" class="album-card">
+                        <div class="album-cover" style="background: linear-gradient(135deg, #10b981, #3b82f6);">
+                            <span>💎</span>
+                        </div>
+                        <div class="album-info">
+                            <h4>GET TO ME</h4>
+                            <p>Kasane Teto • 2025</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="profile" class="section profile-section">
+        <div class="container">
+            <h2 class="section-title glitch" data-text="★ CHARACTER PROFILE">★ CHARACTER PROFILE</h2>
+            <p class="section-subtitle">Meet the chimera diva</p>
+
+            <div class="profile-layout">
+                <div class="profile-card">
+                    <div class="profile-avatar">
+                        <img src="https://static.wikia.nocookie.net/vocaloid/images/5/5a/Teto.png/revision/latest?cb=20260310064834" alt="Kasane Teto">
+                    </div>
+                    <div class="profile-stats">
+                        <div class="stat">
+                            <span class="stat-label">Height</span>
+                            <span class="stat-value">159.5 cm</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Weight</span>
+                            <span class="stat-value">47 kg</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Age</span>
+                            <span class="stat-value">31</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Type</span>
+                            <span class="stat-value">Chimera</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-details">
+                    <div class="detail-card">
+                        <h3>🧬 Origins</h3>
+                        <p>Born on <strong>April 1, 2008</strong> as an April Fools' Day prank on 2channel. Users created a fake "VOCALOID" character with randomly selected traits. She was later turned into a real UTAU voicebank, becoming a "diva born from a hoax."</p>
+                    </div>
+                    <div class="detail-card">
+                        <h3>🎤 Voice</h3>
+                        <p>Voiced by <strong>Mayo Oyamano</strong> (小山乃 舞世). Available for UTAU, Synthesizer V AI, VOICEPEAK, and TALQu. Her voice is described as bright, energetic, and versatile.</p>
+                    </div>
+                    <div class="detail-card">
+                        <h3>🥖 Personality</h3>
+                        <p><strong>Tsundere</strong> personality. Cheerful, eager, and a bit mischievous. Loves French bread (baguettes), playing tricks, and getting attention. Hates rats and people who mistake her drills for pigtails. Her favorite country is Norway!</p>
+                    </div>
+                    <div class="detail-card">
+                        <h3>💇 Appearance</h3>
+                        <p>Red eyes, red hair styled in iconic <strong>twin drills</strong>. Typically wears a dark blue/gray outfit with red trim. As a chimera, she's sometimes depicted with wings and a forked tail.</p>
+                    </div>
+                    <div class="detail-card">
+                        <h3>🎭 Fun Facts</h3>
+                        <ul>
+                            <li>Her name "Kasane" (重音) means "heavy sound" or "overlapped sound"</li>
+                            <li>She's one of "The 3 UTAU Girls" alongside Uta Utane and Momo Momone</li>
+                            <li>Her character code is 0401 (April 1st)</li>
+                            <li>She can extend DVD rental periods with tricks</li>
+                            <li>Her measurements: 73cm (bust), 54cm (waist), 88cm (hips)</li>
+                        </ul>
+                    </div>
+                    <div class="detail-card">
+                        <h3>🌐 Official Links</h3>
+                        <div class="social-links">
+                            <a href="https://kasaneteto.jp/" target="_blank" class="social-btn">Official Site</a>
+                            <a href="https://open.spotify.com/artist/4JX0GdKx8EduY2Ck7qac4H" target="_blank" class="social-btn">Spotify</a>
+                            <a href="https://www.youtube.com/results?search_query=kasane+teto" target="_blank" class="social-btn">YouTube</a>
+                            <a href="https://teto.fandom.com/wiki/Kasane_Teto" target="_blank" class="social-btn">Tetopedia</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="gallery" class="section gallery-section">
+        <div class="container">
+            <h2 class="section-title glitch" data-text="✿ FAN ART GALLERY">✿ FAN ART GALLERY</h2>
+            <p class="section-subtitle">Beautiful artwork from the community</p>
+
+            <div class="gallery-filters">
+                <button class="filter-btn active" onclick="filterGallery('all')">All</button>
+                <button class="filter-btn" onclick="filterGallery('official')">Official</button>
+                <button class="filter-btn" onclick="filterGallery('fanart')">Fan Art</button>
+                <button class="filter-btn" onclick="filterGallery('mesmerizer')">Mesmerizer</button>
+            </div>
+
+            <div class="gallery-grid" id="galleryGrid">
+                <div class="gallery-item" data-category="official">
+                    <img src="https://static.zerochan.net/Kasane.Teto.full.788365.jpg" alt="Kasane Teto Official">
+                    <div class="gallery-overlay">
+                        <span>Official Art</span>
+                        <a href="https://www.zerochan.net/Kasane+Teto" target="_blank">View Source</a>
+                    </div>
+                </div>
+                <div class="gallery-item" data-category="fanart">
+                    <img src="https://static.zerochan.net/Kasane.Teto.full.487685.jpg" alt="Kasane Teto Fanart">
+                    <div class="gallery-overlay">
+                        <span>Fan Art</span>
+                        <a href="https://www.zerochan.net/Kasane+Teto" target="_blank">View Source</a>
+                    </div>
+                </div>
+                <div class="gallery-item" data-category="mesmerizer">
+                    <img src="https://static.zerochan.net/Cross-Over.full.2331503.png" alt="Mesmerizer Art">
+                    <div class="gallery-overlay">
+                        <span>Mesmerizer</span>
+                        <a href="https://www.zerochan.net/Kasane+Teto" target="_blank">View Source</a>
+                    </div>
+                </div>
+                <div class="gallery-item" data-category="official">
+                    <img src="https://static.zerochan.net/Kasane.Teto.full.562584.jpg" alt="Kasane Teto Classic">
+                    <div class="gallery-overlay">
+                        <span>Classic Teto</span>
+                        <a href="https://www.zerochan.net/Kasane+Teto" target="_blank">View Source</a>
+                    </div>
+                </div>
+                <div class="gallery-item" data-category="fanart">
+                    <img src="https://static.zerochan.net/Kasane.Teto.full.4381988.jpg" alt="Kasane Teto Art">
+                    <div class="gallery-overlay">
+                        <span>Fan Art</span>
+                        <a href="https://www.zerochan.net/Kasane+Teto" target="_blank">View Source</a>
+                    </div>
+                </div>
+                <div class="gallery-item" data-category="mesmerizer">
+                    <img src="https://static.zerochan.net/Cross-Over.full.2372715.jpg" alt="Miku & Teto">
+                    <div class="gallery-overlay">
+                        <span>Miku & Teto</span>
+                        <a href="https://www.zerochan.net/Kasane+Teto" target="_blank">View Source</a>
+                    </div>
+                </div>
+                <div class="gallery-item" data-category="fanart">
+                    <img src="https://static.zerochan.net/Kasane.Teto.full.4381987.jpg" alt="Kasane Teto Fanart 2">
+                    <div class="gallery-overlay">
+                        <span>Fan Art</span>
+                        <a href="https://www.zerochan.net/Kasane+Teto" target="_blank">View Source</a>
+                    </div>
+                </div>
+                <div class="gallery-item" data-category="official">
+                    <img src="https://static.zerochan.net/Kasane.Teto.full.4517374.jpg" alt="Kasane Teto SV">
+                    <div class="gallery-overlay">
+                        <span>Synthesizer V</span>
+                        <a href="https://www.zerochan.net/Kasane+Teto" target="_blank">View Source</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="gallery-more">
+                <a href="https://www.pixiv.net/en/tags/%E9%87%8D%E9%9F%B3%E3%83%86%E3%83%88/illustrations" target="_blank" class="cta-btn">View More on Pixiv →</a>
+                <a href="https://alphacoders.com/kasane-teto" target="_blank" class="cta-btn secondary">Wallpapers on Alpha Coders →</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section quote-section">
+        <div class="container">
+            <h2 class="section-title glitch" data-text="💬 RANDOM TETO QUOTE">💬 RANDOM TETO QUOTE</h2>
+            <div class="quote-box">
+                <div class="quote-icon">"</div>
+                <p class="quote-text" id="quoteText">Kimi wa jitsu ni baka dana (You really are an idiot)</p>
+                <p class="quote-translation" id="quoteTranslation">— Kasane Teto's favorite phrase</p>
+                <button class="quote-btn" onclick="newQuote()">🔄 New Quote</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="section countdown-section">
+        <div class="container">
+            <h2 class="section-title glitch" data-text="🎂 COUNTDOWN">🎂 COUNTDOWN</h2>
+            <p class="section-subtitle">Next Teto celebration</p>
+            <div class="countdown-container">
+                <div class="countdown-item">
+                    <span class="countdown-number" id="days">000</span>
+                    <span class="countdown-label">Days</span>
+                </div>
+                <div class="countdown-separator">:</div>
+                <div class="countdown-item">
+                    <span class="countdown-number" id="hours">00</span>
+                    <span class="countdown-label">Hours</span>
+                </div>
+                <div class="countdown-separator">:</div>
+                <div class="countdown-item">
+                    <span class="countdown-number" id="minutes">00</span>
+                    <span class="countdown-label">Minutes</span>
+                </div>
+                <div class="countdown-separator">:</div>
+                <div class="countdown-item">
+                    <span class="countdown-number" id="seconds">00</span>
+                    <span class="countdown-label">Seconds</span>
+                </div>
+            </div>
+            <p class="countdown-event" id="countdownEvent">Until Teto's Birthday (March 20) 🎉</p>
+        </div>
+    </section>
+
+    <section id="game" class="section game-section">
+        <div class="container">
+            <h2 class="section-title glitch" data-text="🎮 TETO CLICKER GAME">🎮 TETO CLICKER GAME</h2>
+            <p class="section-subtitle">Click the baguette to collect points!</p>
+
+            <div class="game-container">
+                <div class="game-hud">
+                    <div class="game-score">
+                        <span>🥖</span>
+                        <span id="gameScore">0</span>
+                    </div>
+                    <div class="game-level">
+                        Level: <span id="gameLevel">1</span>
+                    </div>
+                </div>
+                <div class="game-area">
+                    <button class="teto-clicker" id="tetoClicker" onclick="clickBaguette()">
+                        🥖
+                    </button>
+                    <div class="click-particles" id="clickParticles"></div>
+                </div>
+                <div class="game-upgrades">
+                    <h4>Upgrades</h4>
+                    <button class="upgrade-btn" id="upgrade1" onclick="buyUpgrade(1)">
+                        <span>🥖 +1 per click</span>
+                        <span class="upgrade-cost">Cost: 10</span>
+                    </button>
+                    <button class="upgrade-btn" id="upgrade2" onclick="buyUpgrade(2)">
+                        <span>⚡ Auto-click</span>
+                        <span class="upgrade-cost">Cost: 50</span>
+                    </button>
+                    <button class="upgrade-btn" id="upgrade3" onclick="buyUpgrade(3)">
+                        <span>🔥 x2 Multiplier</span>
+                        <span class="upgrade-cost">Cost: 200</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <span class="logo-glitch" data-text="TETO FEED">TETO FEED</span>
+                    <p>A fan-made tribute to Kasane Teto</p>
+                </div>
+                <div class="footer-links">
+                    <a href="https://kasaneteto.jp/" target="_blank">Official Site</a>
+                    <a href="https://teto.fandom.com/wiki/Kasane_Teto" target="_blank">Tetopedia</a>
+                    <a href="https://open.spotify.com/artist/4JX0GdKx8EduY2Ck7qac4H" target="_blank">Spotify</a>
+                    <a href="https://www.pixiv.net/en/tags/%E9%87%8D%E9%9F%B3%E3%83%86%E3%83%88/illustrations" target="_blank">Pixiv</a>
+                </div>
+                <div class="footer-credits">
+                    <p>All characters, music, and art belong to their respective creators.</p>
+                    <p>Made with 💖 by a Teto fan</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

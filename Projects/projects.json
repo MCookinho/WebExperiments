@@ -2,11 +2,11 @@
     "projects": [
         {
             "name": "TETO FEED",
-            "description": "A kasane teto website!",
-            "tags": ["Anime", "Experiment"],
+            "description": "The ultimate Kasane Teto fan hub — music player, discography, profile, gallery, quotes, countdown & mini game!",
+            "tags": ["Anime", "VTuber", "Music", "Fan Hub", "Game"],
             "image": "Projects/teto-feed/thumb.gif",
             "url": "Projects/teto-feed/",
-            "color": "#6366f1",
+            "color": "#ff6b9d",
             "date": "2024-01-15"
         },
         {
