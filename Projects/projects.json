@@ -38,10 +38,19 @@
         },
         {
             "name": "Simple CTF",
-            "description": " Simple web attack ctf",
+            "description": "Simple web attack ctf",
             "tags": ["CTF"],
             "image": "",
             "url": "Projects/simple-ctf/",
+            "color": "#ff00ff",
+            "date": "2026-07-16"
+        },
+        {
+            "name": "Anime PointerPointer",
+            "description": "https://pointerpointer.com but with anime pictures",
+            "tags": ["Experiment"],
+            "image": "",
+            "url": "Projects/AnimePointerPointer/",
             "color": "#ff00ff",
             "date": "2026-07-16"
         }

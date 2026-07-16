@@ -1,0 +1,22 @@
+{
+  "app": "TechVault Corp",
+  "version": "3.2.1",
+  "debug_mode": true,
+  "admin": {
+    "username": "sysadmin",
+    "password_hash": "5f4dcc3b5aa765d61d8327deb882cf99",
+    "hash_algorithm": "md5",
+    "note": "password is the same as the default on the wiki"
+  },
+  "api": {
+    "base_url": "https://api.techvault-internal.net/v2",
+    "key": "tv_internal_8f3k2mPq7wLz9xRv",
+    "rate_limit": 1000
+  },
+  "flags": {
+    "ctf_flag_1": "flag{r3c0nn4ss4nc3_1s_k3y}",
+    "ctf_flag_2": "flag{h1dd3n_1n_pl41n_s1ght}",
+    "ctf_final": "flag{y0u_4r3_th3_t3chv4ult_m4st3r}"
+  },
+  "internal_notes": "base64: ZmxhZ3tjbGllbnRfc2lkZV9hdXRoX2lzX25vX2F1dGh9"
+}

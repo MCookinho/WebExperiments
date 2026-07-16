@@ -1,0 +1,21 @@
+Sprint 14 - Dev Notes (DO NOT SHARE)
+=====================================
+
+TODO:
+- Fix the XSS on the contact form (reported by QA)
+- Update the admin password (it's still the default from the wiki)
+- Remove debug mode from production .env
+- The backup config file in /backup/ should be deleted before going live
+- Migrate from MD5 to bcrypt for password hashing
+
+Admin panel: https://techvault-corp.github.io/internal/
+Default admin creds are on the Confluence wiki page "DB-Setup-2024"
+
+Known issues:
+- The JWT token validation is broken in v3.2.0
+- Session tokens are stored in localStorage (not ideal but works for now)
+
+NOTE TO JUNIOR DEVS:
+If you need to test the API, use the internal key from the .env file.
+Base64 encoded dev token: ZGVidWdfdG9rZW46IFRWLURFQlVHLThmM2s=
+Decoded value is stored in localStorage under key "debug_session"

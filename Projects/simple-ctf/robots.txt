@@ -1,0 +1,15 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /dev/
+Disallow: /backup/
+Disallow: /internal/
+Disallow: /.env
+Disallow: /api/config
+Disallow: /api/users
+Disallow: /api/debug
+
+# Sitemap
+Sitemap: https://techvault-corp.github.io/sitemap.xml
+
+# CTF Challenge by TechVault Corp Security Team
+# Good luck finding all the flags!

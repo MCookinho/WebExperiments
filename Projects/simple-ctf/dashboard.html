@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - TechVault Corp</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">TechVault<span>Corp</span></div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="#" id="logoutBtn" class="nav-links" style="color: var(--danger);">Logout</a>
+        </div>
+    </nav>
+
+    <div class="dashboard" id="dashboardContent" style="display: none;">
+        <div class="dashboard-header">
+            <h1>Painel Administrativo</h1>
+            <span id="welcomeMsg" style="color: var(--text-muted);">Bem-vindo</span>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="dash-card">
+                <h3>Status do Sistema</h3>
+                <p>Todos os serviços operacionais.<br>
+                Uptime: 99.97%<br>
+                Último scan: 2024-01-15</p>
+            </div>
+            <div class="dash-card">
+                <h3>Clientes Ativos</h3>
+                <p>Total: 512<br>
+                Enterprise: 89<br>
+                Professional: 203<br>
+                Starter: 220</p>
+            </div>
+            <div class="dash-card">
+                <h3>Incidentes Recentes</h3>
+                <p>Críticos: 0<br>
+                Altos: 2 (resolvidos)<br>
+                Médios: 5<br>
+                Baixos: 12</p>
+            </div>
+        </div>
+
+        <!-- CTF: This is the final reward for completing the challenge -->
+        <div class="flag-box" id="finalFlag">
+            <h2>Parabéns, Hacker!</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                Você completou o desafio CTF da TechVault Corp!<br>
+                Aqui está sua flag final:
+            </p>
+            <div class="flag-text">flag{y0u_4r3_th3_t3chv4ult_m4st3r}</div>
+            <p style="color: var(--text-muted); margin-top: 1rem; font-size: 0.85rem;">
+                Você explorou: Recon, Source Analysis, File Discovery, Crypto, e Auth Bypass
+            </p>
+        </div>
+    </div>
+
+    <div id="accessDenied" style="display: none; text-align: center; padding: 4rem 2rem;">
+        <h2 style="color: var(--danger);">Acesso Negado</h2>
+        <p style="color: var(--text-muted); margin-top: 1rem;">Você precisa estar logado para acessar esta página.</p>
+        <a href="login.html" class="btn-primary" style="display: inline-block; margin-top: 1.5rem;">Fazer Login</a>
+    </div>
+
+    <script>
+        // CTF: Client-side auth check - easily bypassable!
+        // Vulnerability: Auth is checked only on client side
+        const session = localStorage.getItem('tv_session');
+        const authToken = localStorage.getItem('tv_auth_token');
+
+        if (session && authToken) {
+            try {
+                const sessionData = JSON.parse(atob(session));
+                const tokenParts = authToken.split('.');
+                if (tokenParts.length === 3) {
+                    const payload = JSON.parse(atob(tokenParts[1]));
+                    if (payload.user === 'sysadmin' && payload.role === 'admin') {
+                        document.getElementById('dashboardContent').style.display = 'block';
+                        document.getElementById('welcomeMsg').textContent = `Bem-vindo, ${sessionData.username || 'Admin'}`;
+                        document.getElementById('accessDenied').style.display = 'none';
+                    } else {
+                        throw new Error('Unauthorized');
+                    }
+                } else {
+                    throw new Error('Invalid token');
+                }
+            } catch (e) {
+                document.getElementById('dashboardContent').style.display = 'none';
+                document.getElementById('accessDenied').style.display = 'block';
+            }
+        } else {
+            document.getElementById('dashboardContent').style.display = 'none';
+            document.getElementById('accessDenied').style.display = 'block';
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('tv_session');
+            localStorage.removeItem('tv_auth_token');
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>
