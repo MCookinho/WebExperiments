@@ -1,11 +1,11 @@
 {
     "projects": [
         {
-            "name": "Projeto Exemplo",
-            "description": "Este é um projeto de exemplo para demonstrar como os cards aparecem no site. Edite o arquivo projects.json para adicionar seus próprios projetos.",
-            "tags": ["exemplo", "demo", "template"],
-            "image": "Projects/exemplo/tetodancingfofa.gif",
-            "url": "Projects/exemplo/",
+            "name": "Fuga do mbappe",
+            "description": " Ela vai subir, ela vai descer",
+            "tags": ["meme", "test", "template"],
+            "image": "Projects/fuja-do-mbappe/tetodancingfofa.gif",
+            "url": "Projects/fuja-do-mbappe/",
             "color": "#6366f1",
             "date": "2024-01-15"
         }
