@@ -430,7 +430,7 @@ function buildWallGridFromLayouts() {
   floorYData = new Array(gridW * gridH);
   for (let i = 0; i < floorYData.length; i++) floorYData[i] = [];
   for (let f = 0; f < proceduralLayouts.length; f++) {
-    const map = proceduralLayouts[f];
+    const { map } = proceduralLayouts[f];
     const baseY = f * floorH;
     for (let gz = 0; gz < gridH; gz++) {
       for (let gx = 0; gx < gridW; gx++) {
