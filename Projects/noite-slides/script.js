@@ -817,3 +817,282 @@ console.log(`Total slides: ${totalSlides}`);
 console.log('Navigation: Arrow keys, click, touch swipe, mouse wheel');
 console.log('Secret code: MONITOR');
 console.log('Konami Code: \u2191\u2191\u2193\u2193\u2190\u2192\u2190\u2192BA');
+
+// ============================================
+// ARG EASTER EGGS
+// ============================================
+
+// --- Recording Dot ---
+function initRecordingDot() {
+    const dot = document.getElementById('recording-dot');
+    if (!dot) return;
+
+    function scheduleNextAppearance() {
+        const delay = 15000 + Math.random() * 45000; // 15-60s
+        setTimeout(() => {
+            if (Math.random() > 0.4) {
+                dot.classList.remove('hidden');
+                dot.classList.add('visible');
+                setTimeout(() => {
+                    dot.classList.remove('visible');
+                    dot.classList.add('hidden');
+                }, 3000 + Math.random() * 5000);
+            }
+            scheduleNextAppearance();
+        }, delay);
+    }
+    scheduleNextAppearance();
+}
+
+// --- Dead Pixel ---
+function initDeadPixel() {
+    const pixel = document.getElementById('dead-pixel');
+    if (!pixel) return;
+
+    let x = Math.random() * window.innerWidth;
+    let y = Math.random() * window.innerHeight;
+    let dx = (Math.random() - 0.5) * 0.5;
+    let dy = (Math.random() - 0.5) * 0.5;
+    let visible = false;
+
+    function scheduleAppear() {
+        const delay = 20000 + Math.random() * 60000;
+        setTimeout(() => {
+            if (Math.random() > 0.5) {
+                x = Math.random() * window.innerWidth;
+                y = Math.random() * window.innerHeight;
+                dx = (Math.random() - 0.5) * 0.5;
+                dy = (Math.random() - 0.5) * 0.5;
+                pixel.classList.remove('hidden');
+                pixel.classList.add('visible');
+                visible = true;
+                setTimeout(() => {
+                    pixel.classList.remove('visible');
+                    pixel.classList.add('hidden');
+                    visible = false;
+                    scheduleAppear();
+                }, 8000 + Math.random() * 12000);
+            } else {
+                scheduleAppear();
+            }
+        }, delay);
+    }
+
+    function animate() {
+        if (visible) {
+            x += dx;
+            y += dy;
+            if (x < 0 || x > window.innerWidth) dx *= -1;
+            if (y < 0 || y > window.innerHeight) dy *= -1;
+            pixel.style.left = `${x}px`;
+            pixel.style.top = `${y}px`;
+        }
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+    scheduleAppear();
+}
+
+// --- Subliminal Flash ---
+function initSubliminalFlash() {
+    const flash = document.getElementById('subliminal-flash');
+    if (!flash) return;
+
+    const messages = [
+        'NAO OLHE', 'ELES ESTAO AQUI', 'VOCE NAO ESTA SOZINHO',
+        'MONITOR', 'NÃO DESLIGUE', 'OLHE PARA A LUA',
+        'SECUESAO', 'ELE VEM', 'CORRA',
+        'A TELA SABE', 'VOCÊ ESTÁ SENDO OBSERVADO',
+        'STATIC', 'SINAL PERDIDO', 'REPITA'
+    ];
+
+    function scheduleFlash() {
+        const delay = 25000 + Math.random() * 75000;
+        setTimeout(() => {
+            const msg = messages[Math.floor(Math.random() * messages.length)];
+            flash.innerHTML = `<span class="subliminal-text">${msg}</span>`;
+            flash.classList.remove('hidden');
+            flash.classList.add('active');
+
+            setTimeout(() => {
+                flash.classList.remove('active');
+                flash.classList.add('hidden');
+            }, 200);
+
+            scheduleFlash();
+        }, delay);
+    }
+    scheduleFlash();
+}
+
+// --- Page Title Changes ---
+function initTitleChanges() {
+    const originalTitle = document.title;
+    const creepyTitles = [
+        'ELES ESTAO OBSERVANDO',
+        'NAO DESLIGUE A TELA',
+        'MONITOR',
+        'LOCAL 58 - BROADCAST ATIVO',
+        'VOCE NAO ESTA SOZINHO',
+        'SINAL PERDIDO...',
+        'OLHE PARA A LUA',
+        'BACKROOMS - NIVEL 0',
+        'RECORDING...',
+        'CA9D3_1N5_73RR0R',
+        'NOITE DOS SLIDES DA CASA DE HEITOR',
+        'HELP ME',
+        'THEY ARE WATCHING',
+        'DONT TURN OFF THE SCREEN',
+        'A TELA SABE ONDE VOCE ESTA'
+    ];
+
+    setInterval(() => {
+        if (Math.random() > 0.85) {
+            const creepy = creepyTitles[Math.floor(Math.random() * creepyTitles.length)];
+            document.title = creepy;
+            setTimeout(() => {
+                document.title = originalTitle;
+            }, 3000 + Math.random() * 5000);
+        }
+    }, 10000);
+}
+
+// --- Ghost Image on Specific Slides ---
+function initGhostImage() {
+    const container = document.getElementById('ghost-image-container');
+    if (!container) return;
+
+    const ghostImages = [
+        { slide: 1, src: 'https://i.ytimg.com/vi/3c66w6fVqOI/maxresdefault.jpg' },
+        { slide: 14, src: 'https://i.ytimg.com/vi/PH2FhZZscrQ/maxresdefault.jpg' },
+        { slide: 21, src: 'https://i.ytimg.com/vi/rkbIjuVZ_54/maxresdefault.jpg' }
+    ];
+
+    window.showGhostImage = function(slideIndex) {
+        const match = ghostImages.find(g => g.slide === slideIndex);
+        if (!match) return;
+
+        if (Math.random() > 0.6) {
+            container.innerHTML = `<img src="${match.src}" alt="">`;
+            container.classList.remove('hidden');
+            setTimeout(() => container.classList.add('visible'), 10);
+
+            setTimeout(() => {
+                container.classList.remove('visible');
+                setTimeout(() => {
+                    container.classList.add('hidden');
+                    container.innerHTML = '';
+                }, 3000);
+            }, 2000 + Math.random() * 3000);
+        }
+    };
+}
+
+// --- Click Hotspots ---
+function initClickHotspots() {
+    const hotspots = [
+        { slide: 0, x: '85%', y: '15%', action: 'static' },
+        { slide: 7, x: '10%', y: '80%', action: 'whisper' },
+        { slide: 13, x: '90%', y: '90%', action: 'glitch' },
+        { slide: 20, x: '50%', y: '5%', action: 'blink' }
+    ];
+
+    hotspots.forEach(h => {
+        const slide = slides[h.slide];
+        if (!slide) return;
+
+        const spot = document.createElement('div');
+        spot.className = 'click-hotspot';
+        spot.style.left = h.x;
+        spot.style.top = h.y;
+
+        spot.addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+
+            if (h.action === 'static') {
+                const sn = document.getElementById('static-noise');
+                if (sn) { sn.style.opacity = '0.5'; setTimeout(() => sn.style.opacity = '0.15', 500); }
+            } else if (h.action === 'whisper') {
+                const whisper = document.createElement('div');
+                whisper.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);font-family:"Press Start 2P",cursive;font-size:0.5rem;color:rgba(255,255,255,0.2);z-index:1100;pointer-events:none;animation:blink 0.5s infinite 3;';
+                whisper.textContent = '...voce me ouviu...';
+                document.body.appendChild(whisper);
+                setTimeout(() => whisper.remove(), 3000);
+            } else if (h.action === 'glitch') {
+                document.body.style.animation = 'screenTear 0.3s steps(5)';
+                setTimeout(() => document.body.style.animation = '', 300);
+            } else if (h.action === 'blink') {
+                document.body.style.filter = 'invert(1)';
+                setTimeout(() => document.body.style.filter = '', 200);
+            }
+        });
+
+        slide.style.position = 'relative';
+        slide.appendChild(spot);
+    });
+}
+
+// --- Cursor Trail (subtle red dots that fade) ---
+function initCursorTrail() {
+    let lastX = 0, lastY = 0;
+    document.addEventListener('mousemove', (e) => {
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist > 80 && Math.random() > 0.7) {
+            const trail = document.createElement('div');
+            trail.className = 'cursor-trail';
+            trail.style.left = `${e.clientX}px`;
+            trail.style.top = `${e.clientY}px`;
+            document.body.appendChild(trail);
+
+            setTimeout(() => {
+                trail.style.opacity = '0';
+                setTimeout(() => trail.remove(), 500);
+            }, 100);
+
+            lastX = e.clientX;
+            lastY = e.clientY;
+        }
+    });
+}
+
+// --- Hook subliminal flash into slide transitions ---
+(function() {
+    const _origOnSlideEnter = onSlideEnter;
+    onSlideEnter = function(index) {
+        _origOnSlideEnter(index);
+
+        if (Math.random() > 0.8) {
+            const flash = document.getElementById('subliminal-flash');
+            if (flash) {
+                const messages = ['VOCE NAO ESTA SOZINHO', 'ELES VEEM', 'NAO DESLIGUE', 'SINAL', 'CORRA', 'MONITOR'];
+                flash.innerHTML = `<span class="subliminal-text">${messages[Math.floor(Math.random() * messages.length)]}</span>`;
+                flash.classList.remove('hidden');
+                flash.classList.add('active');
+                setTimeout(() => {
+                    flash.classList.remove('active');
+                    flash.classList.add('hidden');
+                }, 150);
+            }
+        }
+
+        if (typeof window.showGhostImage === 'function') {
+            window.showGhostImage(index);
+        }
+    };
+})();
+
+// Initialize all new easter eggs
+document.addEventListener('DOMContentLoaded', () => {
+    initRecordingDot();
+    initDeadPixel();
+    initSubliminalFlash();
+    initTitleChanges();
+    initGhostImage();
+    initClickHotspots();
+    initCursorTrail();
+});

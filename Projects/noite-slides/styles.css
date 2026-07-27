@@ -2341,3 +2341,189 @@ body.presentation-mode .audio-invert-btn {
         font-size: 1.2rem;
     }
 }
+
+/* ============================================
+   ARG EASTER EGGS
+   ============================================ */
+
+/* Recording dot - fake "REC" indicator */
+#recording-dot {
+    position: fixed;
+    top: 20px;
+    right: 25px;
+    z-index: 1050;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+#recording-dot::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: #ff0000;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #ff0000, 0 0 12px #ff0000;
+    animation: blink 1s infinite;
+}
+
+#recording-dot::after {
+    content: 'REC';
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.6rem;
+    color: #ff0000;
+    letter-spacing: 2px;
+}
+
+#recording-dot.visible {
+    opacity: 0.6;
+    animation: recordingFlicker 4s infinite;
+}
+
+@keyframes recordingFlicker {
+    0%, 92%, 94%, 96%, 100% { opacity: 0.6; }
+    93% { opacity: 0; }
+    95% { opacity: 0.3; }
+}
+
+/* Dead pixel - small dot that drifts across screen */
+#dead-pixel {
+    position: fixed;
+    width: 3px;
+    height: 3px;
+    background: #000;
+    z-index: 1040;
+    pointer-events: none;
+    box-shadow: 0 0 1px rgba(0,0,0,0.8);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 2s;
+}
+
+#dead-pixel.visible {
+    opacity: 0.85;
+}
+
+/* Subliminal flash overlay */
+#subliminal-flash {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1500;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    opacity: 0;
+}
+
+#subliminal-flash.active {
+    animation: subliminalBurst 0.15s steps(1);
+}
+
+@keyframes subliminalBurst {
+    0% { opacity: 0.9; }
+    50% { opacity: 0.9; }
+    100% { opacity: 0; }
+}
+
+#subliminal-flash .subliminal-text {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 2rem;
+    color: #000;
+    text-transform: uppercase;
+    letter-spacing: 8px;
+}
+
+/* Hidden selectable text - only visible on Ctrl+A */
+#hidden-select-text {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    color: transparent;
+    font-size: 0.01rem;
+    line-height: 1;
+    overflow: hidden;
+    user-select: all;
+    -webkit-user-select: all;
+}
+
+#hidden-select-text::selection,
+#hidden-select-text::-moz-selection {
+    background: #ff0000;
+    color: #00ff00;
+}
+
+/* Ghost image that appears on specific slides */
+#ghost-image-container {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1030;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 3s ease-in-out;
+    mix-blend-mode: screen;
+}
+
+#ghost-image-container img {
+    max-width: 300px;
+    max-height: 300px;
+    filter: grayscale(1) contrast(0.3) brightness(0.4);
+    opacity: 0.15;
+}
+
+#ghost-image-container.visible {
+    opacity: 1;
+}
+
+/* Hidden clickable hotspot - subtle pulsing dot */
+.click-hotspot {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 50;
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.click-hotspot::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 4px; height: 4px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: hotspotPulse 3s infinite;
+}
+
+.click-hotspot:hover::before {
+    background: rgba(255,0,0,0.6);
+    box-shadow: 0 0 10px rgba(255,0,0,0.4);
+}
+
+@keyframes hotspotPulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+    50% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.6; }
+}
+
+/* Creepy cursor trail effect */
+.cursor-trail {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    background: rgba(255,0,0,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: opacity 0.5s;
+}
