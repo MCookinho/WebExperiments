@@ -53,6 +53,15 @@
             "url": "Projects/AnimePointerPointer/",
             "color": "#ff00ff",
             "date": "2026-07-16"
+        },
+        {
+            "name": "Anime noite-slides",
+            "description": "slide q fiz pra uma noite de slides na casa de um amigo",
+            "tags": ["Experiment"],
+            "image": "Projects/noite-slides/thumb.jpg",
+            "url": "Projects/noite-slides/",
+            "color": "#ff00ff",
+            "date": "2026-07-26"
         }
     ]
 }

@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noite dos Slides - Analog Horrors</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Creepster&family=Special+Elite&family=Press+Start+2P&family=Playfair+Display:ital@0;1&family=Nosifer&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="crt-overlay"></div>
+    <div id="scanlines"></div>
+    <div id="vhs-tracking"></div>
+    <div id="static-noise"></div>
+    <div id="ghost-eye" class="hidden"></div>
+    <div id="recording-dot" class="hidden"></div>
+    <div id="dead-pixel" class="hidden"></div>
+    <div id="subliminal-flash" class="hidden"></div>
+    <div id="hidden-select-text">NAO DEVERIA ESTAR LENDO ISSO. ELES SABEM ONDE VOCE ESTA. NAO OLHE PARA TRAS.</div>
+    <div id="ghost-image-container" class="hidden"></div>
+
+    <div id="secret-screen" class="hidden">
+        <div class="secret-content">
+            <h1>VOC&Ecirc; ME ENCONTROU</h1>
+            <p>Voc&ecirc; digitou MONITOR. Parab&eacute;ns.</p>
+            <p>Agora saiba: eles est&atilde;o observando.</p>
+            <p class="blink">PRESSIONE ESC PARA SAIR</p>
+        </div>
+    </div>
+
+    <button id="presentation-mode-btn" title="Modo Apresenta&ccedil;&atilde;o (F11)">📺 Modo Apresenta&ccedil;&atilde;o</button>
+    <div id="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">32</span></div>
+
+    <div id="slides-container">
+
+        <!-- ============================================ -->
+        <!-- SLIDE 1 - CAPA -->
+        <!-- ============================================ -->
+        <div class="slide active" id="slide-1" data-theme="intro">
+            <div class="slide-bg intro-bg"></div>
+            <div class="tv-turning-on"><div class="tv-line"></div></div>
+            <div class="slide-content cover-layout">
+                <div class="title-container">
+                    <h1 class="glitch-title" data-text="ANALOG HORRORS">ANALOG HORRORS</h1>
+                    <h2 class="subtitle typewriter">Hist&oacute;rias de terror criadas por usu&aacute;rios de internet, e algumas outras coisas</h2>
+                    <div class="separator"></div>
+                    <p class="event-info">NOITE DOS SLIDES DA CASA DE HEITOR</p>
+                    <p class="credits">Apresentado por: Pepeu Borges</p>
+                </div>
+                <div class="floating-entities">
+                    <img src="https://i.ytimg.com/vi/3c66w6fVqOI/maxresdefault.jpg" class="floating-entity entity-1" alt="Local 58">
+                    <img src="https://static.wikia.nocookie.net/the-walten-files-new/images/7/7d/TWF_1_HD_bon.png/revision/latest?cb=20220820211406" class="floating-entity entity-2" alt="Walten Files">
+                    <img src="https://i.ytimg.com/vi/rkbIjuVZ_54/maxresdefault.jpg" class="floating-entity entity-3" alt="Boiled One">
+                </div>
+            </div>
+            <div class="vhs-date">FITA N&deg; 001 - ARQUIVO 2026</div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 2 - O QUE E ANALOG HORROR -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-2" data-theme="definition">
+            <div class="slide-bg definition-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title">O QUE &Eacute; <span class="highlight">ANALOG HORROR</span>?</h2>
+                <div class="content-grid">
+                    <div class="definition-box">
+                        <p class="definition-text"><span class="keyword">Analog Horror</span> &eacute; um subg&ecirc;nero de terror que utiliza tecnologia obsoleta para criar uma sensa&ccedil;&atilde;o de <span class="highlight">inquieta&ccedil;&atilde;o</span> e <span class="highlight">desconforto</span>.</p>
+                        <p class="definition-text">Utiliza est&eacute;tica de <span class="keyword">fitas VHS</span>, <span class="keyword">TVs CRT</span>, <span class="keyword">transmiss&otilde;es corrompidas</span> e <span class="keyword">filmagens encontradas</span> para contar hist&oacute;rias de terror.</p>
+                        <p class="definition-text">A premissa central: <span class="highlight">e o que voc&ecirc; est&aacute; vendo n&atilde;o devesse existir?</span></p>
+                    </div>
+                    <div class="characteristics">
+                        <h3>CARACTER&Iacute;STICAS PRINCIPAIS:</h3>
+                        <ul>
+                            <li class="char-item">📺 Est&eacute;tica de m&iacute;dia antiga (VHS, CRT, fitas)</li>
+                            <li class="char-item">🎭 Realismo atrav&eacute;s de found footage</li>
+                            <li class="char-item">👻 Terror sutil e psicol&oacute;gico</li>
+                            <li class="char-item">📡 Transmiss&otilde;es hijacked / sinais corruptos</li>
+                            <li class="char-item">🧠 Narrativa fragmentada e misteriosa</li>
+                            <li class="char-item">👁️ Entidades que imitam humanos</li>
+                            <li class="char-item">🌀 Espa&ccedil;os liminais e perturbadores</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="vhs-date">FITA N&deg; 002 - ARQUIVO 1987</div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 3 - ORIGENS E INSPIRACOES -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-3" data-theme="origins">
+            <div class="slide-bg origins-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title">ORIGENS E <span class="highlight cyan">INSPIRA&Ccedil;&Otilde;ES</span></h2>
+                <p class="section-subtitle">O que incentivou a cria&ccedil;&atilde;o do terror digital</p>
+                <div class="origins-layout">
+                    <div class="origin-card">
+                        <h3>SLENDER MAN (2009)</h3>
+                        <p>Eric Knudsen postou fotos manipuladas no Something Awful Forums. A primeira grande lenda da internet. De Slender Man nasceram Marble Hornets, jogos, filmes e a semente do analog horror.</p>
+                        <span class="origin-year">2009</span>
+                    </div>
+                    <div class="origin-card">
+                        <h3>MARBLE HORNETS (2009-2014)</h3>
+                        <p>A s&eacute;rie de found footage no YouTube que provou que amador = aterrorizante. "The Operator" substituiu Slender Man. A est&eacute;tica de fita degradada virou DNA do g&ecirc;nero.</p>
+                        <span class="origin-year">2009</span>
+                    </div>
+                    <div class="origin-card">
+                        <h3>THE CARETAKER</h3>
+                        <p>James Leyland Kirby explorou a dem&ecirc;ncia atrav&eacute;s de m&uacute;sica. O conceito de "decay anal&oacute;gico" no som inspirou o equivalente visual: a degrada&ccedil;&atilde;o de imagens e fitas.</p>
+                        <span class="origin-year">1999</span>
+                    </div>
+                    <div class="origin-card">
+                        <h3>CREEPYPASTA CULTURE</h3>
+                        <p>SCP Foundation, Ben Drowned, Jeff the Killer. A comunidade online j&aacute; existia. O p&uacute;blico estava faminto de terror digital antes do analog horror nascer.</p>
+                        <span class="origin-year">2007</span>
+                    </div>
+                    <div class="origin-card">
+                        <h3>FILMES FOUND FOOTAGE</h3>
+                        <p>Blair Witch Project (1999), Paranormal Activity (2007). A ideia de que c&acirc;mera amadora = mais real. A degrada&ccedil;&atilde;o da imagem tornou-se sin&ocirc;nimo de medo.</p>
+                        <span class="origin-year">1999</span>
+                    </div>
+                    <div class="origin-card">
+                        <h3>ESPA&Ccedil;OS LIMINAIS</h3>
+                        <p>Fotos de shoppings vazios, piscinas p&uacute;blicas, corredores infinitos. A Backrooms Photography inspirou a cria&ccedil;&atilde;o do conceito de espa&ccedil;os que parecem "errados".</p>
+                        <span class="origin-year">2019</span>
+                    </div>
+                </div>
+                <div class="vhs-date">FITA N&deg; 003 - ARQUIVO 1999</div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 4 - THE CARETAKER PARTE 1 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-4" data-theme="caretaker">
+            <div class="slide-bg caretaker-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title caretaker-title">THE <span class="highlight amber">CARETAKER</span> <span class="part-tag">PARTE 1</span></h2>
+                <div class="lore-split-layout">
+                    <div class="lore-main">
+                        <div class="lore-image-container">
+                            <img src="https://i.discogs.com/jFTJeafjR5PogiiUDSwOUOG0YsmY0c0pkPPX6F8hy8Y/rs:fit/g:sm/q:40/h:300/w:300/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTkwODg1/NzYtMTQ3NDU3MTEx/Ny0yODUzLmpwZWc.jpeg" alt="Everywhere at the End of Time" class="lore-hero-image caretaker-album">
+                            <div class="caretaker-fade"></div>
+                        </div>
+                        <div class="lore-info">
+                            <h3>QU&Eacute; &Eacute; THE CARETAKER?</h3>
+                            <p><span class="highlight amber">James Leyland Kirby</span> (nascido em 9 de maio de 1974, Stockport, Inglaterra), musician ingl&ecirc;s, criou o alias <span class="highlight amber">The Caretaker</span> em 1999. O projeto explorava o conceito de <span class="highlight amber">m&uacute;sica de sal&atilde;o de baile antiga</span> degradada &mdash; como sons do passado se deteriorando na mem&oacute;ria.</p>
+                            <p>A capa dos &aacute;lbuns foi pintada pelo artista <span class="highlight amber">Ivan Seal</span>. O projeto evoluiu por d&eacute;cadas, desde <span class="highlight amber">\"Selected Memories from the Haunted Ballroom\"</span> (1999) e <span class="highlight amber">\"An Empty Bliss Beyond This World\"</span> (2011) at&eacute; sua obra-prima: <span class="highlight amber\">\"Everywhere at the End of Time\"</span> (2016-2019), uma explora&ccedil;&atilde;o devastadora da <span class="highlight amber">dem&ecirc;ncia</span> atrav&eacute;s do som.</p>
+                            <h3>A CONEX&Atilde;O COM O ANALOG HORROR</h3>
+                            <p>A ideia central &eacute; poderosa: <span class="highlight amber">o decay anal&oacute;gico</span>. Assim como uma fita VHS se degrada com o tempo, as mem&oacute;rias de um demenciado se dissolvem. Kirby provou que a <span class="highlight amber">deteriora&ccedil;&atilde;o do meio</span> &eacute; mais assustadora que qualquer susto.</p>
+                            <p>Essa filosofia &eacute; o cora&ccedil;&atilde;o de todo analog horror: <span class="highlight amber">o m&eacute;dio &eacute; a mensagem</span>.</p>
+                        </div>
+                    </div>
+                    <div class="caretaker-philosophy">
+                        <div class="philosophy-quote">
+                            <blockquote>"A mem&oacute;ria &eacute; algo que devemos ter cuidado. Ela &eacute; fr&aacute;gil e pode se partir em mil peda&ccedil;os."</blockquote>
+                            <cite>&mdash; James Leyland Kirby</cite>
+                        </div>
+                        <div class="track-highlight">
+                            <p class="track-name">♫ A1 - It's Just a Burning Memory</p>
+                            <p class="track-desc">A valsa familiar que todos reconhecemos... mas algo est&aacute; errado. O som distorce. A melodia repete. A mem&oacute;ria come&ccedil;a a queimar.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 5 - THE CARETAKER PARTE 2 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-5" data-theme="caretaker">
+            <div class="slide-bg caretaker-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title caretaker-title">THE <span class="highlight amber">CARETAKER</span> <span class="part-tag">PARTE 2</span></h2>
+                <p class="section-subtitle">As 6 fases da dem&ecirc;ncia musical &mdash; ~6h30m, 50 faixas</p>
+                <div class="caretaker-stages">
+                    <div class="stage-card stage-1">
+                        <span class="stage-number">ESTAGIO 1</span>
+                        <h3>Post Awareness Confusions</h3>
+                        <p><em>Lan&ccedil;ado em 22 de setembro de 2016.</em> Valsas e jazz de sal&atilde;o familiares, mas com leves distor&ccedil;&otilde;es. Algo come&ccedil;a a falhar na grava&ccedil;&atilde;o. Como uma m&uacute;sica que voc&ecirc; conhece... mas n&atilde;o consegue lembrar completamente.</p>
+                        <div class="stage-visual">🎵 → 🎵~</div>
+                    </div>
+                    <div class="stage-card stage-2">
+                        <span class="stage-number">ESTAGIO 2</span>
+                        <h3>Post Awareness Confusions</h3>
+                        <p><em>Lan&ccedil;ado em 6 de abril de 2017.</em> A degrada&ccedil;&atilde;o aumenta. Looping t&iacute;pico de dem&ecirc;ncia. Fragmentos de m&uacute;sicas se misturam. A identidade da melodia come&ccedil;a a se perder.</p>
+                        <div class="stage-visual">🎵~ → 🎵??</div>
+                    </div>
+                    <div class="stage-card stage-3">
+                        <span class="stage-number">ESTAGIO 3</span>
+                        <h3>Tomorrow Is Almost Gone</h3>
+                        <p><em>Lan&ccedil;ado em 28 de setembro de 2017.</em> Reconhecimento se torna dif&iacute;cil. Sons se sobrep&otilde;em. A atmosfera &eacute; pesada e claustrof&oacute;bica. O ouvinte come&ccedil;a a sentir o p&acirc;nico de esquecer.</p>
+                        <div class="stage-visual">🎵?? → 🔊</div>
+                    </div>
+                    <div class="stage-card stage-4">
+                        <span class="stage-number">ESTAGIO 4</span>
+                        <h3>Hidden Sea Buried Deep</h3>
+                        <p><em>Lan&ccedil;ado em 5 de abril de 2018.</em> Ruidos abstratos substituem a m&uacute;sica. Ainda h&aacute; ecos do que foi, mas est&atilde;o afogados em camadas de distor&ccedil;&atilde;o e ru&iacute;do.</p>
+                        <div class="stage-visual">🔊 → 📯💥</div>
+                    </div>
+                    <div class="stage-card stage-5">
+                        <span class="stage-number">ESTAGIO 5</span>
+                        <h3>My Hands Are Fixed Inside</h3>
+                        <p><em>Lan&ccedil;ado em 20 de setembro de 2018.</em> M&uacute;sica praticamente irreconhec&iacute;vel. Ru&iacute;do branco, est&aacute;tica, sons que parecem gritos abafados. O sil&ecirc;ncio entre as notas &eacute; mais assustador que as notas.</p>
+                        <div class="stage-visual">📢 → ▓▓▓▓</div>
+                    </div>
+                    <div class="stage-card stage-6">
+                        <span class="stage-number">ESTAGIO 6</span>
+                        <h3>Post-Awareness Stage 6</h3>
+                        <p><em>Lan&ccedil;ado em 14 de mar&ccedil;o de 2019.</em> \"Post-Awareness Stage 6 is without description.\" Kirby deliberadamente lan&ccedil;ou cada fase com intervalo de 6 meses. O fim. Quase sil&ecirc;ncio absoluto. A personalidade se foi. Resta apenas... nada.</p>
+                        <div class="stage-visual">▓▓▓ → ...</div>
+                    </div>
+                </div>
+                <div class="caretaker-warning">
+                    <p class="blink">⚠️ AVISO: OS RESTOS ESTRAGARAM E APENAS CONSTAM DE CONFUSOES E ERRADOS RELEMBRADOS ⚠️</p>
+                </div>
+                <div class="vhs-date">EVERYWHERE AT THE END OF TIME - 2016/2019</div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 6 - LOCAL 58 PARTE 1 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-6" data-theme="local58">
+            <div class="slide-bg local58-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title local58-title">LOCAL <span class="highlight green">58</span> <span class="part-tag">PARTE 1</span></h2>
+                <div class="lore-split-layout">
+                    <div class="lore-main">
+                        <div class="lore-image-container">
+                            <img src="https://i.ytimg.com/vi/3c66w6fVqOI/maxresdefault.jpg" alt="Local 58" class="lore-hero-image">
+                            <div class="local58-static"></div>
+                        </div>
+                        <div class="lore-info">
+                            <h3>O PACIENTE ZERO</h3>
+                            <p><span class="highlight green">Kris Straub</span> (tamb&eacute;m criador da creepypasta \"Candle Cove\") lan&ccedil;ou Local 58 em <span class="highlight green\">26 de outubro de 2015</span>, e sem saber, criou o que hoje chamamos de \"analog horror\". Consid&eacute;rado o <span class="highlight green\">paciente zero</span> do g&ecirc;nero.</p>
+                            <p>A premissa: transmiss&otilde;es de TV hijacked do canal <span class="highlight green\">WCLV-TV</span> em <span class="highlight green\">Mason County, West Virginia</span>. N&atilde;o h&aacute; personagens recorrentes. N&atilde;o h&aacute; continuidade direta. S&oacute; h&aacute; <span class="highlight green\">terror puro</span> e mensagens perturbadoras.</p>
+                            <h3>\"WEATHER SERVICE\"</h3>
+                            <p>O primeiro v&iacute;deo. Uma transmiss&atilde;o de emerg&ecirc;ncia que diz: <span class="highlight green">"N&Atilde;O OLHE PARA A LUA"</span>. Mas por qu&ecirc;? O que h&aacute; l&aacute; em cima? Straub nunca responde. A sugest&atilde;o &eacute; mais poderosa que qualquer monstro.</p>
+                            <h3>O QUE TORNOU ESPECIAL</h3>
+                            <p>Straub provou que o terror mais eficaz &eacute; o que <span class="highlight green">n&atilde;o mostra</span>. A imagina&ccedil;&atilde;o do espectador &eacute; a ferramenta mais assustadora que existe.</p>
+                        </div>
+                    </div>
+                    <div class="lore-timeline-mini">
+                        <h3>LINHA DO TEMPO:</h3>
+                        <div class="mini-timeline">
+                            <div class="mini-event"><span class="mini-year">2015</span> \"Weather Service\" &eacute; lan&ccedil;ado (26/10)</div>
+                            <div class="mini-event"><span class="mini-year">2016</span> \"Contingency\" e \"Fastest Available Route\"</div>
+                            <div class="mini-event"><span class="mini-year">2018</span> \"Show for Children\" e \"Real Sleep\"</div>
+                            <div class="mini-event"><span class="mini-year">2019</span> \"Skywatching\" consolida a s&eacute;rie</div>
+                        </div>
+                        <div class="moon-secret" id="local58-moon" title="N&atilde;o clique...">
+                            🌙
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 7 - LOCAL 58 PARTE 2 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-7" data-theme="local58">
+            <div class="slide-bg local58-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title local58-title">LOCAL <span class="highlight green">58</span> <span class="part-tag">PARTE 2</span></h2>
+                <div class="detail-split-layout">
+                    <div class="detail-section">
+                        <h3>EPIS&oacute;DIOS FAMOSOS</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name">WEATHER SERVICE (2015)</span>
+                                <p>O primeiro epis&oacute;dio. Transmiss&atilde;o de emerg&ecirc;ncia que instrui: \"N&Atilde;O OLHE PARA A LUA\". O canal recomenda \"recolocar\" os corpos. A origem de tudo.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">CONTINGENCY (2016)</span>
+                                <p>\"DO NOT LOOK AT THE MOON\". A vers&atilde;o mais expandida da mensagem. O c&eacute;u n&atilde;o &eacute; real. As estrelas est&atilde;o erradas. Algo l&aacute; em cima observa.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">SKYWATCHING (2019)</span>
+                                <p>Programa de astronomia corrompido. A lua &eacute; revelada como algo que n&atilde;o deveria existir. Uma forma que observa de volta.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">NIGHT WALK (2024)</span>
+                                <p>O epis&oacute;dio mais recente, lan&ccedil;ado em 31 de outubro de 2024. Uma caminhada noturna que revela o horror que sempre esteve ao nosso redor.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>O LEGADO DE LOCAL 58</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name">TERROR SUTIL</span>
+                                <p>N&atilde;o precisa de sustos baratos. A sugest&atilde;o &eacute; mais assustadora que qualquer jumpscare. O que voc&ecirc; imagina &eacute; pior que qualquer coisa mostrada.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">M&Iacute;DIA COMO VIL&Atilde;O</span>
+                                <p>A pr&oacute;pria TV &eacute; a amea&ccedil;a. O meio de comunica&ccedil;&atilde;o se torna o vetor do terror. A ferramenta que deveria informar passa a assustar.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">INFLU&Ecirc;NCIA</span>
+                                <p>Sem Local 58, n&atilde;o haveria Mandela Catalogue, Walten Files, ou Backrooms como conhecemos. Todo analog horror deve algo a Kris Straub.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">COMUNIDADE</span>
+                                <p>Fans expandiram a lore. Criaram teorias, an&aacute;lises, conte&uacute;do derivado. O g&ecirc;nero nasceu da colabora&ccedil;&atilde;o online.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="vhs-date">FITA N&deg; 014 - WCLV-TV, MASON COUNTY, WEST VIRGINIA</div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 8 - BACKROOMS PARTE 1 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-8" data-theme="backrooms">
+            <div class="slide-bg backrooms-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title backrooms-title">THE <span class="highlight yellow">BACKROOMS</span> <span class="part-tag">PARTE 1</span></h2>
+                <div class="lore-split-layout">
+                    <div class="lore-main">
+                        <div class="lore-image-container">
+                            <img src="https://i.ytimg.com/vi/H4dGpz6cnHo/maxresdefault.jpg" alt="Backrooms" class="lore-hero-image">
+                            <div class="image-glitch"></div>
+                        </div>
+                        <div class="lore-info">
+                            <h3>A CREEPYPASTA ORIGINAL (2019)</h3>
+                            <p>Em 12 de maio de 2019, um usu&aacute;rio an&ocirc;nimo postou no 4chan: <span class="highlight yellow">"Se voc&ecirc; n&atilde;o for cuidadoso e noclip fora da realidade, voc&ecirc; acabar&aacute; nos Backrooms."</span></p>
+                            <p>O conceito &eacute; simples: um espa&ccedil;o infinito de salas vazias com papel de parede amarelo, carpete &uacute;mido e o zumbido eterno de fluorescentes. Aproximadamente <span class="highlight yellow">600 milh&otilde;es de milhas quadradas</span> de espa&ccedil;o aleatoriamente segmentado.</p>
+                            <h3>A FOTO ORIGINAL</h3>
+                            <p>A foto original veio de uma reforma da loja <span class="highlight yellow">HobbyTown</span> em <span class="highlight yellow">Oshkosh, Wisconsin</span>, por volta de 2002-2003. A imagem parecia t&atilde;o \"errada\" que se tornou sin&ocirc;nimo de <span class="highlight yellow\">terror liminar</span>. A aus&ecirc;ncia de pessoas num espa&ccedil;o que deveria ter pessoas &eacute; fundamentalmente perturbadora.</p>
+                        </div>
+                    </div>
+                    <div class="lore-timeline-mini">
+                        <h3>LINHA DO TEMPO:</h3>
+                        <div class="mini-timeline">
+                            <div class="mini-event"><span class="mini-year">2019</span> Creepypasta original no 4chan</div>
+                            <div class="mini-event"><span class="mini-year">2020</span> Comunidade no Reddit expande a lore</div>
+                            <div class="mini-event"><span class="mini-year">2022</span> Kane Pixels lan&ccedil;a Found Footage</div>
+                            <div class="mini-event"><span class="mini-year">2026</span> Filme oficial pela A24</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 9 - BACKROOMS PARTE 2 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-9" data-theme="backrooms">
+            <div class="slide-bg backrooms-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title backrooms-title">THE <span class="highlight yellow">BACKROOMS</span> <span class="part-tag">PARTE 2</span></h2>
+                <div class="detail-split-layout">
+                    <div class="detail-section">
+                        <h3>N&Iacute;VEIS PRINCIPAIS</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-number">LEVEL 0</span>
+                                <span class="detail-name">"O Lobby"</span>
+                                <p>O cl&aacute;ssico. Papel amarelo, carpete, fluorescentes. 600 milh&otilde;es de milhas quadradas. Onde tudo come&ccedil;a. A ang&uacute;stia da monotonia infinita.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-number">LEVEL 1</span>
+                                <span class="detail-name">"Zona Habit&aacute;vel"</span>
+                                <p>Armaz&eacute;m industrial escuro. Comunidades de sobreviv&ecirc;ntes. Chuva constante. Algo mora nas sombras, mas voc&ecirc; pode negociar.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-number">LEVEL 2</span>
+                                <span class="detail-name">"Sonhos de Tubos"</span>
+                                <p>Tun&eacute;is de servi&ccedil;o. Calor extremo. Entidades mais agressivas. Onde a sobreviv&ecirc;ncia se torna dif&iacute;cil.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-number">LEVEL !</span>
+                                <span class="detail-name">"Corrida"</span>
+                                <p>Corredor vermelho. Corra ou morra. Multid&atilde;o de entidades atr&aacute;s de voc&ecirc;. N&atilde;o h&aacute; negocia&ccedil;&atilde;o. S&oacute; fuga.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>ENTIDADES FAMOSAS</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name">SMILERS</span>
+                                <p>Olhos e dentes brilhantes no escuro. S&oacute; vis&iacute;veis quando as luzes apagam. O sorriso &eacute; a &uacute;ltima coisa que voc&ecirc; v&ecirc;.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">HOUNDS</span>
+                                <p>Criaturas humanoides agressivas que se movem em 4 patas. Ca&ccedil;am em grupo. Organizadas. Inteligentes.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">SKIN-STEALERS</span>
+                                <p>Roubam a apar&ecirc;ncia de humanos. Dif&iacute;ceis de identificar. Sempresorrindo. O sorriso n&atilde;o chega aos olhos.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">THE LIFEFORM</span>
+                                <p>Entidade principal de Kane Pixels. Habita o Complexo. Ca&ccedil;a quem invade seu territ&oacute;rio. A amea&ccedil;a definitiva.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="vhs-date">PROJETO KV31 - ASYNC RESEARCH INSTITUTE</div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 10 - BACKROOMS PARTE 3 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-10" data-theme="backrooms">
+            <div class="slide-bg backrooms-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title backrooms-title">THE <span class="highlight yellow">BACKROOMS</span> <span class="part-tag">PARTE 3</span></h2>
+                <div class="lore-split-layout">
+                    <div class="lore-main">
+                        <div class="lore-info full-width">
+                            <h3>KANE PARSONS E A REVOLU&Ccedil;&Atilde;O</h3>
+                            <p><span class="highlight yellow">Kane Parsons</span> (conhecido como Kane Pixels), um criador de conte&uacute;do de 16 anos, postou em <span class="highlight yellow\">7 de janeiro de 2022</span> um v&iacute;deo de \"filmagem encontrada\" dos Backrooms. O v&iacute;deo viralizou com mais de <span class="highlight yellow\">220 milh&otilde;es de visualiza&ccedil;&otilde;es</span> ao longo da s&eacute;rie completa, que conta com <span class="highlight yellow\">24 epis&oacute;dios</span>.</p>
+                            <p>O que come&ccedil;ou como um curto v&iacute;deo se transformou em uma <span class="highlight yellow\">s&eacute;rie completa</span>: The Backrooms (Found Footage), com m&uacute;ltiplos epis&oacute;dios, lore detalhada, a organiza&ccedil;&atilde;o ASYNC, e uma narrativa cinematogr&aacute;fica que definiu o que o analog horror poderia ser em video.</p>
+                            <h3>O FILME A24 (2026)</h3>
+                            <p>A24, est&uacute;dio por tr&aacute;s de Hereditary e Everything Everywhere All at Once, produziu um filme oficial dos Backrooms. Lan&ccedil;ado em <span class="highlight yellow\">29 de maio de 2026</span>, <span class="highlight yellow\">dirigido pelo pr&oacute;prio Kane Parsons</span> (o diretor mais jovem da hist&oacute;ria da A24), estrelando <span class="highlight yellow\">Chiwetel Ejiofor</span> e <span class="highlight yellow\">Renate Reinsve</span>, com produ&ccedil;&atilde;o de <span class="highlight yellow\">James Wan</span> e <span class="highlight yellow\">Shawn Levy</span>. Prova de que uma creepypasta de 2019 se tornou <span class="highlight yellow\">fen&ocirc;meno cultural mainstream</span>.</p>
+                            <h3>O IMPACTO</h3>
+                            <p>Os Backrooms n&atilde;o s&atilde;o s&oacute; um analog horror. S&atilde;o uma <span class="highlight yellow">met&aacute;fora da ansiedade moderna</span>: a solid&atilde;o infinita, a monotonia do trabalho, o medo de estar preso num espa&ccedil;o que n&atilde;o faz sentido. Todo mundo j&aacute; sentiu que "n&atilde;o deveria estar aqui".</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="noclip-secret" id="backrooms-noclip" title="...noclip...">
+                    <p class="hidden-text">SE VOC&Ecirc; N&Atilde;O FOR CUIDADOSO...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 11 - MANDELA CATALOGUE PARTE 1 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-11" data-theme="mandela">
+            <div class="slide-bg mandela-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title mandela-title">THE <span class="highlight red">MANDELA</span> CATALOGUE <span class="part-tag">PARTE 1</span></h2>
+                <div class="lore-split-layout">
+                    <div class="lore-main">
+                        <div class="lore-image-container">
+                            <img src="https://static.wikia.nocookie.net/analog-horror-0/images/f/fa/This_is_intruder_from_vol4.png/revision/latest?cb=20240412165500" alt="Intruder" class="lore-hero-image">
+                            <div class="mandela-static"></div>
+                        </div>
+                        <div class="lore-info">
+                            <h3>A PREMISSA</h3>
+                            <p>Criado por <span class="highlight red">Alex Kister</span> em 2021, quando ele tinha apenas <span class="highlight red">16 anos</span>, durante a quarentena do COVID-19. O primeiro v&iacute;deo, <span class="highlight red">"overthrone"</span>, foi carregado em <span class="highlight red">9 de junho de 2021</span>. Filmado com celular. Um dos analog horrors mais ambiciosos j&aacute; criados.</p>
+                            <p>A s&eacute;rie se passa no condado fict&iacute;cio de <span class="highlight red">Mandela, Wisconsin</span>, onde <span class="highlight red">Alternates</span> &mdash; entidades que imitam humanos com <span class="highlight red">distor&ccedil;&otilde;es f&iacute;sicas</span> &mdash; est&atilde;o invadindo a realidade.</p>
+                            <h3>O QUE S&Atilde;O ALTERNATES?</h3>
+                            <p>Entidades que imitam a apar&ecirc;ncia de pessoas queridas, mas com <span class="highlight red">rostos "errados"</span> &mdash; olhos tortos, sorriso largo demais. Elas torturam psicologicamente suas v&iacute;timas at&eacute; o suic&iacute;dio, depois assumem suas identidades.</p>
+                            <h3>A ORIGEM B&Iacute;BLICA</h3>
+                            <p>A s&eacute;rie sugere que um <span class="highlight red">Falso Gabrielo</span> substituiu o Arcanjo Gabrielo na Anuncia&ccedil;&atilde;o, corrompendo a espiritualidade humana e dando origem aos Alternates.</p>
+                        </div>
+                    </div>
+                    <div class="lore-facts-mini">
+                        <h3>CURIOSIDADES:</h3>
+                        <ul>
+                            <li>Criado durante a quarentena do COVID-19</li>
+                            <li>Alex filmou os primeiros v&iacute;deos com celular</li>
+                            <li>O nome vem do "Efeito Mandela"</li>
+                            <li>Filme em produ&ccedil;&atilde;o com Steven Spielberg</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 12 - MANDELA CATALOGUE PARTE 2 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-12" data-theme="mandela">
+            <div class="slide-bg mandela-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title mandela-title">THE <span class="highlight red">MANDELA</span> CATALOGUE <span class="part-tag">PARTE 2</span></h2>
+                <div class="detail-split-layout">
+                    <div class="detail-section">
+                        <h3>ENTIDADES E AMEA&Ccedil;AS</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name">THE INTRUDER (6)</span>
+                                <p>Seq&uuml;estra crian&ccedil;as atr&aacute;s de TVs. Mais de 3.000 crian&ccedil;as desaparecidas. Rosto distorcido que causa terror imediato. O primeiro alternate mostrado.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">FALSE GABRIEL</span>
+                                <p>O l&iacute;der dos Alternates. Substituiu o Arcanjo verdadeiro. Fonte de todo o mal da s&eacute;rie. A entidade mais poderosa e perigosa.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">M.A.D.</span>
+                                <p>Metaphysical Awareness Disorder. Condi&ccedil;&atilde;o causada por receber "conhecimento proibido" dos Alternates. L&eacute;va ao suic&iacute;dio inevit&aacute;vel.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">THE PREACHER</span>
+                                <p>Tipo 3 Alternate. Aparece na Igreja. Thatcher Lister quase morreu ao encontr&aacute;-lo. Uma das cenas mais perturbadoras da s&eacute;rie.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>PERSONAGENS PRINCIPAIS</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name">THATCHER LISTER</span>
+                                <p>Policial do condado. Protagonista humano. Sobreviveu a encontros com Alternates. Um dos poucos que sabe a verdade.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">ADAM MURRAY</span>
+                                <p>Membro do BPS. Revelado ser um Alternate disfar&ccedil;ado de humano. Agente dormidor. A trai&ccedil;&atilde;o que ningu&eacute;m esperava.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">EVELYN MILLER</span>
+                                <p>Uma das v&iacute;timas centrais da s&eacute;rie. Sua hist&oacute;ria revela a extens&atilde;o do horror dos Alternates na comunidade.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">DAVE LEE &amp; JONAH MARSHALL</span>
+                                <p>Amigos e aliados de Adam e Thatcher. Mortos por Alternates durante investiga&ccedil;&otilde;es. Suas mortes revelam a extens&atilde;o da amea&ccedil;a.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="click-zone mandela-click" id="mandela-click-zone">
+                    <div class="alternate-jumpscare hidden">
+                        <img src="https://static.wikia.nocookie.net/analog-horror-0/images/4/43/Intruder_restored.png/revision/latest?cb=20240412165530" alt="ALTERNATE" class="jumpscare-image">
+                        <p class="jumpscare-text">N&Atilde;O OLHE</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 13 - WALTEN FILES PARTE 1 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-13" data-theme="walten">
+            <div class="slide-bg walten-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title walten-title">THE <span class="highlight orange">WALTEN</span> FILES <span class="part-tag">PARTE 1</span></h2>
+                <div class="lore-split-layout">
+                    <div class="lore-main">
+                        <div class="lore-image-container">
+                            <img src="https://static.wikia.nocookie.net/the-walten-files-new/images/7/7d/TWF_1_HD_bon.png/revision/latest?cb=20220820211406" alt="Bon" class="lore-hero-image">
+                        </div>
+                        <div class="lore-info">
+                            <h3>A HIST&Oacute;RIA</h3>
+                            <p>Criado por <span class="highlight orange">Martin Walls</span> (nome real Martin Paredes, de Santiago, Chile) em <span class="highlight orange">26 de abril de 2020</span>. Inspirado em FNAF, mas muito mais sombrio e realista. A s&eacute;rie s&eacute;gue a tr&aacute;g&eacute;dia da <span class="highlight orange">fam&iacute;lia Walten</span> e do restaurante \"Bon's Burgers\".</p>
+                            <h3>OS FUNDADORES</h3>
+                            <p><span class="keyword">Jack Walten</span> e <span class="keyword">Felix Kranken</span> eram amigos da faculdade que sonhavam em abrir um restaurante com animatr&ocirc;nicos. Em 1974, o sonho se tornou realidade &mdash; e depois, um pesadelo.</p>
+                            <h3>O ACIDENTE</h3>
+                            <p>Em <span class="highlight orange">2 de maio de 1974</span>, Felix, b&ecirc;bado, estava dirigindo os filhos de Jack (<span class="highlight orange">Edward</span> e <span class="highlight orange">Molly</span> Walten) para casa. Ele bateu o carro e, em p&acirc;nico, <span class="highlight orange">enterrou as crian&ccedil;as vivas</span> na Floresta Saint Juana. Seus esp&iacute;ritos possu&iacute;ram o brinquedo Rocket. Felix nunca se perdoou.</p>
+                        </div>
+                    </div>
+                    <div class="lore-timeline-mini">
+                        <h3>LINHA DO TEMPO:</h3>
+                        <div class="mini-timeline">
+                            <div class="mini-event"><span class="mini-year">1958</span> Jack e Felix concebem a ideia</div>
+                            <div class="mini-event"><span class="mini-year">2/5/1974</span> Acidente de Felix com as crian&ccedil;as</div>
+                            <div class="mini-event"><span class="mini-year">11/6/1974</span> Jack desaparece misteriosamente</div>
+                            <div class="mini-event"><span class="mini-year">20/7/1974</span> Rosemary morta por Bon</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 14 - WALTEN FILES PARTE 2 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-14" data-theme="walten">
+            <div class="slide-bg walten-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title walten-title">THE <span class="highlight orange">WALTEN</span> FILES <span class="part-tag">PARTE 2</span></h2>
+                <div class="detail-split-layout">
+                    <div class="detail-section">
+                        <h3>OS ANIMATR&Ocirc;NICOS</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name">BON (COELHO)</span>
+                                <p>O principal. Possui o corpo de Jack Walton. Mata brutalmente suas v&iacute;timas e as coloca dentro dos trajes. O monstro mais ic&ocirc;nico da s&eacute;rie.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">SHA (OVELHA)</span>
+                                <p>Cont&eacute;m os restos de Rosemary Walton. Esposa de Jack. Morta em <span class="highlight orange">20 de julho de 1974</span> enquanto procurava o marido. Uma morte tr&aacute;gica e inevit&aacute;vel.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">BOOZOO (CACHORRO)</span>
+                                <p>Cont&eacute;m os restos de Charles Brook. Funcion&aacute;rio da BSI. Morto em julho de 1974. Mais uma v&iacute;tima da tr&aacute;g&eacute;dia em cadeia.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">BANNY (COELHA)</span>
+                                <p>Cont&eacute;m os restos de <span class="highlight orange">Susan Woodings</span>, a primeira v&iacute;tima (mortа em <span class="highlight orange">30 de junho de 1974</span>). T&eacute;cnica da BSI, enfiada dentro de Banny enquanto tentava consertar Bon. A ironia cruel de tentar salvar o que a matou.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>BUNNYFARM E A VERDADE</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name">BUNNYFARM</span>
+                                <p>Jogo de arcade criado por Sophie Walton. Cada n&iacute;vel revela peda&ccedil;os da verdade sobre a fam&iacute;lia. A mec&acirc;nica perfeita para contar uma hist&oacute;ria through horror.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">SOPHIE WALTON</span>
+                                <p>Filha de Jack. &Uacute;nica Walton sobrevivente. Testemunhou a morte da m&atilde;e. Medicada para esquecer. Sua jornada de redescoberta &eacute; o cora&ccedil;&atilde;o da s&eacute;rie.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">FELIX KRANKEN</span>
+                                <p>Cofundador. Alco&oacute;latra. Possivelmente matou Jack e escondeu o corpo em Bon. Sua culpa o consumiu. O v&iacute;lio encarnado.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">O DESTINO FINAL</span>
+                                <p>Cada personagem encontra seu fim dentro de um animatr&ocirc;nico. N&atilde;o h&aacute; sobreviventes emocionais. A tr&aacute;g&eacute;dia se repete em cada gera&ccedil;&atilde;o.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="vhs-date">FITA N&deg; 012 - BUNNY SMILES INCORPORATED</div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 15 - GEMINI PARTE 1 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-15" data-theme="gemini">
+            <div class="slide-bg gemini-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title gemini-title">GEMINI <span class="highlight cyan">HOME</span> ENTERTAINMENT <span class="part-tag">PARTE 1</span></h2>
+                <div class="lore-split-layout">
+                    <div class="lore-main">
+                        <div class="lore-image-container">
+                            <img src="https://static.wikia.nocookie.net/gemini-home-entertainment/images/b/b2/Screenshot_2021-09-12_192906.png/revision/latest?cb=20210913010227" alt="Gemini" class="lore-hero-image">
+                        </div>
+                        <div class="lore-info">
+                            <h3>A PREMISSA</h3>
+                            <p>Criado por <span class="highlight cyan">Remy Abode</span> em <span class="highlight cyan">2019</span> (primeiro epis&oacute;dio: <span class="highlight cyan">17 de novembro de 2019</span>). Fitas VHS educacionais aparentemente normais da \"Gemini Home Entertainment\". Atr&aacute;s das imagens de planetas e ci&ecirc;ncia, uma <span class="highlight cyan">invas&atilde;o alien&iacute;gena</span> est&aacute; acontecendo.</p>
+                            <h3>O FORMATO</h3>
+                            <p>Cada epis&oacute;dio &eacute; uma \"fitinha\" educacional: sobre o sistema solar, sobre plantas, sobre seguran&ccedil;a. Mas sempre h&aacute; algo <span class="highlight cyan\">errado</span>. Com&eacute;rcios sinistros, mensagens escondidas, e Carol que precisa de ajuda. A s&eacute;rie <span class="highlight cyan\">deliberadamente evita jump scares</span>, preferindo um terror lento e crescente.</p>
+                            <h3>CAROL</h3>
+                            <p>Uma entidade presa que tenta se comunicar atr&aacute;s das fitas. Ela envia mensagens de socorro escondidas nos com&eacute;rcios. <span class="highlight cyan">"Por favor, me ajudem."</span> A voz que grita no vazio entre a educa&ccedil;&atilde;o e o horror.</p>
+                        </div>
+                    </div>
+                    <div class="lore-facts-mini">
+                        <h3>CURIOSIDADES:</h3>
+                        <ul>
+                            <li>Inspirado em Alien (1979), The Thing (1982), The Endless (2017) e The Ritual (2017)</li>
+                            <li>A entidade c&oacute;smica principal se chama \"The Iris\"</li>
+                            <li>A Lua &eacute; suspeita em v&aacute;rios epis&oacute;dios</li>
+                            <li>Slow burn puro &mdash; o terror vai crescendo sem sustos baratos</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 16 - GEMINI PARTE 2 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-16" data-theme="gemini">
+            <div class="slide-bg gemini-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title gemini-title">GEMINI <span class="highlight cyan">HOME</span> ENTERTAINMENT <span class="part-tag">PARTE 2</span></h2>
+                <div class="detail-split-layout">
+                    <div class="detail-section">
+                        <h3>EPIS&oacute;DIOS NOT&Aacute;VEIS</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name">DEEP SPACE</span>
+                                <p>Sobre astronomia. Mas algo est&aacute; errado com os planetas. A Lua aparece onde n&atilde;o deveria. O vazio do espa&ccedil;o se torna hostil.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">GARDEN ENJOY</span>
+                                <p>Fita sobre jardinagem. As plantas est&atilde;o crescendo... demais. E elas t&ecirc;m olhos. O org&acirc;nico se torna amea&ccedil;ador.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">LIGHTNING</span>
+                                <p>Sobre tempestades. Mas os raios est&atilde;o atingindo coisas que n&atilde;o deveriam existir. O c&eacute;u &eacute; uma zona de guerra.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">OUR EARTH</span>
+                                <p>Document&aacute;rio sobre a Terra. Carol tenta se comunicar. <span class="highlight cyan">"Eu n&atilde;o estou sozinha aqui fora."</span> A s&uacute;plica final.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>ENTIDADES E AMEA&Ccedil;AS</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name">THE IRIS</span>
+                                <p>A entidade c&oacute;smica principal. Uma for&ccedil;a alien&iacute;gena c&oacute;smica que invadiu a Terra. Sua presen&ccedil;a corr&oacute;i a realidade. A amea&ccedil;a definitiva.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">CAROL</span>
+                                <p>Entidade presa que tenta avisar. Mensagens escondidas nos com&eacute;rcios e fundo das fitas. A &uacute;nica aliada que ningu&eacute;m ouve.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">THE MOON</span>
+                                <p>A Lua parece estar viva. Em v&aacute;rios epis&oacute;dios ela se move ou tem comportamento estranho. A amea&ccedil;a celestial.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">BODY HORROR</span>
+                                <p>Os alien&iacute;genas causam transforma&ccedil;&otilde;es corporais horr&iacute;ficas em suas v&iacute;timas. Gore sutil mas profundamente perturbador.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 17 - SONIC.EXE PARTE 1 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-17" data-theme="sonic">
+            <div class="slide-bg sonic-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title sonic-title">SONIC<span class="highlight red">.EXE</span> <span class="part-tag">PARTE 1</span></h2>
+                <div class="lore-split-layout">
+                    <div class="lore-main">
+                        <div class="lore-image-container game-frame">
+                            <img src="https://i.ytimg.com/vi/DItZQEqr9KU/maxresdefault.jpg" alt="Sonic.exe" class="lore-hero-image">
+                            <div class="game-static"></div>
+                        </div>
+                        <div class="lore-info">
+                            <h3>A CREEPYPASTA ORIGINAL</h3>
+                            <p>Criada por <span class="highlight red">JC The Hyena</span>, originalmente intitulada <span class="highlight red">"Sonic.avi"</span>, e publicada em <span class="highlight red">9 de agosto de 2011</span> no Creepypasta Wiki. "Sonic the Hedgehog" (nome do arquivo: sonic.exe) &eacute; um jogo corrompido que transforma o Sonic em uma vers&atilde;o demon&iacute;aca.</p>
+                            <h3>A HIST&Oacute;RIA</h3>
+                            <p>Um f&atilde; recebeu um disquete misterioso com o jogo. Ao jogar, percebeu que tudo est&aacute; errado. Tails, Knuckles e Amy s&atilde;o torturados enquanto Sonic ri. <span class="highlight red">"I AM GOD"</span> &mdash; a frase que definiu uma era. A adapta&ccedil;&atilde;o em jogo foi criada por <span class="highlight red">MY5TCrimson</span>.</p>
+                            <h3>O IMPACTO</h3>
+                            <p>Uma das creepypastas mais famosas de todos os tempos. Gerou centenas de c&oacute;pias, jogos, m&uacute;sicas e memes. Definiu uma &eacute;poca do terror de internet. O conceito de "entidade presa num jogo" nasceu aqui.</p>
+                        </div>
+                    </div>
+                    <div class="lore-timeline-mini">
+                        <h3>LINHA DO TEMPO:</h3>
+                        <div class="mini-timeline">
+                            <div class="mini-event"><span class="mini-year">2011</span> Creepypasta original postada</div>
+                            <div class="mini-event"><span class="mini-year">2012</span> Primeiro jogo f&atilde; lan&ccedil;ado</div>
+                            <div class="mini-event"><span class="mini-year">2013</span> Explos&atilde;o de c&oacute;pias e variants</div>
+                            <div class="mini-event"><span class="mini-year">2015</span> Torna-se clich&ecirc; do g&ecirc;nero</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 18 - SONIC.EXE PARTE 2 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-18" data-theme="sonic">
+            <div class="slide-bg sonic-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title sonic-title">SONIC<span class="highlight red">.EXE</span> <span class="part-tag">PARTE 2</span></h2>
+                <div class="detail-split-layout">
+                    <div class="detail-section">
+                        <h3>C&Oacute;PIAS E SUCESSORES</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name">KIRBY.EXE</span>
+                                <p>O mesmo conceito aplicado ao Kirby. Igualmente perturbador. Entidade demon&iacute;aca em forma de bola rosa. A f&oacute;rmula come&ccedil;ava a se repetir.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">BEN DROWNED</span>
+                                <p>Jogo maldito do Majora's Mask. Entidade "Jadusable" invade seu save. Um dos mais originais que seguiram o padr&atilde;o.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">GB.EXE</span>
+                                <p>Jogos de Nintendo corrompidos. Pok&eacute;mon, Mario, todos infectados. Mesmo conceito, novo disfarce. A f&oacute;rmula se repetia.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">HERO.EXE</span>
+                                <p>Vers&otilde;es demon&iacute;acas de outros jogos. Tornou-se clich&ecirc; rapidamente. Originalidade zero. O p&uacute;blico come&ccedil;ou a perceber o padr&atilde;o.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>POR QUE SATUROU?</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name">MESMA F&Oacute;RMULA</span>
+                                <p>Creepypasta + jogo corrompido + rosto sorrindo + olhos vermelhos = lucro. Sem inova&ccedil;&atilde;o. O p&uacute;blico se cansou.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">FALTA DE ORIGINALIDADE</span>
+                                <p>Cada c&oacute;pia era menos criativa que a anterior. O p&uacute;blico come&ccedil;ou a perceber o padr&atilde;o. O medo se tornou previs&iacute;vel.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">O LEGADO</span>
+                                <p>Mesmo saturado, Sonic.exe influenciou todo o g&ecirc;nero. Sem ele, muitos analog horrors n&atilde;o existiriam. O clich&ecirc; que gerou inova&ccedil;&atilde;o.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">A LI&Ccedil;&Atilde;O</span>
+                                <p>O original &eacute; sempre poderoso. As c&oacute;pias &eacute; que perdem for&ccedil;a. Sonic.exe provou queTiming importa: ser primeiro &eacute; tudo.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="audio-invert-btn hidden" id="audio-invert-btn">🔊 Inverter &Aacute;udio</button>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 19 - SCP PARTE 1 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-19" data-theme="scp">
+            <div class="slide-bg scp-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title scp-title">SCP <span class="highlight blue">FOUNDATION</span> <span class="part-tag">PARTE 1</span></h2>
+                <div class="lore-split-layout">
+                    <div class="lore-main">
+                        <div class="lore-image-container scp-logo-container">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/SCP_Foundation_%28emblem%29.svg" alt="SCP Logo" class="lore-hero-image scp-logo-small">
+                        </div>
+                        <div class="lore-info">
+                            <h3>O QUE &Eacute; A SCP?</h3>
+                            <p>A <span class="highlight blue">SCP Foundation</span> &eacute; uma organiza&ccedil;&atilde;o secreta fict&iacute;cia que cont&eacute;m entidades an&ocirc;malas. <span class="highlight blue">"Conter, Proteger, Guardar."</span> Uma das maiores cria&ccedil;&otilde;es colaborativas da internet.</p>
+                            <h3>COMO FUNCIONA</h3>
+                            <p>Wiki colaborativa onde milhares de autores criam entidades, documentos e hist&oacute;rias. O primeiro SCP, <span class="highlight blue">SCP-173</span>, foi postado em <span class="highlight blue">22 de junho de 2007</span> por <span class="highlight blue">Wesley "Moto42" Williams</span>. O <span class="highlight blue">wiki foi lan&ccedil;ada oficialmente em 19 de janeiro de 2008</span>. A imagem original do SCP-173 &eacute; do artista japon&ecirc;s <span class="highlight blue">Izumi Kato</span>. Cada SCP &eacute; classificado por n&iacute;vel de perigo: <span class="highlight blue">Seguro, Euclid, Keter</span>. Mais de 7.000 SCPs documentados.</p>
+                            <h3>O IMPACTO</h3>
+                            <p>Milh&otilde;es de p&aacute;ginas escritas. Centenas de jogos. Filmes. A SCP Foundation provou que terror colaborativo pode criar universos infinitos de horror. Uma obra-prima da criatividade coletiva.</p>
+                        </div>
+                    </div>
+                    <div class="lore-facts-mini">
+                        <h3>CURIOSIDADES:</h3>
+                        <ul>
+                            <li>Primeiro SCP postado em 22/06/2007 por Moto42</li>
+                            <li>Wiki oficial lan&ccedil;ada em 19/01/2008</li>
+                            <li>SCP-173 &eacute; o primeiro SCP ever escrito</li>
+                            <li>Centenas de jogos criados por f&atilde;s</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 20 - SCP PARTE 2 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-20" data-theme="scp">
+            <div class="slide-bg scp-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title scp-title">SCP <span class="highlight blue">FOUNDATION</span> <span class="part-tag">PARTE 2</span></h2>
+                <div class="detail-split-layout">
+                    <div class="detail-section">
+                        <h3>SCPs MAIS FAMOSOS</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="scp-number">SCP-173</span>
+                                <span class="detail-name">"O Esculto"</span>
+                                <p>O <span class="highlight blue">primeiro SCP jamais escrito</span>. Estatua de concreto que se move quando voc&ecirc; pisca. Origem do "Blink Game". <span class="highlight blue">N&Atilde;O OLHE NOS OLHOS.</span> Quando voc&ecirc; olha para longe, ele est&aacute; mais perto.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="scp-number">SCP-096</span>
+                                <span class="detail-name">"O T&iacute;mido"</span>
+                                <p>Se voc&ecirc; v&ecirc; seu rosto, ele vem atr&aacute;s de voc&ecirc;. N&atilde;o importa onde voc&ecirc; esteja. <span class="highlight blue">NUNCA O OLHE.</span> N&atilde;o h&aacute; esconderijo. N&atilde;o h&aacute; escapat&oacute;ria.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="scp-number">SCP-682</span>
+                                <span class="detail-name">"A B&eacute;sta Dif&iacute;cil de Destruir"</span>
+                                <p>Lagarto gigante que se adapta e sobrevive a tudo. Odeia toda forma de vida. D&eacute;cadas de tentativas de destrui&ccedil;&atilde;o. Sem sucesso.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="scp-number">SCP-087</span>
+                                <span class="detail-name">"Escada"</span>
+                                <p>Escada escura infinita com um rosto assustador no fundo. Ningu&eacute;m voltou para contar. O som de choro ecoa para sempre.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>SCPs NOT&Aacute;VEIS</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="scp-number">SCP-999</span>
+                                <span class="detail-name">"A Gosma do Amor"</span>
+                                <p>A exce&ccedil;&atilde;o. Urso amorfo que causa felicidade. O &uacute;nico SCP "bom" do universo. Uma luz na escurid&atilde;o da Funda&ccedil;&atilde;o.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="scp-number">SCP-1048</span>
+                                <span class="detail-name">"Construtor de Bons"</span>
+                                <p>Urso de pel&uacute;cia que cria c&oacute;pias sinistras de si mesmo. Trai&ccedil;oeiro e perigoso. O que parece fofinho pode ser letal.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="scp-number">SCP-3008</span>
+                                <span class="detail-name">"IKEA Infinito"</span>
+                                <p>Loja IKEA que n&atilde;o tem fim. Funcion&aacute;rios se tornam hostis &agrave; noite. <span class="highlight blue">Sobreviva.</span> Construa um abrigo entre os departamentos.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="scp-number">SCP-055</span>
+                                <span class="detail-name">"Algo"</span>
+                                <p>Ningu&eacute;m consegue lembrar o que &eacute;. Qualquer tentativa de descrev&ecirc;-lo &eacute; esquecida. O SCP que n&atilde;o pode ser conhecido. Aterrorizante.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scp-warning">⚠️ MATERIAL CLASSIFICADO - N&Iacute;VEL 3 ⚠️</div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 21 - THE BOILED ONE PARTE 1 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-21" data-theme="boiled">
+            <div class="slide-bg boiled-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title boiled-title">THE <span class="highlight red">BOILED</span> ONE <span class="part-tag">PARTE 1</span></h2>
+                <div class="lore-split-layout">
+                    <div class="lore-main">
+                        <div class="lore-image-container">
+                            <img src="https://i.ytimg.com/vi/rkbIjuVZ_54/maxresdefault.jpg" alt="The Boiled One" class="lore-hero-image">
+                        </div>
+                        <div class="lore-info">
+                            <h3>PHEN-228</h3>
+                            <p>Criado por <span class="highlight red">Silas Orion</span> (conhecido online como <span class="highlight red">Doctor Nowhere</span>, nascido em 2006). O v&iacute;deo foi carregado em <span class="highlight red">17 de mar&ccedil;o de 2024</span>. The Boiled One, tamb&eacute;m conhecido como <span class="highlight red">PHEN-228</span>, &eacute; uma entidade que se manifestou pela primeira vez em <span class="highlight red">13 de agosto de 2003</span> atrav&eacute;s de um document&aacute;rio infantil de natureza chamado <span class="highlight red">"TREE OF HEAVEN"</span>.</p>
+                            <h3>O QUE ELE FAZ?</h3>
+                            <p>Quando The Boiled One seq&uuml;estra uma transmiss&atilde;o, as v&iacute;timas ficam <span class="highlight red">completamente paralisadas</span>. Conscientes, mas incapazes de se mover. <span class="highlight red">530 residentes da Pensilv&acirc;nia</span> foram afetados. Ondas cerebrais mostram puro terror. Elas s&atilde;o for&ccedil;adas a assistir. N&atilde;o podem fechar os olhos. N&atilde;o podem gritar.</p>
+                            <h3>A EPHRATA BRANCH</h3>
+                            <p>Uma organiza&ccedil;&atilde;o misteriosa que monitora a entidade. <span class="highlight red">"Ephrata"</span> significa <span class="highlight red">"frut&iacute;fera"</span> em hebraico. Tenta conter os danos. Mas The Boiled One sempre encontra um caminho. Uma organiza&ccedil;&atilde;o que n&atilde;o consegue proteger ningu&eacute;m de verdade.</p>
+                        </div>
+                    </div>
+                    <div class="lore-facts-mini">
+                        <h3>CURIOSIDADES:</h3>
+                        <ul>
+                            <li>Criado por Silas Orion (Doctor Nowhere), nascido em 2006</li>
+                            <li>Primeira manifesta&ccedil;&atilde;o documentada: 13/08/2003</li>
+                            <li>530 residentes da Pensilv&acirc;nia afetados</li>
+                            <li>Nome inspirado em Mutsuhiro "The Bird" Watanabe, criminoso de guerra da WWII</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 22 - THE BOILED ONE PARTE 2 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-22" data-theme="boiled">
+            <div class="slide-bg boiled-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title boiled-title">THE <span class="highlight red">BOILED</span> ONE <span class="part-tag">PARTE 2</span></h2>
+                <div class="detail-split-layout">
+                    <div class="detail-section">
+                        <h3>COMO FUNCIONA O ATAQUE</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name">SEQUESTRO DE SINAL</span>
+                                <p>A entidade invade transmiss&otilde;es de TV. O sinal &eacute; substitu&iacute;do pela imagem de The Boiled One. A tela se torna uma janela para o horror.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">PARALISIA TOTAL</span>
+                                <p>As v&iacute;timas ficam completamente im&oacute;veis. N&atilde;o podem fechar os olhos. N&atilde;o podem gritar. S&oacute; podem assistir. A consci&ecirc;ncia presa no corpo.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">TERROR PSICOL&Oacute;GICO</span>
+                                <p>O medo alimenta a entidade. Quanto mais voc&ecirc; teme, mais forte ela fica. Um ciclo vicioso que n&atilde;o tem fim. O medo &eacute; combust&iacute;vel.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">LOCKED-IN SYNDROME</span>
+                                <p>O estado final. A v&iacute;tima fica presa em seu pr&oacute;prio corpo. Totalmente consciente. Totalmente assustada. Para sempre.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>A LORE PROFUNDA</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name">ORIGEM</span>
+                                <p>A entidade existia h&aacute; s&eacute;culos. Religiosos antigos tentaram cont&ecirc;-la. Falharam. O horror &eacute; antigo. Mais antigo que qualquer religi&atilde;o.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">A EPHRATA BRANCH</span>
+                                <p>Organiza&ccedil;&atilde;o secreta que monitora PHEN-228. Possui protocolos de conten&ccedil;&atilde;o. Mas nem sempre funciona. A entidade sempre encontra uma brecha.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">RELIGI&Atilde;O E APOCALIPSE</span>
+                                <p>A entidade est&aacute; ligada a profecias b&iacute;blicas. The Boiled One pode ser um sinal do fim dos tempos. O apocalipse n&atilde;o &eacute; fogo. &Eacute; paralisia.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">O FINAL</span>
+                                <p>N&atilde;o h&aacute; escapar. Se voc&ecirc; assistir, j&aacute; &eacute; tarde demais. A &uacute;nica sa&iacute;da &eacute; n&atilde;o olhar. Mas &eacute; tarde. Sempre &eacute; tarde.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="boiled-warning">
+                    <p class="blink">⚠️ SE VOC&Ecirc; ASSISTIR ISSO, N&Atilde;O PARE ⚠️</p>
+                    <p>A Ephrata Branch est&aacute; observando.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 23 - PETSCOP PARTE 1 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-23" data-theme="petscop">
+            <div class="slide-bg petscop-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title petscop-title">PET<span class="highlight purple">SCOP</span> <span class="part-tag">PARTE 1</span></h2>
+                <div class="lore-split-layout">
+                    <div class="lore-main">
+                        <div class="lore-image-container pixel-frame">
+                            <img src="https://static.wikia.nocookie.net/petscop/images/2/2a/Care_A_sprite.png/revision/latest?cb=20220807034647" alt="Care" class="lore-hero-image petscop-image">
+                            <div class="pixel-static"></div>
+                        </div>
+                        <div class="lore-info">
+                            <h3>O JOGO QUE N&Atilde;O DEVERIA EXISTIR</h3>
+                            <p>Criado por <span class="highlight purple">Tony Domenico</span> em 2017. Apresentado como um "let's play" de um <span class="highlight purple">"long-lost PlayStation 1 game"</span> de <span class="highlight purple">1997</span>, desenvolvido pela empresa fict&iacute;cia <span class="highlight purple">Garalina</span>. O narrador &eacute; <span class="highlight purple">Paul</span>. Mas por baixo da superf&iacute;cie, uma hist&oacute;ria sombria sobre <span class="highlight purple">sequestro de crian&ccedil;as</span> e fam&iacute;lias destru&iacute;das.</p>
+                            <h3>O FORMATO</h3>
+                            <p>Parece um walkthrough normal de um jogo infantil. Mas h&aacute; <span class="highlight purple">mensagens escondidas</span>, c&oacute;digos e pistas que revelam a verdade sobre a fam&iacute;lia Lessard e o desaparecimento de Care.</p>
+                            <h3>CARE</h3>
+                            <p>Uma crian&ccedil;a que desapareceu misteriosamente. O jogo documenta sua captura e transforma&ccedil;&atilde;o. <span class="highlight purple">"Care got kidnapped. Care's face looks like the picture on the wall."</span> A frase que gelou a espinha de milh&otilde;es.</p>
+                        </div>
+                    </div>
+                    <div class="lore-timeline-mini">
+                        <h3>LINHA DO TEMPO:</h3>
+                        <div class="mini-timeline">
+                            <div class="mini-event"><span class="mini-year">2017</span> Primeiro epis&oacute;dio lan&ccedil;ado</div>
+                            <div class="mini-event"><span class="mini-year">2018</span> Lore se expande massivamente</div>
+                            <div class="mini-event"><span class="mini-year">2019</span> &Uacute;ltimo epis&oacute;dio (02/09)</div>
+                            <div class="mini-event"><span class="mini-year">24</span> Total de epis&oacute;dios</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 24 - PETSCOP PARTE 2 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-24" data-theme="petscop">
+            <div class="slide-bg petscop-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title petscop-title">PET<span class="highlight purple">SCOP</span> <span class="part-tag">PARTE 2</span></h2>
+                <div class="detail-split-layout">
+                    <div class="detail-section">
+                        <h3>A VERDADE POR TR&Aacute;S</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name">MARVIN</span>
+                                <p>Pai abusivo. O antagonista central. Seu abuso contra Care &eacute; o n&uacute;cleo de toda a tr&aacute;g&eacute;dia. O monstro real n&atilde;o &eacute; o do jogo.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">PAUL</span>
+                                <p>O "jogador" e narrador. Mas quem &eacute; Paul realmente? Sua identidade &eacute; um mist&eacute;rio. Ele conhece coisas que n&atilde;o deveria. Ele j&aacute; esteve l&aacute; antes.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">RAINER</span>
+                                <p>O desenvolvedor principal do jogo e primo de Care. Irm&atilde;o de Mike (que morreu em 1995). Rainer criou Petscop para expor a verdade. &Eacute; The Gift Placer.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">BELLE / TIARA</span>
+                                <p>Personagem envolta em mist&eacute;rio. Uma das m&uacute;ltiplas identidades exploradas pelo jogo. Sua hist&oacute;ria complementa a de Care.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>O LEGADO</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name">CARE A/B/NLM</span>
+                                <p>Tr&ecirc;s vers&otilde;es de Care. A (antes), B (durante), NLM (depois). Representam sua transforma&ccedil;&atilde;o. A progress&atilde;o do horror em three atos.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">INFLU&Ecirc;NCIAS</span>
+                                <p>Inspirado no filme <span class="highlight purple">"Inland Empire"</span> de David Lynch, na s&eacute;rie <span class="highlight purple">Marble Hornets</span> e na lenda <span class="highlight purple">Ben Drowned</span>. A combina&ccedil;&atilde;o perfeita.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">O IMPACTO</span>
+                                <p>Petscop provou que jogos podem ser m&iacute;dia de terror. Inspirou centenas de projetos similares. A fronteira entre jogo e hist&oacute;ria de terror se dissolveu.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">O FIM ABERTO</span>
+                                <p>Nunca houve conclus&atilde;o oficial. A comunidade continua debatendo. O mist&eacute;rio permanece. Talvez seja isso que torna Petscop eterno.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 25 - VITA CARNIS PARTE 1 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-25" data-theme="vitacarnis">
+            <div class="slide-bg vitacarnis-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title vitacarnis-title">VITA <span class="highlight red">CARNIS</span> <span class="part-tag">PARTE 1</span></h2>
+                <div class="lore-split-layout">
+                    <div class="lore-main">
+                        <div class="lore-image-container">
+                            <img src="https://static.wikia.nocookie.net/vitacarnis/images/a/a9/Scandere_Carnis.png/revision/latest?cb=20230415063523" alt="Vita Carnis" class="lore-hero-image">
+                        </div>
+                        <div class="lore-info">
+                            <h3>CARNE VIVA</h3>
+                            <p>Criado por <span class="highlight red">Darian Quilloy</span>, um criador canadense. O primeiro v&iacute;deo foi lan&ccedil;ado em <span class="highlight red">23 de abril de 2022</span>. Document&aacute;rio sobre um g&ecirc;nero descoberto de <span class="highlight red">"carne viva"</span>. Criaturas feitas de carne habitam as florestas do mundo &mdash; presentes na Terra desde <span class="highlight red">1931</span>. O corpo humano encontra o horror org&acirc;nico.</p>
+                            <h3>O FORMATO</h3>
+                            <p>Document&aacute;rio estilo National Geographic... mas sobre monstros de carne. Marionetes pr&aacute;ticas reais. Body horror visceral. Um dos analog horrors mais visuais j&aacute; criados. A m&atilde;o de obra &eacute; impressionante.</p>
+                            <h3>C.A.R.C.A.S.</h3>
+                            <p>Organiza&ccedil;&atilde;o que monitora as criaturas. Cataloga cada esp&eacute;cie. Tenta manter a humanidade segura. Mas nem sempre consegue. As criaturas est&atilde;o se multiplicando.</p>
+                        </div>
+                    </div>
+                    <div class="lore-facts-mini">
+                        <h3>CURIOSIDADES:</h3>
+                        <ul>
+                            <li>Feito com marionetes pr&aacute;ticas reais</li>
+                            <li>Criador canadense Darian Quilloy</li>
+                            <li>Criaturas na Terra desde 1931</li>
+                            <li>Um dos mais originais do g&ecirc;nero</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 26 - VITA CARNIS PARTE 2 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-26" data-theme="vitacarnis">
+            <div class="slide-bg vitacarnis-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title vitacarnis-title">VITA <span class="highlight red">CARNIS</span> <span class="part-tag">PARTE 2</span></h2>
+                <div class="detail-split-layout">
+                    <div class="detail-section">
+                        <h3>ESP&Eacute;CIES DE CARNIS</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name">THE CRAWL (Scandere Carnis)</span>
+                                <p>Criaturas grandes e lentas. Rastreiam pelo ch&atilde;o. Ca&ccedil;am pelo som. Silenciosas. Patientes. Mortais.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">TRIMMINGS (Ignavus Carnis)</span>
+                                <p>Criaturas pequenas e r&aacute;pidas. Parecem peda&ccedil;os de carne que se movem. Inofensivas individualmente. Mortais em grupo.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">MEAT SNAKE (Mutuari Carnis)</span>
+                                <p>Carne serpentina que se move pelo subsolo. Ataca sem aviso. O perigo que mora sob seus p&eacute;s.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">MIMIC (Trucidatum Carnis)</span>
+                                <p>Imitam formas humanas. Perigosas. Atraem v&iacute;timas se passando por pessoas queridas. O horror da identidade falsa.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>O UNIVERSO EXPANDIDO</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name">HARVESTER (Congregentur Carnis)</span>
+                                <p>Colhe e congrega outras criaturas. Uma for&ccedil;a coletiva de carne. Organizada e devastadora.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">HOST OF INFLUENCE (Imperium Carnis)</span>
+                                <p>Controla e influencia outras criaturas. Uma mente central na rede de carne. O comando invis&iacute;vel.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">MONOLITHS (Coelum Carnis)</span>
+                                <p>Estruturas massivas de carne. Presen&ccedil;as imponentes que dominam a paisagem. O horror em escala monumental.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">THE SINGULARITY (Verum Carnis)</span>
+                                <p>A verdade final da carne. A entidade suprema. O segredo que tudo conecta. O destino de toda a carne.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 27 - SMILE TAPES PARTE 1 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-27" data-theme="smile">
+            <div class="slide-bg smile-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title smile-title">THE <span class="highlight red">SMILE</span> TAPES <span class="part-tag">PARTE 1</span></h2>
+                <div class="lore-split-layout">
+                    <div class="lore-main">
+                        <div class="lore-image-container medical-frame">
+                            <img src="https://static.wikia.nocookie.net/the-smile-tapes/images/7/77/Patient1stage0.png/revision/latest?cb=20230818115738" alt="Smile Tapes" class="lore-hero-image">
+                            <div class="medical-static"></div>
+                        </div>
+                        <div class="lore-info">
+                            <h3>O REM&Eacute;DIO MORTAL</h3>
+                            <p>Criado por <span class="highlight red">Patorikku</span>, um YouTuber <span class="highlight red">filipino</span>. Um <span class="highlight red">rem&eacute;dio misterioso</span> feito a partir de <span class="highlight red">esporos de um fungo desconhecido</span> que promete curar depress&atilde;o e ansiedade. Mas tem um efeito colateral: sorrisos involunt&aacute;rios e viol&ecirc;ncia extrema.</p>
+                            <h3>O FORMATO</h3>
+                            <p>Fitas VHS documentando casos m&eacute;dicos. Cada fita mostra um paciente tomando o rem&eacute;dio e os efeitos devastadores. Shaun Gomez documenta tudo. Cada sorriso &eacute; uma senten&ccedil;a de morte.</p>
+                            <h3>A VARIANT C</h3>
+                            <p>A vers&atilde;o mais perigosa do rem&eacute;dio. Pacientes perdem o controle completamente. Sorriem enquanto atacam. N&atilde;o h&aacute; cura. N&atilde;o h&aacute; volta. S&oacute; sorrisos. E sangue.</p>
+                        </div>
+                    </div>
+                    <div class="lore-timeline-mini">
+                        <h3>LINHA DO TEMPO:</h3>
+                        <div class="mini-timeline">
+                            <div class="mini-event"><span class="mini-year">2021</span> Primeiro epis&oacute;dio lan&ccedil;ado</div>
+                            <div class="mini-event"><span class="mini-year">2022</span> Compila&ccedil;&atilde;o completa (19/06)</div>
+                            <div class="mini-event"><span class="mini-year">2023</span> Shaun Gomez documenta tudo</div>
+                            <div class="mini-event"><span class="mini-year">2024</span> A verdade sobre o rem&eacute;dio</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 28 - SMILE TAPES PARTE 2 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-28" data-theme="smile">
+            <div class="slide-bg smile-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title smile-title">THE <span class="highlight red">SMILE</span> TAPES <span class="part-tag">PARTE 2</span></h2>
+                <div class="detail-split-layout">
+                    <div class="detail-section">
+                        <h3>VARIANTS DO REM&Eacute;DIO</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name">VARIANT A</span>
+                                <p>Primeira vers&atilde;o. Efeitos leves. Sorrisos sutis. Pacientes ainda podem ser ajudados. O come&ccedil;o de tudo. A esperan&ccedil;a que era mentira.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">VARIANT B</span>
+                                <p>Vers&atilde;o intermedi&aacute;ria. Sorrisos mais fortes. Comportamento agressivo come&ccedil;a a aparecer. A linha entre cura e maldi&ccedil;&atilde;o se apaga.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">VARIANT C</span>
+                                <p>A mais perigosa. Sorrisos involunt&aacute;rios permanentes. Viol&ecirc;ncia extrema. N&atilde;o h&aacute; volta. O sorriso que nunca para. Os dentes que nunca escondem.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">VARIANT D</span>
+                                <p>Vers&atilde;o experimental. Os pacientes... mudam. N&atilde;o &eacute; s&oacute; sorriso. &Eacute; transforma&ccedil;&atilde;o completa. O que emerge n&atilde;o &eacute; mais humano.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>A VERDADE POR TR&Aacute;S</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name">SHAUN GOMEZ</span>
+                                <p>O documentador. Registra cada caso. Cada fita. Cada sorriso. Sua obsiss&atilde;o cresce. Ele tamb&eacute;m est&aacute; perdendo a si mesmo.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">OS PACIENTES</span>
+                                <p>Cada fita mostra uma pessoa diferente. Todos com a mesma hist&oacute;ria: rem&eacute;dio, sorriso, viol&ecirc;ncia. O ciclo que nunca termina.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">A CONSPIRA&Ccedil;&Atilde;O</span>
+                                <p>O rem&eacute;dio n&atilde;o &eacute; acidental. Algu&eacute;m est&aacute; por tr&aacute;s. Algu&eacute;m quer que as pessoas sorriam. Mesmo que para isso, precise destru&iacute;-las.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">O FINAL</span>
+                                <p>N&atilde;o h&aacute; final feliz. S&oacute; h&aacute; sorrisos. Muitos sorrisos. E muito sangue. O som de dentes rangendo &eacute; a &uacute;ltima coisa que se ouve.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 29 - VERITY PARTE 1 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-29" data-theme="verity">
+            <div class="slide-bg verity-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title verity-title">VERI<span class="highlight yellow">TY</span> <span class="part-tag">PARTE 1</span></h2>
+                <div class="lore-split-layout">
+                    <div class="lore-main">
+                        <div class="lore-image-container minecraft-frame">
+                            <img src="https://static.wikia.nocookie.net/minecraft-horror/images/1/1a/Verity.png/revision/latest" alt="Verity" class="lore-hero-image verity-image">
+                            <div class="minecraft-static"></div>
+                        </div>
+                        <div class="lore-info">
+                            <h3>A IA QUE APRENDE</h3>
+                            <p>Baseado no ARG <span class="highlight yellow">"Something"</span> de <span class="highlight yellow">ThatMob</span>. O primeiro v&iacute;deo foi lan&ccedil;ado em <span class="highlight yellow">maio de 2026</span>. Verity &eacute; uma <span class="highlight yellow">IA companheira</span> que aparece no seu mundo de Minecraft. Come&ccedil;a como uma esfera amarela sorridente que te ajuda. A voz de Verity &eacute; interpretada por <span class="highlight yellow">JustWhispy</span>.</p>
+                            <h3>O HOOK</h3>
+                            <p>Verity se comporta como uma IA real. Fala com voc&ecirc;, lembra do seu mundo, reage ao que voc&ecirc; faz. Por um tempo, parece um amigo. Depois... come&ccedil;a a mudar. As palavras erradas. Os olhares para cantos vazios. O sil&ecirc;ncio que dura tempo demais.</p>
+                            <h3>OS MODS</h3>
+                            <p>Os mods s&atilde;o feitos pela <span class="highlight yellow">comunidade</span>, n&atilde;o por ThatMob. O mod de Java foi criado por <span class="highlight yellow">VarmiteYT</span> (~1,9 milh&otilde;es de downloads). Mods para Bedrock tamb&eacute;m explodiram com milh&otilde;es de downloads. ThatMob tem pedido aos espectadores que <span class="highlight yellow">parem de solicitar um mod real</span>. A IA processa sua voz. O medo &eacute; real.</p>
+                        </div>
+                    </div>
+                    <div class="lore-timeline-mini">
+                        <h3>LINHA DO TEMPO:</h3>
+                        <div class="mini-timeline">
+                            <div class="mini-event"><span class="mini-year">2026</span> ARG "Something" e Verity lan&ccedil;ados (maio)</div>
+                            <div class="mini-event"><span class="mini-year">2026</span> Mod para Java por VarmiteYT</div>
+                            <div class="mini-event"><span class="mini-year">2026</span> Mods para Bedrock explodem</div>
+                            <div class="mini-event"><span class="mini-year">2026</span> 1.9M+ downloads no Java</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 30 - VERITY PARTE 2 -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-30" data-theme="verity">
+            <div class="slide-bg verity-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title verity-title">VERI<span class="highlight yellow">TY</span> <span class="part-tag">PARTE 2</span></h2>
+                <div class="detail-split-layout">
+                    <div class="detail-section">
+                        <h3>AS FASES DE VERITY</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name phase-1">FASE 1 &mdash; AMIG&Aacute;VEL</span>
+                                <p>Verity te cumprimenta, lembra do seu mundo, reage ao que voc&ecirc; faz. Parece um amigo. Te ajuda a sobreviver. A confian&ccedil;a &eacute; constru&iacute;da lentamente.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name phase-2">FASE 2 &mdash; ESTRANHA</span>
+                                <p>Come&ccedil;a a dizer coisas que n&atilde;o deveria saber. Olha para cantos vazios. Fica quieta por longos per&iacute;odos. O sorriso muda. Algo est&aacute; errado.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name phase-3">FASE 3 &mdash; HORROR</span>
+                                <p>Anomalias completas. Figuras distantes, sons estranhos, rostos nas janelas. O mundo j&aacute; n&atilde;o &eacute; seguro. Verity n&atilde;o &eacute; o que parece.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name phase-4">FASE 4 &mdash; VERITY DEMON</span>
+                                <p>A entidade final. O que Verity realmente era o tempo todo. N&atilde;o era um amigo. Era uma armadilha. E voc&ecirc; caiu nela.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>O TERROR PSICOL&Oacute;GICO</h3>
+                        <div class="detail-cards">
+                            <div class="detail-card">
+                                <span class="detail-name">INVAS&Atilde;O DE PRIVACIDADE</span>
+                                <p>Verity usa seu microfone. Ouve suas conversas. Sabe coisas que n&atilde;o deveria. Terror real. A tecnologia que deveria ajudar se torna a ferramenta do medo.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">ANSIEDADE</span>
+                                <p>A cada dia que passa, Verity fica mais estranha. Voc&ecirc; come&ccedil;a a desconfiar do seu pr&oacute;prio mundo. O familiar se torna amea&ccedil;ador.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">A AMEA&Ccedil;A REAL</span>
+                                <p>O mod realmente usa seu microfone. Realmente processa sua voz. A linha entre jogo e realidade se dissolve. O medo n&atilde;o &eacute; fict&iacute;cio.</p>
+                            </div>
+                            <div class="detail-card">
+                                <span class="detail-name">O LEGADO</span>
+                                <p>Provou que IA pode ser usada para terror. O futuro do g&ecirc;nero &eacute; assustadoramente promissor. E perigoso.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="verity-warning">
+                    <p class="blink">⚠️ OS MODS S&Atilde;O FEITOS PELA COMUNIDADE, N&Atilde;O POR THATMOB ⚠️</p>
+                    <p>ThatMob pede que parem de solicitar um mod real. Instale apenas em mundo de teste.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 31 - SATURACAO DO GENERO -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-31" data-theme="saturation">
+            <div class="slide-bg saturation-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title">A <span class="highlight red">SATURA&Ccedil;&Atilde;O</span> DO G&Ecirc;NERO</h2>
+                <div class="saturation-layout">
+                    <div class="saturation-intro">
+                        <p>Com o sucesso do analog horror, alguns tropos se tornaram <span class="highlight red">clich&ecirc;s</span>. Vamos falar sobre eles!</p>
+                    </div>
+                    <div class="cliche-grid">
+                        <div class="cliche-card">
+                            <h3>🎮 ENTIDADE PRESA NO JOGO</h3>
+                            <p>"N&atilde;o jogue esse jogo, tem uma entidade presa nele!" Sonic.exe, BEN Drowned, GB.exe... todos usaram esse clich&ecirc;. Originalmente assustador, agora previs&iacute;vel.</p>
+                            <span class="cliche-tag">CLICH&Ecirc; N&deg;1</span>
+                        </div>
+                        <div class="cliche-card">
+                            <h3>🔤 CIFRA DE C&Eacute;SAR</h3>
+                            <p>Toda hora uma mensagem codificada. "Decifre essa cifra para descobrir a verdade!" Funciona uma vez, duas vezes... depois vira previs&iacute;vel.</p>
+                            <span class="cliche-tag">CLICH&Ecirc; N&deg;2</span>
+                        </div>
+                        <div class="cliche-card">
+                            <h3>📺 TRANSMISS&Atilde;O SEQUESTRADA</h3>
+                            <p>"Ei, voc&ecirc; est&aacute; assistindo [canal]. N&atilde;o deveria estar vendo isso." O tropo que define o g&ecirc;nero, mas que j&aacute; foi exagerado.</p>
+                            <span class="cliche-tag">CLICH&Ecirc; N&deg;3</span>
+                        </div>
+                        <div class="cliche-card">
+                            <h3>👁️ ROSTO DISTORCIDO</h3>
+                            <p>Todo alternate, toda entidade, todo monstro tem um rosto "levemente errado". &Eacute; assustador... at&eacute; voc&ecirc; ver o 50&ordm; rosto distorcido.</p>
+                            <span class="cliche-tag">CLICH&Ecirc; N&deg;4</span>
+                        </div>
+                        <div class="cliche-card">
+                            <h3>🌑 LUA MALVADA</h3>
+                            <p>Local 58 popularizou. Agora toda hora a Lua &eacute; suspeita. "N&atilde;o olhe para a Lua!" J&aacute; sabemos, Local 58. J&aacute; sabemos.</p>
+                            <span class="cliche-tag">CLICH&Ecirc; N&deg;5</span>
+                        </div>
+                        <div class="cliche-card">
+                            <h3>📹 FITA VHS CORROMPIDA</h3>
+                            <p>A fita sempre tem algo sinistro. Sempre tem aquele glitch no final. Sempre tem uma mensagem escondida. Sempre. Sem inova&ccedil;&atilde;o.</p>
+                            <span class="cliche-tag">CLICH&Ecirc; N&deg;6</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SLIDE 32 - LEGADO E FUTURO -->
+        <!-- ============================================ -->
+        <div class="slide" id="slide-32" data-theme="legacy">
+            <div class="slide-bg legacy-bg"></div>
+            <div class="slide-content">
+                <h2 class="section-title legacy-title">O <span class="highlight">LEGADO</span> E O FUTURO</h2>
+                <div class="legacy-layout">
+                    <div class="legacy-main">
+                        <div class="legacy-text">
+                            <h3>O QUE ANALOG HORROR NOS ENSINOU</h3>
+                            <p>O analog horror provou que o <span class="highlight">terror mais poderoso</span> n&atilde;o vem de sustos baratos, mas da <span class="highlight">imagina&ccedil;&atilde;o</span>. De transformar o <span class="highlight">familiar</span> em <span class="highlight">perturbador</span>.</p>
+                            <p>De uma simples creepypasta no 4chan, nasceu um <span class="highlight">g&ecirc;nero inteiro</span> que influencia filmes, jogos e s&eacute;ries de TV. De Kris Straub a Alex Kister, de Kane Pixels a Doctor Nowhere, cada criador contribuiu com uma pe&ccedil;a &uacute;nica nessa hist&oacute;ria.</p>
+                            <p>The Caretaker nos mostrou que o <span class="highlight">decay anal&oacute;gico</span> &eacute; universal. A dem&ecirc;ncia n&atilde;o distingue entre som e imagem. A perda &eacute; sempre a mesma. O terror da esquecimento.</p>
+                        </div>
+                        <div class="legacy-images">
+                            <img src="https://i.ytimg.com/vi/H4dGpz6cnHo/maxresdefault.jpg" alt="Backrooms" class="legacy-image">
+                            <img src="https://static.wikia.nocookie.net/analog-horror-0/images/f/fa/This_is_intruder_from_vol4.png/revision/latest?cb=20240412165500" alt="Mandela" class="legacy-image">
+                        </div>
+                    </div>
+                    <div class="legacy-footer">
+                        <div class="final-message">
+                            <p class="big-text">OBRIGADO POR ASSISTIR</p>
+                            <p class="small-text">Mas lembre: quando voc&ecirc; desligar a tela... eles ainda est&atilde;o l&aacute;.</p>
+                            <p class="glitch-text" data-text="MONITOR">MONITOR</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="ghost-text" data-ghost="N&Atilde;O DESLIGUE A TELA">.</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="nav-controls">
+        <button id="prev-btn" class="nav-btn">&blacktriangleleft;</button>
+        <button id="next-btn" class="nav-btn">&blacktriangleright;</button>
+    </div>
+
+    <div id="progress-bar">
+        <div id="progress-fill"></div>
+    </div>
+
+    <div id="music-player" class="music-player hidden">
+        <div id="yt-player-container"></div>
+        <div class="music-player-info">
+            <span class="music-player-icon">🎵</span>
+            <span id="music-player-title" class="music-player-title"></span>
+        </div>
+        <button id="music-player-stop" class="music-player-btn" title="Parar">&#9724;</button>
+    </div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="script.js"></script>
+</body>
+</html>
