@@ -14,8 +14,9 @@
             name: 'Jaqueta Leve',
             category: 'base',
             icon: '🧥',
-            price: 35,
-            link: 'https://www.amazon.com/s?k=lightweight+breathable+zip+jacket',
+            price: 89,
+            currency: 'R$',
+            link: 'https://shopee.com.br/search?keyword=jaqueta%20leve%20masculina%20moletom',
             desc: 'Jaqueta leve de tecido respirável (algodão/poli). Ideal para o calor e com bolsos internos discretos.',
             details: [
                 'Tecido respirável ideal pro calor',
@@ -28,8 +29,9 @@
             name: 'Camiseta Base',
             category: 'base',
             icon: '👕',
-            price: 15,
-            link: 'https://www.amazon.com/s?k=plain+tee+shirt+black',
+            price: 29,
+            currency: 'R$',
+            link: 'https://shopee.com.br/search?keyword=camiseta%20basica%20preta%20algodao',
             desc: 'Camiseta básica de algodão. Serve de segunda camada e esconde fios discretamente sob a jaqueta.',
             details: [
                 '100% algodão',
@@ -42,8 +44,9 @@
             name: 'Fone Intra-Auricular',
             category: 'comunicacao',
             icon: '🎧',
-            price: 45,
-            link: 'https://www.amazon.com/s?k=invisible+bluetooth+earbud',
+            price: 79,
+            currency: 'R$',
+            link: 'https://shopee.com.br/search?keyword=fone%20intra-auricular%20bluetooth%20discreto',
             desc: 'Micro fone intra-auricular translúcido. Fica praticamente invisível no ouvido e toca a IA só pra você.',
             details: [
                 'Som privado e claro',
@@ -56,8 +59,9 @@
             name: 'Microfone de Lapela',
             category: 'comunicacao',
             icon: '🎤',
-            price: 25,
-            link: 'https://www.amazon.com/s?k=hidden+clip+microphone',
+            price: 39,
+            currency: 'R$',
+            link: 'https://shopee.com.br/search?keyword=microfone%20lapela%20discreto',
             desc: 'Microfone minúsculo escondido no colarinho. Capta sua voz com qualidade enquanto parece apenas um botão.',
             details: [
                 'Qualidade de estúdio',
@@ -70,8 +74,9 @@
             name: 'Baralho de Cartas (Mágica)',
             category: 'magica',
             icon: '🃏',
-            price: 15,
-            link: 'https://www.amazon.com/s?k=magic+cards+professional',
+            price: 25,
+            currency: 'R$',
+            link: 'https://shopee.com.br/search?keyword=baralho%20magia%20profissional',
             desc: 'Baralho profissional para truques de sleight of hand. Guardado num bolso secreto da jaqueta.',
             details: [
                 'Truques clássicos',
@@ -84,8 +89,9 @@
             name: 'Máquina de Fumaça de Bolso',
             category: 'magica',
             icon: '💨',
-            price: 25,
-            link: 'https://www.amazon.com/s?k=pocket+smoke+machine',
+            price: 49,
+            currency: 'R$',
+            link: 'https://shopee.com.br/search?keyword=maquina%20fuma%C3%A7a%20mini%20de%20bolso',
             desc: 'Dispositivo de bolso que solta uma nuvem de fumaça. Perfeito para revelações e saídas dramáticas.',
             details: [
                 'Ativa no ato',
@@ -98,8 +104,9 @@
             name: 'Equipamento de Moeda Voadora',
             category: 'magica',
             icon: '🪙',
-            price: 10,
-            link: 'https://www.amazon.com/s?k=coin+magic+trick',
+            price: 19,
+            currency: 'R$',
+            link: 'https://shopee.com.br/search?keyword=moeda%20magica%20truque%20flutuar',
             desc: 'Gimmick de moeda que faz moedas aparecer, desaparecer e flutuar. Clássico impressionante.',
             details: [
                 'Aparece/desaparece',
@@ -112,8 +119,9 @@
             name: 'Gravador de Voz Escondido',
             category: 'extras',
             icon: '🎙️',
-            price: 25,
-            link: 'https://www.amazon.com/s?k=hidden+voice+recorder+pen+drive',
+            price: 45,
+            currency: 'R$',
+            link: 'https://shopee.com.br/search?keyword=gravador%20voz%20pen%20drive%20escondido',
             desc: 'Gravador em formato de pen drive escondido no bolso. Grava reuniões e conversas discretamente.',
             details: [
                 'Formato pen drive',
@@ -126,8 +134,9 @@
             name: 'Compartimentos Secretos',
             category: 'extras',
             icon: '🔒',
-            price: 15,
-            link: 'https://www.amazon.com/s?k=hidden+secret+pouch',
+            price: 29,
+            currency: 'R$',
+            link: 'https://shopee.com.br/search?keyword=pochete%20secreta%20escondida',
             desc: 'Bolsos invisíveis para dinheiro, documentos e chaves. Escondidos no forro da jaqueta.',
             details: [
                 'Escondidos no forro',
@@ -140,8 +149,9 @@
             name: 'GPS Rastreador',
             category: 'extras',
             icon: '📡',
-            price: 18,
-            link: 'https://www.amazon.com/s?k=small+gps+tracker',
+            price: 35,
+            currency: 'R$',
+            link: 'https://shopee.com.br/search?keyword=rastreador%20gps%20mini%20pequeno',
             desc: 'Rastreador GPS minúsculo escondido no forro. Saiba onde sua jaqueta está a qualquer momento.',
             details: [
                 'Rastreamento em tempo real',
@@ -154,8 +164,9 @@
             name: 'Vibrador de Alertas',
             category: 'extras',
             icon: '📳',
-            price: 15,
-            link: 'https://www.amazon.com/s?k=smart+wristband+vibration+alarm',
+            price: 29,
+            currency: 'R$',
+            link: 'https://shopee.com.br/search?keyword=pulseira%20vibra%C3%A7%C3%A3o%20alerta%20discreta',
             desc: 'Dispositivo de vibração escondido na manga. Receba notificações discretas sem olhar o celular.',
             details: [
                 'Alertas discretos',
@@ -194,35 +205,36 @@
     }
 
     function updatePrices() {
+        const fmt = (v) => 'R$ ' + v;
         const total = totalPrice();
         document.querySelectorAll('[data-price="total"], [data-price="sum"], [data-price="footer"]')
-            .forEach(el => el.textContent = '$' + total);
+            .forEach(el => el.textContent = fmt(total));
         document.querySelectorAll('[data-price="base"]')
-            .forEach(el => el.textContent = '$' + sumByCategory('base'));
+            .forEach(el => el.textContent = fmt(sumByCategory('base')));
         document.querySelectorAll('[data-price="comunicacao"]')
-            .forEach(el => el.textContent = '$' + sumByCategory('comunicacao'));
+            .forEach(el => el.textContent = fmt(sumByCategory('comunicacao')));
         document.querySelectorAll('[data-price="magica"]')
-            .forEach(el => el.textContent = '$' + sumByCategory('magica'));
+            .forEach(el => el.textContent = fmt(sumByCategory('magica')));
         document.querySelectorAll('[data-price="extras"]')
-            .forEach(el => el.textContent = '$' + sumByCategory('extras'));
+            .forEach(el => el.textContent = fmt(sumByCategory('extras')));
         document.querySelectorAll('[data-price="fone"]')
-            .forEach(el => el.textContent = '$' + (PIECES.find(p => p.name === 'Fone Intra-Auricular')?.price || 0));
+            .forEach(el => el.textContent = fmt(PIECES.find(p => p.name === 'Fone Intra-Auricular')?.price || 0));
         document.querySelectorAll('[data-price="mic"]')
-            .forEach(el => el.textContent = '$' + (PIECES.find(p => p.name === 'Microfone de Lapela')?.price || 0));
+            .forEach(el => el.textContent = fmt(PIECES.find(p => p.name === 'Microfone de Lapela')?.price || 0));
         document.querySelectorAll('[data-price="cartas"]')
-            .forEach(el => el.textContent = '$' + (PIECES.find(p => p.name === 'Baralho de Cartas (Mágica)')?.price || 0));
+            .forEach(el => el.textContent = fmt(PIECES.find(p => p.name === 'Baralho de Cartas (Mágica)')?.price || 0));
         document.querySelectorAll('[data-price="fumaca"]')
-            .forEach(el => el.textContent = '$' + (PIECES.find(p => p.name === 'Máquina de Fumaça de Bolso')?.price || 0));
+            .forEach(el => el.textContent = fmt(PIECES.find(p => p.name === 'Máquina de Fumaça de Bolso')?.price || 0));
         document.querySelectorAll('[data-price="moeda"]')
-            .forEach(el => el.textContent = '$' + (PIECES.find(p => p.name === 'Equipamento de Moeda Voadora')?.price || 0));
+            .forEach(el => el.textContent = fmt(PIECES.find(p => p.name === 'Equipamento de Moeda Voadora')?.price || 0));
         document.querySelectorAll('[data-price="gravador"]')
-            .forEach(el => el.textContent = '$' + (PIECES.find(p => p.name === 'Gravador de Voz Escondido')?.price || 0));
+            .forEach(el => el.textContent = fmt(PIECES.find(p => p.name === 'Gravador de Voz Escondido')?.price || 0));
         document.querySelectorAll('[data-price="compart"]')
-            .forEach(el => el.textContent = '$' + (PIECES.find(p => p.name === 'Compartimentos Secretos')?.price || 0));
+            .forEach(el => el.textContent = fmt(PIECES.find(p => p.name === 'Compartimentos Secretos')?.price || 0));
         document.querySelectorAll('[data-price="gps"]')
-            .forEach(el => el.textContent = '$' + (PIECES.find(p => p.name === 'GPS Rastreador')?.price || 0));
+            .forEach(el => el.textContent = fmt(PIECES.find(p => p.name === 'GPS Rastreador')?.price || 0));
         document.querySelectorAll('[data-price="vibra"]')
-            .forEach(el => el.textContent = '$' + (PIECES.find(p => p.name === 'Vibrador de Alertas')?.price || 0));
+            .forEach(el => el.textContent = fmt(PIECES.find(p => p.name === 'Vibrador de Alertas')?.price || 0));
     }
 
     // ============================================
@@ -239,8 +251,8 @@
                     ${p.details.map(d => `<li>✅ ${d}</li>`).join('')}
                 </ul>
                 <div class="feature-buy">
-                    <span class="feature-price">$${p.price}</span>
-                    <a href="${p.link}" target="_blank" rel="noopener" class="btn-buy">Comprar</a>
+                    <span class="feature-price">R$ ${p.price}</span>
+                    <a href="${p.link}" target="_blank" rel="noopener" class="btn-buy">Comprar na Shopee</a>
                 </div>
             </div>
         `).join('');
