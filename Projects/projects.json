@@ -64,6 +64,15 @@
             "date": "2026-07-26"
         },
         {
+            "name": "Agent Suit",
+            "description": "Um traje comum com tecnologias de agente escondidas — fone, microfone, truques de mágica, gravador e mais. Landing page interativa com preço por peça.",
+            "tags": ["Utility", "Experiment"],
+            "image": "Projects/Agent-Suit/thumb.png",
+            "url": "Projects/Agent-Suit/",
+            "color": "#7c5cff",
+            "date": "2026-09-04"
+        },
+        {
             "name": "Random Books",
             "description": "Each new tab opens a random classic book from Project Gutenberg — 133+ titles, beautiful reader UI, dark mode, and reading progress saved locally.",
             "tags": ["Reading", "Books", "Utility"],

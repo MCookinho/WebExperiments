@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Suit — O Traje do Agente</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- ===== HERO ===== -->
+    <section class="hero" id="hero">
+        <div class="hero-particles" id="hero-particles"></div>
+        <nav class="navbar">
+            <a href="#hero" class="logo">AGENT<span>SUIT</span></a>
+            <div class="nav-links">
+                <a href="#outfit">O Traje</a>
+                <a href="#comunicacao">Comunicação</a>
+                <a href="#magica">Magia</a>
+                <a href="#extras">Extras</a>
+                <a href="#pecas">Peças</a>
+            </div>
+        </nav>
+
+        <div class="hero-content">
+            <div class="hero-text">
+                <span class="hero-badge">Agente Secreto • Empreendedor • Mago</span>
+                <h1>Um traje comum.<br><span class="gradient-text">Tecnologias de agente.</span></h1>
+                <p class="hero-sub">
+                    Jaqueta leve, fone escondido, microfone no colarinho, truques de mágica no bolso.
+                    Tudo discreto, nada de chamar atenção. Parece que você só saiu pra passear.
+                </p>
+                <div class="hero-cta">
+                    <a href="#outfit" class="btn-primary">Conhecer o traje ↓</a>
+                    <div class="hero-price">
+                        <span class="price-label">Traje completo</span>
+                        <span class="price-value" data-price="total">$243</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-figure">
+                <div class="suit-figure">
+                    <div class="suit-head">
+                        <div class="suit-ear bud-left"></div>
+                        <div class="suit-ear bud-right"></div>
+                        <div class="suit-face"></div>
+                    </div>
+                    <div class="suit-body">
+                        <div class="suit-jacket">
+                            <div class="suit-pocket" data-tooltip="Cartas escondidas"></div>
+                            <div class="suit-pocket" data-tooltip="Microfone"></div>
+                            <div class="suit-pocket" data-tooltip="Gravador"></div>
+                            <div class="suit-zipper"></div>
+                        </div>
+                        <div class="suit-sleeve left"></div>
+                        <div class="suit-sleeve right"></div>
+                    </div>
+                    <div class="suit-legs">
+                        <div class="suit-leg"></div>
+                        <div class="suit-leg"></div>
+                    </div>
+                    <div class="suit-glow"></div>
+                    <div class="suit-magic-ring"></div>
+                </div>
+            </div>
+        </div>
+
+        <a href="#outfit" class="scroll-hint" aria-label="Rolar para baixo">
+            <span></span>
+        </a>
+    </section>
+
+    <!-- ===== O TRAJE ===== -->
+    <section class="section" id="outfit">
+        <div class="section-header reveal">
+            <span class="section-tag">Visão geral</span>
+            <h2>O Traje Completo</h2>
+            <p class="section-sub">Todas as peças e a soma total. Escolha o que funciona pra você.</p>
+        </div>
+
+        <div class="outfit-summary reveal">
+            <div class="outfit-stat">
+                <span class="stat-num">8</span>
+                <span class="stat-label">peças</span>
+            </div>
+            <div class="outfit-stat">
+                <span class="stat-num">6</span>
+                <span class="stat-label">funcionalidades</span>
+            </div>
+            <div class="outfit-stat">
+                <span class="stat-num price-num" data-price="sum">$243</span>
+                <span class="stat-label">custo total</span>
+            </div>
+            <div class="outfit-stat">
+                <span class="stat-num">100%</span>
+                <span class="stat-label">discreto</span>
+            </div>
+        </div>
+
+        <div class="outfit-grid">
+            <div class="outfit-card reveal" data-cat="base">
+                <div class="card-icon">🧥</div>
+                <h3>Base</h3>
+                <p>Jaqueta leve + camiseta. Tecido respirável, ideal pro calor.</p>
+                <span class="card-price" data-price="base">$50</span>
+            </div>
+            <div class="outfit-card reveal" data-cat="comunicacao">
+                <div class="card-icon">🎧</div>
+                <h3>Comunicação</h3>
+                <p>Fone intra-auricular + microfone no colarinho. Fala com a IA sem ninguém ver.</p>
+                <span class="card-price" data-price="comunicacao">$70</span>
+            </div>
+            <div class="outfit-card reveal" data-cat="magica">
+                <div class="card-icon">🎩</div>
+                <h3>Mágica</h3>
+                <p>Cartas, fumaça de bolso, moeda voadora. Truques a qualquer momento.</p>
+                <span class="card-price" data-price="magica">$50</span>
+            </div>
+            <div class="outfit-card reveal" data-cat="extras">
+                <div class="card-icon">🔍</div>
+                <h3>Extras</h3>
+                <p>Gravador, compartimentos secretos, GPS e vibração. O toque de agente.</p>
+                <span class="card-price" data-price="extras">$73</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== COMUNICAÇÃO ===== -->
+    <section class="section alt" id="comunicacao">
+        <div class="section-header reveal">
+            <span class="section-tag">Comunicação</span>
+            <h2>Fale com a IA sem ninguém saber</h2>
+            <p class="section-sub">Fone escondido + microfone discreto. Assistentes, informações, ou só dublar sua voz no meio da multidão.</p>
+        </div>
+
+        <div class="feature-row reveal">
+            <div class="feature-visual">
+                <div class="head-circle">
+                    <div class="earphone"></div>
+                    <div class="earphone"></div>
+                </div>
+                <div class="soundwave"></div>
+            </div>
+            <div class="feature-text">
+                <h3>Fone Intra-Auricular</h3>
+                <p>Micro fone de ouvido translúcido que fica praticamente invisível. Som claro, privado. Você ouve a IA — ninguém mais.</p>
+                <ul class="feature-list">
+                    <li>🔇 Som privado (ninguém ouve)</li>
+                    <li>🫣 Fica escondido no ouvido</li>
+                    <li>📱 Conecta ao celular por bluetooth</li>
+                    <li>🔋 Bateria de longa duração</li>
+                </ul>
+                <div class="feature-buy">
+                    <span class="feature-price" data-price="fone">$45</span>
+                    <a href="https://www.amazon.com/s?k=invisible+bluetooth+earbud" target="_blank" rel="noopener" class="btn-buy">Comprar</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-row reverse reveal">
+            <div class="feature-visual">
+                <div class="collar-visual">
+                    <div class="collar-light"></div>
+                </div>
+            </div>
+            <div class="feature-text">
+                <h3>Microfone de Lapela</h3>
+                <p>Minúsculo microfone discreto escondido no colarinho da jaqueta. Capta sua voz com clareza enquanto parece só um botão.</p>
+                <ul class="feature-list">
+                    <li>🎤 Qualidade de estúdio</li>
+                    <li>🧵 Escondido no tecido</li>
+                    <li>📱 Compatível com qualquer app</li>
+                    <li>🌬️ Redução de ruído</li>
+                </ul>
+                <div class="feature-buy">
+                    <span class="feature-price" data-price="mic">$25</span>
+                    <a href="https://www.amazon.com/s?k=hidden+clip+microphone" target="_blank" rel="noopener" class="btn-buy">Comprar</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== MÁGICA ===== -->
+    <section class="section" id="magica">
+        <div class="section-header reveal">
+            <span class="section-tag">Mágica</span>
+            <h2>Magic tricks de bolso</h2>
+            <p class="section-sub">Transforme o traje em um palco. Apareça uma carta, espalhe fumaça, faça uma moeda voar. Impressione sem preparação.</p>
+        </div>
+
+        <div class="magic-grid">
+            <div class="magic-card reveal">
+                <div class="magic-visual cards">
+                    <div class="card flying-1">♠</div>
+                    <div class="card flying-2">♥</div>
+                    <div class="card flying-3">♦</div>
+                </div>
+                <h3>Cartas</h3>
+                <p>Baralho profissional escondido no bolso. Truques clássicos, sleight of hand.</p>
+                <div class="feature-buy">
+                    <span class="feature-price" data-price="cartas">$15</span>
+                    <a href="https://www.amazon.com/s?k=magic+cards+professional" target="_blank" rel="noopener" class="btn-buy">Comprar</a>
+                </div>
+            </div>
+
+            <div class="magic-card reveal delay-1">
+                <div class="magic-visual smoke">
+                    <div class="smoke-cloud"></div>
+                </div>
+                <h3>Máquina de Fumaça</h3>
+                <p>Dispositivo de bolso que solta uma nuvem de fumaça no ato. Perfeito para saídas dramáticas ou revelações.</p>
+                <div class="feature-buy">
+                    <span class="feature-price" data-price="fumaca">$25</span>
+                    <a href="https://www.amazon.com/s?k=pocket+smoke+machine" target="_blank" rel="noopener" class="btn-buy">Comprar</a>
+                </div>
+            </div>
+
+            <div class="magic-card reveal delay-2">
+                <div class="magic-visual coin">
+                    <div class="coin" data-coin></div>
+                </div>
+                <h3>Moeda Voadora</h3>
+                <p>Equipamento de moeda que faz uma moeda aparecer, desaparecer e flutuar. Clássico que sempre impressiona.</p>
+                <div class="feature-buy">
+                    <span class="feature-price" data-price="moeda">$10</span>
+                    <a href="https://www.amazon.com/s?k=coin+magic+trick" target="_blank" rel="noopener" class="btn-buy">Comprar</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== EXTRAS ===== -->
+    <section class="section alt" id="extras">
+        <div class="section-header reveal">
+            <span class="section-tag">Extras</span>
+            <h2>O toque de agente</h2>
+            <p class="section-sub">Funcionalidades que fazem o traje parecer do James Bond, mas sem ninguém perceber.</p>
+        </div>
+
+        <div class="extras-grid">
+            <div class="extra-item reveal">
+                <div class="extra-icon">🎙️</div>
+                <h3>Gravador escondido</h3>
+                <p>Gravador de voz em formato de pen drive, escondido no bolso. Grava reuniões e conversas discretamente.</p>
+                <div class="feature-buy">
+                    <span class="feature-price" data-price="gravador">$25</span>
+                    <a href="https://www.amazon.com/s?k=hidden+voice+recorder+pen+drive" target="_blank" rel="noopener" class="btn-buy">Comprar</a>
+                </div>
+            </div>
+
+            <div class="extra-item reveal delay-1">
+                <div class="extra-icon">🔒</div>
+                <h3>Compartimentos secretos</h3>
+                <p>Bolsos invisíveis para dinheiro, documentos e chaves. Escondidos no forro da jaqueta.</p>
+                <div class="feature-buy">
+                    <span class="feature-price" data-price="compart">$15</span>
+                    <a href="https://www.amazon.com/s?k=hidden+secret+pouch" target="_blank" rel="noopener" class="btn-buy">Comprar</a>
+                </div>
+            </div>
+
+            <div class="extra-item reveal delay-2">
+                <div class="extra-icon">📡</div>
+                <h3>GPS rastreador</h3>
+                <p>Pequeno rastreador GPS escondido no forro. Saiba onde sua jaqueta/mochila está a qualquer momento.</p>
+                <div class="feature-buy">
+                    <span class="feature-price" data-price="gps">$18</span>
+                    <a href="https://www.amazon.com/s?k=small+gps+tracker" target="_blank" rel="noopener" class="btn-buy">Comprar</a>
+                </div>
+            </div>
+
+            <div class="extra-item reveal delay-3">
+                <div class="extra-icon">📳</div>
+                <h3>Vibração p/ alertas</h3>
+                <p>Vibrador discreto escondido na manga. Receba notificações discretas do celular sem olhar a tela.</p>
+                <div class="feature-buy">
+                    <span class="feature-price" data-price="vibra">$15</span>
+                    <a href="https://www.amazon.com/s?k=smart+wristband+vibration+alarm" target="_blank" rel="noopener" class="btn-buy">Comprar</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== TODAS AS PEÇAS ===== -->
+    <section class="section" id="pecas">
+        <div class="section-header reveal">
+            <span class="section-tag">Catálogo</span>
+            <h2>Todas as Peças</h2>
+            <p class="section-sub">Cada peça com detalhes, preço e link de compra.</p>
+        </div>
+
+        <div class="catalog" id="catalog">
+            <!-- Populated by JS -->
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-logo">AGENT<span>SUIT</span></div>
+            <p class="footer-note">Projeto conceitual. Preços aproximados e links de exemplo do mercado.</p>
+            <p class="footer-price">Total do traje: <strong data-price="footer">$243</strong></p>
+        </div>
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
