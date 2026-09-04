@@ -120,7 +120,7 @@
     }
 
     // ============================================
-    // FETCH & PARSE BOOK
+    // FETCH BOOK FROM LOCAL JSON
     // ============================================
     async function pickAndLoadRandomBook() {
         const book = pickRandomBook();
@@ -131,20 +131,15 @@
         showLoading('Loading "' + book.title + '"...');
         currentBook = book;
 
-        const cacheKey = 'lr_cache_' + book.id;
-        let text;
         try {
-            text = localStorage.getItem(cacheKey);
-            if (!text) {
-                text = await fetchGutenbergText(book.id);
-                try { localStorage.setItem(cacheKey, text); } catch (e) { /* quota exceeded, ignore */ }
-            }
+            const resp = await fetch(`books/${book.id}.json`);
+            if (!resp.ok) throw new Error('Book file not found');
+            const data = await resp.json();
+            chapters = data.chapters;
         } catch (e) {
-            showError('Could not download book. Check your connection.');
+            showError('Could not load book.');
             return;
         }
-
-        chapters = parseChapters(text);
         markAsRead(book.id);
 
         topbarTitle.textContent = book.title;
@@ -168,110 +163,6 @@
                 bookScroll.scrollTop = saved.scroll * bookScroll.scrollHeight;
             });
         }
-    }
-
-    async function fetchGutenbergText(id) {
-        const url = `https://www.gutenberg.org/cache/epub/${id}/pg${id}.txt`;
-        const resp = await fetch(url);
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        return await resp.text();
-    }
-
-    // ============================================
-    // CHAPTER PARSING
-    // ============================================
-    function parseChapters(text) {
-        // Strip Gutenberg header/footer
-        const startMarkers = [
-            /\*\*\* START OF (THE|THIS) PROJECT GUTENBERG/,
-            /\*\*\*START OF (THE|THIS) PROJECT GUTENBERG/,
-            /End of the Project Gutenberg/,
-            /End of Project Gutenberg/
-        ];
-        const endMarkers = [
-            /\*\*\* END OF (THE|THIS) PROJECT GUTENBERG/,
-            /\*\*\*END OF (THE|THIS) PROJECT GUTENBERG/,
-            /End of the Project Gutenberg/,
-            /End of Project Gutenberg/,
-            /END OF THE PROJECT GUTENBERG EBOOK/,
-            /END OF PROJECT GUTENBERG/
-        ];
-
-        let body = text;
-        let startIdx = -1;
-        let endIdx = text.length;
-
-        for (const m of startMarkers) {
-            const match = text.match(m);
-            if (match) {
-                startIdx = text.indexOf(match[0]) + match[0].length;
-                break;
-            }
-        }
-
-        for (const m of endMarkers) {
-            const match = text.match(m);
-            if (match) {
-                endIdx = text.indexOf(match[0]);
-                break;
-            }
-        }
-
-        if (startIdx > 0) body = text.substring(startIdx, endIdx);
-        else body = text.substring(0, endIdx);
-
-        // Try to split by chapter headings
-        const lines = body.split('\n');
-        const chapterPatterns = [
-            /^(?:CHAPTER|Chapter)\s+[IVXLCDM\d]+/m,
-            /^(?:CHAPTER|Chapter)\s+\d+/m,
-            /^(?:PART|Part)\s+[IVXLCDM\d]+/m,
-            /^(?:BOOK|Book)\s+[IVXLCDM\d]+/m
-        ];
-
-        let splitChar = '\n';
-        let bestPattern = null;
-        let bestCount = 0;
-
-        for (const pat of chapterPatterns) {
-            const count = lines.filter(l => pat.test(l.trim())).length;
-            if (count > bestCount) {
-                bestCount = count;
-                bestPattern = pat;
-            }
-        }
-
-        if (bestCount >= 2) {
-            // Rejoin and split by the pattern
-            const fullText = lines.join('\n');
-            const parts = fullText.split(new RegExp(`(?=${bestPattern.source})`, 'm'));
-            return parts
-                .map(p => p.trim())
-                .filter(p => p.length > 100)
-                .map((p, i) => {
-                    const firstLine = p.split('\n')[0].trim();
-                    return { title: firstLine.substring(0, 120) || `Section ${i + 1}`, content: p };
-                });
-        }
-
-        // Fallback: split into ~3000 char chunks
-        const chunkSize = 3000;
-        const chunks = [];
-        for (let i = 0; i < body.length; i += chunkSize) {
-            let end = i + chunkSize;
-            if (end < body.length) {
-                const lastNewline = body.lastIndexOf('\n', end);
-                if (lastNewline > i + chunkSize * 0.5) end = lastNewline;
-            }
-            const chunk = body.substring(i, end).trim();
-            if (chunk.length > 50) {
-                chunks.push({
-                    title: `Part ${chunks.length + 1}`,
-                    content: chunk
-                });
-            }
-        }
-        return chunks.length > 0 ? chunks : [{ title: 'Content', content: body.trim() }];
     }
 
     // ============================================
