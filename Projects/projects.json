@@ -62,6 +62,15 @@
             "url": "Projects/noite-slides/",
             "color": "#ff00ff",
             "date": "2026-07-26"
+        },
+        {
+            "name": "Random Books",
+            "description": "Each new tab opens a random classic book from Project Gutenberg — 133+ titles, beautiful reader UI, dark mode, and reading progress saved locally.",
+            "tags": ["Reading", "Books", "Utility"],
+            "image": "",
+            "url": "Projects/Random-Books/",
+            "color": "#8b4513",
+            "date": "2026-09-04"
         }
     ]
 }
